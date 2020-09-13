@@ -27,4 +27,4 @@ Click File->Import, select Git->Projects from Git (with smart import) and select
 
 ## Upload 
 
-For now since we're prototyping on a Teensy 3.6 and can't use an external programmer we're using a Teensyduino to upload the HEX file. Note that once the flight computer PCB is completed we'll be able to upload directly. To upload using this method follow [this guide](images/1-Teensy-Upload.md). 
+For now since we're prototyping on a Teensy 3.6 and can't use an external programmer we're using a Teensyduino to upload the HEX file. Note that once the flight computer PCB is completed we'll be able to upload directly. To upload using this method follow [this guide](doc/1-Teensy-Upload.md). 
