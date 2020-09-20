@@ -28,3 +28,10 @@ Click File->Import, select Git->Projects from Git (with smart import) and select
 ## Upload 
 
 For now since we're prototyping on a Teensy 3.6 and can't use an external programmer we're using a Teensyduino to upload the HEX file. Note that once the flight computer PCB is completed we'll be able to upload directly. To upload using this method follow [this guide](doc/1-Teensy-Upload.md). 
+
+## Project Documentation
+
+All documentation are currently kept in the /doc folder. 
+
+1. Uploading to Teensy [guide](doc/1-Teensy-Upload.md).
+2. freeRTOS installation and usage [guide](doc/2-RTOS-basics.md).
