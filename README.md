@@ -34,4 +34,4 @@ For now since we're prototyping on a Teensy 3.6 and can't use an external progra
 All documentation are currently kept in the /doc folder. 
 
 1. Uploading to Teensy [guide](doc/1-Teensy-Upload.md).
-2. freeRTOS installation and usage [guide](doc/2-RTOS-basics.md).
+2. freeRTOS installation and usage [guide](doc/2-RTOS-Basics.md).
