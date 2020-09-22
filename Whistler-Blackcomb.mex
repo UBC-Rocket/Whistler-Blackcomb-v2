@@ -24,6 +24,8 @@
             <processor_version>8.0.1</processor_version>
             <pin_labels>
                <pin_label pin_num="110" pin_signal="PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2" label="LED_RGBBUILTIN" identifier="LED_BUILTIN"/>
+               <pin_label pin_num="95" pin_signal="TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0" label="DEBUG_UART_RX" identifier="DEBUG_UART_RX"/>
+               <pin_label pin_num="96" pin_signal="TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1" label="DEBUG_UART_TX" identifier="DEBUG_UART_TX"/>
             </pin_labels>
          </pins_profile>
          <functions_list>
@@ -35,6 +37,11 @@
                   <enableClock>true</enableClock>
                </options>
                <dependencies>
+                  <dependency resourceType="Peripheral" resourceId="UART0" description="Peripheral UART0 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
                      <feature name="enabled" evaluation="equal" configuration="core0">
                         <data>true</data>
@@ -57,6 +64,8 @@
                         <pin_feature name="direction" value="OUTPUT"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="UART0" signal="RX" pin_num="95" pin_signal="TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0"/>
+                  <pin peripheral="UART0" signal="TX" pin_num="96" pin_signal="TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1"/>
                </pins>
             </function>
          </functions_list>
