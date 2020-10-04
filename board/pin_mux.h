@@ -26,6 +26,7 @@ extern "C" {
 void BOARD_InitBootPins(void);
 
 #define SOPT5_UART0TXSRC_UART_TX 0x00u /*!<@brief UART 0 transmit data source select: UART0_TX pin */
+#define SOPT5_UART1TXSRC_UART_TX 0x00u /*!<@brief UART 1 transmit data source select: UART1_TX pin */
 
 /*! @name PORTC5 (number 110), LED_RGBBUILTIN
   @{ */
@@ -57,6 +58,24 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_DEBUG_UART_TX_PIN 17U                   /*!<@brief PORT pin number */
 #define BOARD_INITPINS_DEBUG_UART_TX_PIN_MASK (1U << 17U)      /*!<@brief PORT pin mask */
                                                                /* @} */
+
+/*! @name PORTC3 (number 106), IMU_UART_TX
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_IMU_UART_TX_PORT PORTC               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_IMU_UART_TX_PIN 3U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_IMU_UART_TX_PIN_MASK (1U << 3U)      /*!<@brief PORT pin mask */
+                                                            /* @} */
+
+/*! @name PORTC4 (number 109), IMU_UART_RX
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_IMU_UART_RX_PORT PORTC               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_IMU_UART_RX_PIN 4U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_IMU_UART_RX_PIN_MASK (1U << 4U)      /*!<@brief PORT pin mask */
+                                                            /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
