@@ -209,7 +209,9 @@ static void read_imu_task(void *pvParameters)
         {
             /*****************************************************************************/
         	//Parse datagram here
-
+			double data[13];
+			unsigned char statusBytes[3];
+			interpretImuData(imu_datagram, 0x93, data, statusBytes);
 
         	/*****************************************************************************/
             UART_RTOS_Send(&handle_debug, (uint8_t *)imu_datagram, n);
