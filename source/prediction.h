@@ -5,7 +5,7 @@
 #include <math.h>
 
 #else
-//#include <Arduino.h>
+
 #include <math.h>
 
 #endif
@@ -14,15 +14,15 @@
 
 // Quaternion struct definition
 typedef struct quaternions {
-    float q0;
-    float q1;
-    float q2;
-    float q3;
+    double re;
+    double i;
+    double j;
+    double k;
 } quaternion;
 
-void printMat(float mat[][MATRIX_SIZE]);
+void printMat(double mat[][MATRIX_SIZE]);
 
-void printVec(float vec[], int size);
+void printVec(double vec[], int size);
 
 void printQuaternion(quaternion q);
 
@@ -34,35 +34,35 @@ quaternion qNorm(quaternion q);
 
 quaternion qConjugate(quaternion q);
 
-quaternion getOrientationOrder1(float deltaT, quaternion qPrev, float gx, float gy, float gz);
+quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx, double gy, double gz);
 
-quaternion getOrientation(float deltaT, quaternion qPrev, float gx, float gy, float gz);
+quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy, double gz);
 
-void matMult(float mat1[][MATRIX_SIZE], float mat2[][MATRIX_SIZE], float result[][MATRIX_SIZE]);
+void matMult(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE], double result[][MATRIX_SIZE]);
 
-void transpose(float mat[][MATRIX_SIZE]);
+void transpose(double mat[][MATRIX_SIZE]);
 
-void matVecMult(float mat[][MATRIX_SIZE], float vec[], float result[]);
+void matVecMult(double mat[][MATRIX_SIZE], double vec[], double result[]);
 
-void scalMult(float vec[], float scal, float result[]);
+void scalMult(double vec[], double scal, double result[]);
 
-void addMat(float mat1[][MATRIX_SIZE], float mat2[][MATRIX_SIZE], float result[][MATRIX_SIZE]);
+void addMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE], double result[][MATRIX_SIZE]);
 
-void addVec(float vec1[], float vec2[], float result[]);
+void addVec(double vec1[], double vec2[], double result[]);
 
-void subtractMat(float mat1[][MATRIX_SIZE], float mat2[][MATRIX_SIZE], float result[][MATRIX_SIZE]);
+void subtractMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE], double result[][MATRIX_SIZE]);
 
-void subtractVec(float vec1[], float vec2[], float result[]);
+void subtractVec(double vec1[], double vec2[], double result[]);
 
-void getCofactor(float A[][MATRIX_SIZE], float temp[][MATRIX_SIZE], int p, int q, int n);
+void getCofactor(double A[][MATRIX_SIZE], double temp[][MATRIX_SIZE], int p, int q, int n);
 
-float determinant(float A[][MATRIX_SIZE], int n);
+double determinant(double A[][MATRIX_SIZE], int n);
 
-void adjoint(float A[][MATRIX_SIZE],float adj[][MATRIX_SIZE]);
+void adjoint(double A[][MATRIX_SIZE],double adj[][MATRIX_SIZE]);
 
-int inverse(float A[][MATRIX_SIZE], float inverse[][MATRIX_SIZE]);
+int inverse(double A[][MATRIX_SIZE], double inverse[][MATRIX_SIZE]);
 
-void predictFilter(float deltaT, float position[], float velocity[], float acceleration[], float stateCovariance[][2][2], float processCovariance[2][2]);
+void predictFilter(double deltaT, double position[], double velocity[], double acceleration[], double stateCovariance[][2][2], double processCovariance[2][2]);
 
-void updateFilter(float position[], float velocity[], float gpsPos[], float gpsVel[], float stateCovariance[][2][2], float observationCovariance[2][2]);
+void updateFilter(double position[], double velocity[], double gpsPos[], double gpsVel[], double stateCovariance[][2][2], double observationCovariance[2][2]);
 
