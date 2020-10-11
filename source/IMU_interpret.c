@@ -1,4 +1,4 @@
-#include IMU_interpret.h
+#include "IMU_interpret.h"
 
 int to_2C(int value) {
 	const int MODULO = 1 << 24;
@@ -18,12 +18,12 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 	int statusCount = 0;
 
 	//we'll use this to see if any of the status bytes are in non-OK states
-	bool statusFlag = false;
+	int statusFlag = 0;
 
 	//quick check to make sure the identifier from the packet = identifier it expects.
 	if (datagram[datagramCount] != identifier) {
 		//return error 
-		return ID_MISMATCH;
+		return DATAGRAM_PARSE_ID_MISMATCH;
 	}
 
 	datagramCount += 1; // move 1 byte forward in the datagram
@@ -39,7 +39,7 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 
 	//status byte output and engage flag
 	if (datagram[datagramCount] != 0) {
-		statusFlag = true;
+		statusFlag = 1;
 	}
 	statusBytes[statusCount] = datagram[datagramCount];
 	statusCount++;
@@ -60,7 +60,7 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 
 		//status byte output and engage flag
 		if (datagram[datagramCount] != 0) {
-			statusFlag = true;
+			statusFlag = 1;
 		}
 		statusBytes[statusCount] = datagram[datagramCount];
 		statusCount++;
@@ -81,7 +81,7 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 		dataOutCount += 3;
 		//status byte output and engage flag
 		if (datagram[datagramCount] != 0) {
-			statusFlag = true;
+			statusFlag = 1;
 		}
 		statusBytes[statusCount] = datagram[datagramCount];
 		statusCount++;
@@ -101,7 +101,7 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 			dataOutCount += 3;
 			//status byte output and engage flag
 			if (datagram[datagramCount] != 0) {
-				statusFlag = true;
+				statusFlag = 1;
 			}
 			statusBytes[statusCount] = datagram[datagramCount];
 			statusCount++;
@@ -121,7 +121,7 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 
 		//status byte output and engage flag
 		if (datagram[datagramCount] != 0) {
-			statusFlag = true;
+			statusFlag = 1;
 		}
 		statusBytes[statusCount] = datagram[datagramCount];
 		statusCount++;
@@ -145,13 +145,13 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 	datagramCount += 3;
 
 	//evaluate if any of the status bytes triggered the flag
-	if (statusFlag = true) {
+	if (statusFlag) {
 		//one or more of the status bytes had some kin
-		return ANY_STATUS_BYTE_NOT_OK;
+		return DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK;
 	}
 	else {
 		//if it made it to this point, as far as the program knows the packet was successfully interpereated with no status byte issues
-		return SUCCESS;
+		return DATAGRAM_PARSE_SUCCESS;
 	}
 
 }

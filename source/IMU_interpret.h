@@ -1,16 +1,11 @@
-//so that VS doesn't throw a fit about some of the i/o functios
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <math.h>
 #include <stdio.h>
-#include <stdbool.h>
 
-//defining some error/success codes
-#define SUCCESS						0
-#define ID_MISMATCH					1
-#define ANY_STATUS_BYTE_NOT_OK		2
+// Error/success codes
+#define DATAGRAM_PARSE_SUCCESS						0
+#define DATAGRAM_PARSE_ID_MISMATCH					1
+#define DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK		2
 
-int to_2C(int value);
 
+// InterpretImuData takes a single datagram and interprets into usable double precision values, stored in whatever is passed to dataout[]
 int interpretImuData(unsigned char datagram[], int identifier, double dataout[], unsigned char statusBytes[]);
-//interpretImuData takes a single datagram and interperates into usabe double prescision values, stored in whatever is passed to dataout[]

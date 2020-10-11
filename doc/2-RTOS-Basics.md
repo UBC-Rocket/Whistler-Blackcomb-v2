@@ -1,4 +1,6 @@
-# RTOS Installation
+# RTOS basics
+
+## RTOS Installation
 
 To set up a new project with RTOS built-in, follow [this guide](https://community.nxp.com/t5/Kinetis-Software-Development-Kit/How-to-create-an-FreeRTOS-project-with-MCUXpresso-IDE/ta-p/1107710)
 
@@ -14,7 +16,7 @@ Next, check the FreeRTOS box under Operating System tab. Also check "import othe
 
 
 
-# freeRTOS usage
+## freeRTOS usage
 
 Include relevant headers.
 
@@ -52,3 +54,13 @@ vTaskStartScheduler(); //start running tasks
 ```
 
 Read more at the freeRTOS API documentation [here](https://www.freertos.org/a00106.html).
+
+## Misc. RTOS Notes
+* Do not dynamically allocate memory/arrays inside tasks
+  * This will mess with execution flow and cause tasks to fail
+  * If you really need to there are special functions to do so
+  * For example, **do not** do either of the following inside the task: 
+```C
+int arr[20];
+int* arr = (int*) malloc(20 * sizeof(int));
+```
