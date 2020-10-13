@@ -39,14 +39,14 @@
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-//Constants
+/* Constants */
 #define PI acos(-1)
 
-// Blink
+/* Blink */
 #define BOARD_LED_GPIO     BOARD_LED_BUILTIN_GPIO
 #define BOARD_LED_GPIO_PIN BOARD_INITPINS_LED_BUILTIN_PIN
 
-// Timer
+/* Timer */
 #define STARTUP_LPTMR_BASE   LPTMR0
 #define STARTUP_LPTMR_IRQn   LPTMR0_IRQn
 #define LPTMR_LED_HANDLER LPTMR0_IRQHandler
@@ -55,13 +55,13 @@
 /* Define LPTMR microseconds counts value */
 #define LPTMR_USEC_COUNT 1000000U
 
-// FreeRTOS UART Debug
+/* FreeRTOS UART Debug */
 #define DEBUG_UART            UART1
 #define DEBUG_UART_CLKSRC     SYS_CLK
 #define DEBUG_UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
 #define DEBUG_UART_RX_TX_IRQn UART1_RX_TX_IRQn
 
-// FreeRTOS UART IMU
+/* FreeRTOS UART IMU */
 #define IMU_UART            UART0
 #define IMU_UART_CLKSRC     SYS_CLK
 #define IMU_UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
@@ -75,7 +75,7 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static void read_imu_task(void *pvParameters);
+static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
 
 /*******************************************************************************
@@ -114,28 +114,9 @@ uart_rtos_config_t imu_uart_config = {
  * Positioning Variables
  ******************************************************************************/
 
-int imu_read_count = 0;
-unsigned long imu_last_time;
-
-quaternion orientation;
-quaternion acceleration;
-
-float gravityAccel[3];
-float vecOrientation[] = {0, 0, 1};
-float position[] = {0, 0, 0};
-float velocity[] = {0, 0, 0};
-float accel[] = {0, 0, 0};
-
-// Dummy covariance matrices for now since these are yet to be determined
-float stateCovariance[][2][2] = {{{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}};
-float processCovariance[2][2] = {{0, 0}, {0, 0}};
-
-uint32_t currentCounter = 0U;
-lptmr_config_t lptmrConfig;
-
-uint8_t imu_datagram[40];
-double parsed_imu_data[13];
-unsigned char statusBytes[3];
+double position[] = {0, 0, 0};
+double velocity[] = {0, 0, 0};
+double accel[] = {0, 0, 0};
 
 /*******************************************************************************
  * Main
@@ -150,6 +131,7 @@ int main(void) {
     BOARD_InitBootPeripherals();
 
     /* Configure LPTMR */
+    lptmr_config_t lptmrConfig;
     LPTMR_GetDefaultConfig(&lptmrConfig);
 	/* Initialize the LPTMR */
 	LPTMR_Init(STARTUP_LPTMR_BASE, &lptmrConfig);
@@ -164,7 +146,7 @@ int main(void) {
     /* Copy the following to create a new task */
     if (xTaskCreate(  /* create task */
 			BlinkTask,  /* pointer to the task */
-			"App", /* task name for kernel awareness debugging */
+			"Blink Task", /* task name for kernel awareness debugging */
 			200/sizeof(StackType_t), /* task stack size */
 			(void*)NULL, /* optional task startup argument */
 			tskIDLE_PRIORITY+2,  /* initial priority */
@@ -174,8 +156,8 @@ int main(void) {
     }
 
     if (xTaskCreate(
-    		read_imu_task,
-			"Uart_task",
+    		ReadImuTask,
+			"UART Task",
 			configMINIMAL_STACK_SIZE + 100,
 			NULL,
 			debug_uart_task_PRIORITY,
@@ -198,33 +180,52 @@ int main(void) {
  */
 static void BlinkTask(void *pv) {
     while (1){
-   	 GPIO_PortToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
-   	 // Very important: Don't use normal delays in RTOS tasks, things will break
-   	 vTaskDelay(pdMS_TO_TICKS(1000));
+		GPIO_PortToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
+		// Very important: Don't use normal delays in RTOS tasks, things will break
+		vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 /*!
- * @brief Task responsible for UART read and write
- * Note: was taken from freertos_uart example
+ * @brief Task responsible for IMU UART read and parse
+ * Note: much of this was based from freertos_uart example
  */
-static void read_imu_task(void *pvParameters)
+static void ReadImuTask(void *pv)
 {
     int uart_error;
     size_t n = 0;
 
     int parse_error;
 
-	orientation.re = 1;
-	orientation.i = 0;
-	orientation.j = 0;
-	orientation.k = 0;
+	/* TODO: change sizes to match IMU config automatically */
+	uint8_t * imu_datagram = (uint8_t*) pvPortMalloc(100 * sizeof(uint8_t));
+	double * parsed_imu_data = (double*) pvPortMalloc(13 * sizeof(double));
+	unsigned char * statusBytes = (unsigned char*) pvPortMalloc(3 * sizeof(unsigned char));
+
+	quaternion orientation = qUnit();;
+	quaternion acceleration;
+
+	double * gravityAccel = (double*) pvPortMalloc(3 * sizeof(double));
+	double * vecOrientation = (double*) pvPortMalloc(3 * sizeof(double));
+
+	// Dummy covariance matrices for now since these are yet to be determined
+//	double stateCovariance[][2][2] = {{{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}};
+//	double processCovariance[2][2] = {{0, 0}, {0, 0}};
+
+	double * stateCovariance = (double*) pvPortMalloc(3 * 2 * 2 * sizeof(double));
+	double * processCovariance = (double*) pvPortMalloc(2 * 2 * sizeof(double));
+
+	vecOrientation[0] = 0;
+	vecOrientation[1] = 0;
+	vecOrientation[2] = 1;
 
     debug_uart_config.srcclk = DEBUG_UART_CLK_FREQ;
     debug_uart_config.base   = DEBUG_UART;
 
     imu_uart_config.srcclk = IMU_UART_CLK_FREQ;
 	imu_uart_config.base   = IMU_UART;
+
+	unsigned long imu_last_time = 0;
 
 	/* Initialize UART interfaces. */
     if (kStatus_Success != UART_RTOS_Init(&handle_debug, &t_handle_debug, &debug_uart_config))
@@ -246,7 +247,7 @@ static void read_imu_task(void *pvParameters)
     /* Receive input from imu and parse it. */
     do
     {
-        uart_error = UART_RTOS_Receive(&handle_imu, imu_datagram, sizeof(imu_datagram), &n);
+        uart_error = UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
         if (uart_error == kStatus_UART_RxHardwareOverrun)
         {
             /* Notify about hardware buffer overrun */

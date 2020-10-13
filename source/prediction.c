@@ -25,6 +25,16 @@ void printQuaternion(quaternion q){
 }
 #endif
 
+// Unit quaternion
+quaternion qUnit(){
+	quaternion ret;
+	ret.re = 1;
+	ret.i = 0;
+	ret.j = 0;
+	ret.k = 0;
+	return ret;
+}
+
 // Quaternion multiplication
 quaternion qMult(quaternion qA, quaternion qB){
     quaternion qC;

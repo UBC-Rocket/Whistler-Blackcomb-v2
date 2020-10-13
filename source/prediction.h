@@ -26,6 +26,8 @@ void printVec(double vec[], int size);
 
 void printQuaternion(quaternion q);
 
+quaternion qUnit();
+
 quaternion qMult(quaternion qA, quaternion qB);
 
 quaternion qSum(quaternion qA, quaternion qB);
