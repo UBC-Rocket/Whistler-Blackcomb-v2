@@ -6,7 +6,7 @@ Since the Teensy bootloader chip interferes with an external programmer during r
 
 ### Windows
 
-In the project structure, got to [tools](../tools) and open [teensy.exe](tools/teensy.exe). If it doesn't work Linux option below can also be used for Windows, this is just a bit easier. 
+In the project structure, got to [tools](../tools) and open [teensy.exe](../tools/teensy.exe). If it doesn't work Linux option below can also be used for Windows, this is just a bit easier. 
 
 ### Linux
 
