@@ -13,10 +13,10 @@
 #include <string.h>
 #include <math.h>
 #include "board.h"
-#include "peripherals.h"
+//#include "peripherals.h"
 #include "pin_mux.h"
-#include "clock_config.h"
-#include "MK66F18.h"
+//#include "clock_config.h"
+//#include "MK66F18.h"
 #include "fsl_gpio.h"
 
 /* FreeRTOS kernel includes. */
@@ -26,9 +26,8 @@
 #include "timers.h"
 
 /* Freescale includes. */
-#include "fsl_device_registers.h"
+//#include "fsl_device_registers.h"
 #include "fsl_uart_freertos.h"
-#include "fsl_uart.h"
 #include "fsl_lptmr.h"
 
 
