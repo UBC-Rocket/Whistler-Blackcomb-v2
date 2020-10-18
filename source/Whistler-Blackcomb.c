@@ -10,24 +10,19 @@
 
 #include "env_config.h"
 
-/* Includes */
+/*******************************************************************************
+ * Includes
+ ******************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
 #ifndef x86_compilation
-#include "board.h"
-#include "peripherals.h"
-#include "pin_mux.h"
-#include "clock_config.h"
-//#include "MK66F18.h"
-#include "fsl_gpio.h"
-
-/* Freescale includes. */
-//#include "fsl_device_registers.h"
-#include "fsl_uart_freertos.h"
-#include "fsl_lptmr.h"
 #endif
+
+// Pin definitions
+#include "board.h"
+#include "pin_mux.h"
 
 /* FreeRTOS kernel includes. */
 #include "FreeRTOS.h"
@@ -35,9 +30,15 @@
 #include "queue.h"
 #include "timers.h"
 
-
+/* Includes common between MCU and x86 */
 #include "IMU_interpret.h"
 #include "prediction.h"
+
+/* Includes specific to MCU or x86 */
+#include "time.h"
+#include "hal.h"
+#include "hal_io.h"
+#include "hal_uart.h"
 
 
 /*******************************************************************************
@@ -49,15 +50,6 @@
 /* Blink */
 #define BOARD_LED_GPIO     BOARD_LED_BUILTIN_GPIO
 #define BOARD_LED_GPIO_PIN BOARD_INITPINS_LED_BUILTIN_PIN
-
-/* Timer */
-#define STARTUP_LPTMR_BASE   LPTMR0
-#define STARTUP_LPTMR_IRQn   LPTMR0_IRQn
-#define LPTMR_LED_HANDLER LPTMR0_IRQHandler
-/* Get source clock for LPTMR driver */
-#define LPTMR_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_LpoClk)
-/* Define LPTMR microseconds counts value */
-#define LPTMR_USEC_COUNT 1000000U
 
 /* FreeRTOS UART Debug */
 #define DEBUG_UART            UART1
@@ -114,6 +106,9 @@ uart_rtos_config_t imu_uart_config = {
     .buffer_size = sizeof(background_buffer_imu),
 };
 
+hal_uart_handle_t hal_uart_debug;
+hal_uart_handle_t hal_uart_imu;
+
 /*******************************************************************************
  * Positioning Variables
  ******************************************************************************/
@@ -129,20 +124,9 @@ double accel[] = {0, 0, 0};
  * @brief   Application entry point.
  */
 int main(void) {
-  	/* Init board hardware. */
-    BOARD_InitBootPins();
-    BOARD_InitBootClocks();
-    BOARD_InitBootPeripherals();
 
-    /* Configure LPTMR */
-    lptmr_config_t lptmrConfig;
-    LPTMR_GetDefaultConfig(&lptmrConfig);
-	/* Initialize the LPTMR */
-	LPTMR_Init(STARTUP_LPTMR_BASE, &lptmrConfig);
-
-	/* Sets the timer length to extremely high to not expire */
-	LPTMR_SetTimerPeriod(STARTUP_LPTMR_BASE, USEC_TO_COUNT((100000000), LPTMR_SOURCE_CLOCK));
-	LPTMR_StartTimer(STARTUP_LPTMR_BASE);
+	initHal();
+    initTimers();
 
     NVIC_SetPriority(DEBUG_UART_RX_TX_IRQn, 5);
     NVIC_SetPriority(IMU_UART_RX_TX_IRQn, 5);
@@ -184,7 +168,7 @@ int main(void) {
  */
 static void BlinkTask(void *pv) {
     while (1){
-		GPIO_PortToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
+		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -229,21 +213,25 @@ static void ReadImuTask(void *pv)
     imu_uart_config.srcclk = IMU_UART_CLK_FREQ;
 	imu_uart_config.base   = IMU_UART;
 
+
+	uartConfig(&hal_uart_debug, DEBUG_UART, 374400);
+	uartConfig(&hal_uart_imu, IMU_UART, 374400);
+
 	unsigned long imu_last_time = 0;
 
 	/* Initialize UART interfaces. */
-    if (kStatus_Success != UART_RTOS_Init(&handle_debug, &t_handle_debug, &debug_uart_config))
+    if (kStatus_Success != uartInit(&hal_uart_debug))
     {
         vTaskSuspend(NULL);
     }
 
-    if (kStatus_Success != UART_RTOS_Init(&handle_imu, &t_handle_imu, &imu_uart_config))
+    if (kStatus_Success != uartInit(&hal_uart_imu))
 	{
 		vTaskSuspend(NULL);
 	}
 
     /* Send introduction message. */
-    if (kStatus_Success != UART_RTOS_Send(&handle_debug, (uint8_t *)debug_intro_message, strlen(debug_intro_message)))
+    if (kStatus_Success != uartSend(&hal_uart_debug, (uint8_t *)debug_intro_message, strlen(debug_intro_message)))//UART_RTOS_Send(&handle_debug, (uint8_t *)debug_intro_message, strlen(debug_intro_message)))
     {
         vTaskSuspend(NULL);
     }
@@ -251,12 +239,12 @@ static void ReadImuTask(void *pv)
     /* Receive input from imu and parse it. */
     do
     {
-        uart_error = UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
+        uart_error = uartReceive(&hal_uart_imu, imu_datagram, 40, &n);//UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
         if (uart_error == kStatus_UART_RxHardwareOverrun)
         {
             /* Notify about hardware buffer overrun */
             if (kStatus_Success !=
-                UART_RTOS_Send(&handle_debug, (uint8_t *)send_hardware_overrun, strlen(send_hardware_overrun)))
+                uartSend(&hal_uart_debug, (uint8_t *)send_hardware_overrun, strlen(send_hardware_overrun)))
             {
                 vTaskSuspend(NULL);
             }
@@ -264,7 +252,7 @@ static void ReadImuTask(void *pv)
         if (uart_error == kStatus_UART_RxRingBufferOverrun)
         {
             /* Notify about ring buffer overrun */
-            if (kStatus_Success != UART_RTOS_Send(&handle_debug, (uint8_t *)send_ring_overrun, strlen(send_ring_overrun)))
+            if (kStatus_Success != uartSend(&hal_uart_debug, (uint8_t *)send_ring_overrun, strlen(send_ring_overrun)))
             {
                 vTaskSuspend(NULL);
             }
@@ -286,7 +274,7 @@ static void ReadImuTask(void *pv)
 				double gz = parsed_imu_data[2] * PI / 180;
 
 
-				int cur_time = COUNT_TO_USEC(LPTMR_GetCurrentTimerCount(STARTUP_LPTMR_BASE), LPTMR_SOURCE_CLOCK);
+				int cur_time = timeSinceStartup();
 
 				// Get calculated orientation quaternion
 				orientation = getOrientation((cur_time - imu_last_time) / 1000000.0, orientation, gx, gy, gz);
@@ -308,12 +296,13 @@ static void ReadImuTask(void *pv)
 				imu_last_time = cur_time;
 			}
 
-			UART_RTOS_Send(&handle_debug, (uint8_t *)toPrint, len);
+			uartSend(&hal_uart_debug, (uint8_t *)toPrint, len);
 
         }
     } while (kStatus_Success == uart_error);
 
-    UART_RTOS_Deinit(&handle_debug);
+    uartDeinit(&hal_uart_debug);
+    uartDeinit(&hal_uart_imu);
     vTaskSuspend(NULL);
 }
 
