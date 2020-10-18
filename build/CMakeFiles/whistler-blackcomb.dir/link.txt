@@ -1,0 +1,1 @@
+/bin/c99-gcc -g  -rdynamic CMakeFiles/whistler-blackcomb.dir/source/Whistler-Blackcomb.c.o  -o whistler-blackcomb 

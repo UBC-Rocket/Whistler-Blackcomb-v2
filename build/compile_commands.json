@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/mnt/d/rocket/workspace/Whistler-Blackcomb/build",
+  "command": "/bin/c99-gcc  -I/mnt/d/rocket/workspace/Whistler-Blackcomb/common/include -I/mnt/d/rocket/workspace/Whistler-Blackcomb/envs/x86 -I/mnt/d/rocket/workspace/Whistler-Blackcomb/envs/x86/freertos/include -I/mnt/d/rocket/workspace/Whistler-Blackcomb/envs/x86/freertos/portable -I/mnt/d/rocket/workspace/Whistler-Blackcomb/source  -g   -o CMakeFiles/whistler-blackcomb.dir/source/Whistler-Blackcomb.c.o   -c /mnt/d/rocket/workspace/Whistler-Blackcomb/source/Whistler-Blackcomb.c",
+  "file": "/mnt/d/rocket/workspace/Whistler-Blackcomb/source/Whistler-Blackcomb.c"
+}
+]

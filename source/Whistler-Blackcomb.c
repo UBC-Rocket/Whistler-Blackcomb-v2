@@ -8,27 +8,32 @@
  * @brief   Application entry point.
  */
 
+#include "env_config.h"
+
 /* Includes */
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+#ifndef x86_compilation
 #include "board.h"
-//#include "peripherals.h"
+#include "peripherals.h"
 #include "pin_mux.h"
-//#include "clock_config.h"
+#include "clock_config.h"
 //#include "MK66F18.h"
 #include "fsl_gpio.h"
+
+/* Freescale includes. */
+//#include "fsl_device_registers.h"
+#include "fsl_uart_freertos.h"
+#include "fsl_lptmr.h"
+#endif
 
 /* FreeRTOS kernel includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "timers.h"
-
-/* Freescale includes. */
-//#include "fsl_device_registers.h"
-#include "fsl_uart_freertos.h"
-#include "fsl_lptmr.h"
 
 
 #include "IMU_interpret.h"
@@ -201,7 +206,7 @@ static void ReadImuTask(void *pv)
 	double * parsed_imu_data = (double*) pvPortMalloc(13 * sizeof(double));
 	unsigned char * statusBytes = (unsigned char*) pvPortMalloc(3 * sizeof(unsigned char));
 
-	quaternion orientation = qUnit();;
+	quaternion orientation = qUnit();
 	quaternion acceleration;
 
 	double * gravityAccel = (double*) pvPortMalloc(3 * sizeof(double));
