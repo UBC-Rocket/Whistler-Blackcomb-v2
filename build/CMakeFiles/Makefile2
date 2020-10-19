@@ -54,11 +54,14 @@ CMAKE_BINARY_DIR = /mnt/d/rocket/workspace/Whistler-Blackcomb/build
 
 # The main recursive "all" target.
 all: CMakeFiles/whistler-blackcomb.dir/all
+all: envs/x86/all
+all: common/all
 
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall:
+preinstall: envs/x86/preinstall
+preinstall: common/preinstall
 
 .PHONY : preinstall
 
@@ -92,8 +95,46 @@ clean: CMakeFiles/ContinuousStart.dir/clean
 clean: CMakeFiles/ContinuousMemCheck.dir/clean
 clean: CMakeFiles/ContinuousTest.dir/clean
 clean: CMakeFiles/ContinuousSubmit.dir/clean
+clean: envs/x86/clean
+clean: common/clean
 
 .PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory common
+
+# Recursive "all" directory target.
+common/all:
+
+.PHONY : common/all
+
+# Recursive "preinstall" directory target.
+common/preinstall:
+
+.PHONY : common/preinstall
+
+# Recursive "clean" directory target.
+common/clean:
+
+.PHONY : common/clean
+
+#=============================================================================
+# Directory level rules for directory envs/x86
+
+# Recursive "all" directory target.
+envs/x86/all:
+
+.PHONY : envs/x86/all
+
+# Recursive "preinstall" directory target.
+envs/x86/preinstall:
+
+.PHONY : envs/x86/preinstall
+
+# Recursive "clean" directory target.
+envs/x86/clean:
+
+.PHONY : envs/x86/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/NightlyMemCheck.dir
@@ -534,12 +575,12 @@ CMakeFiles/Nightly.dir/clean:
 CMakeFiles/whistler-blackcomb.dir/all:
 	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/depend
 	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles --progress-num=1,2 "Built target whistler-blackcomb"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 "Built target whistler-blackcomb"
 .PHONY : CMakeFiles/whistler-blackcomb.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/whistler-blackcomb.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles 18
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/whistler-blackcomb.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles 0
 .PHONY : CMakeFiles/whistler-blackcomb.dir/rule

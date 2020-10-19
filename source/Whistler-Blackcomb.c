@@ -35,7 +35,7 @@
 #include "prediction.h"
 
 /* Includes specific to MCU or x86 */
-#include "time.h"
+#include <hal_time.h>
 #include "hal.h"
 #include "hal_io.h"
 #include "hal_uart.h"
@@ -84,28 +84,6 @@ char toPrint[100];
 uint8_t background_buffer_debug[200];
 uint8_t background_buffer_imu[200];
 
-uart_rtos_handle_t handle_debug;
-struct _uart_handle t_handle_debug;
-
-uart_rtos_handle_t handle_imu;
-struct _uart_handle t_handle_imu;
-
-uart_rtos_config_t debug_uart_config = {
-    .baudrate    = 374400,
-    .parity      = kUART_ParityDisabled,
-    .stopbits    = kUART_OneStopBit,
-    .buffer      = background_buffer_debug,
-    .buffer_size = sizeof(background_buffer_debug),
-};
-
-uart_rtos_config_t imu_uart_config = {
-    .baudrate    = 374400,
-    .parity      = kUART_ParityDisabled,
-    .stopbits    = kUART_OneStopBit,
-    .buffer      = background_buffer_imu,
-    .buffer_size = sizeof(background_buffer_imu),
-};
-
 hal_uart_handle_t hal_uart_debug;
 hal_uart_handle_t hal_uart_imu;
 
@@ -128,8 +106,8 @@ int main(void) {
 	initHal();
     initTimers();
 
-    NVIC_SetPriority(DEBUG_UART_RX_TX_IRQn, 5);
-    NVIC_SetPriority(IMU_UART_RX_TX_IRQn, 5);
+    halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
+    halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
 
     /* Copy the following to create a new task */
     if (xTaskCreate(  /* create task */
@@ -169,6 +147,7 @@ int main(void) {
 static void BlinkTask(void *pv) {
     while (1){
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
+		printf( "Hello world\n" );
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -206,12 +185,6 @@ static void ReadImuTask(void *pv)
 	vecOrientation[0] = 0;
 	vecOrientation[1] = 0;
 	vecOrientation[2] = 1;
-
-    debug_uart_config.srcclk = DEBUG_UART_CLK_FREQ;
-    debug_uart_config.base   = DEBUG_UART;
-
-    imu_uart_config.srcclk = IMU_UART_CLK_FREQ;
-	imu_uart_config.base   = IMU_UART;
 
 
 	uartConfig(&hal_uart_debug, DEBUG_UART, 374400);

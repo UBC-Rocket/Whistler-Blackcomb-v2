@@ -520,6 +520,438 @@ ContinuousSubmit/fast:
 	$(MAKE) -f CMakeFiles/ContinuousSubmit.dir/build.make CMakeFiles/ContinuousSubmit.dir/build
 .PHONY : ContinuousSubmit/fast
 
+common/src/IMU_interpret.o: common/src/IMU_interpret.c.o
+
+.PHONY : common/src/IMU_interpret.o
+
+# target to build an object file
+common/src/IMU_interpret.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/common/src/IMU_interpret.c.o
+.PHONY : common/src/IMU_interpret.c.o
+
+common/src/IMU_interpret.i: common/src/IMU_interpret.c.i
+
+.PHONY : common/src/IMU_interpret.i
+
+# target to preprocess a source file
+common/src/IMU_interpret.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/common/src/IMU_interpret.c.i
+.PHONY : common/src/IMU_interpret.c.i
+
+common/src/IMU_interpret.s: common/src/IMU_interpret.c.s
+
+.PHONY : common/src/IMU_interpret.s
+
+# target to generate assembly for a file
+common/src/IMU_interpret.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/common/src/IMU_interpret.c.s
+.PHONY : common/src/IMU_interpret.c.s
+
+common/src/prediction.o: common/src/prediction.c.o
+
+.PHONY : common/src/prediction.o
+
+# target to build an object file
+common/src/prediction.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/common/src/prediction.c.o
+.PHONY : common/src/prediction.c.o
+
+common/src/prediction.i: common/src/prediction.c.i
+
+.PHONY : common/src/prediction.i
+
+# target to preprocess a source file
+common/src/prediction.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/common/src/prediction.c.i
+.PHONY : common/src/prediction.c.i
+
+common/src/prediction.s: common/src/prediction.c.s
+
+.PHONY : common/src/prediction.s
+
+# target to generate assembly for a file
+common/src/prediction.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/common/src/prediction.c.s
+.PHONY : common/src/prediction.c.s
+
+envs/x86/freertos/croutine.o: envs/x86/freertos/croutine.c.o
+
+.PHONY : envs/x86/freertos/croutine.o
+
+# target to build an object file
+envs/x86/freertos/croutine.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/croutine.c.o
+.PHONY : envs/x86/freertos/croutine.c.o
+
+envs/x86/freertos/croutine.i: envs/x86/freertos/croutine.c.i
+
+.PHONY : envs/x86/freertos/croutine.i
+
+# target to preprocess a source file
+envs/x86/freertos/croutine.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/croutine.c.i
+.PHONY : envs/x86/freertos/croutine.c.i
+
+envs/x86/freertos/croutine.s: envs/x86/freertos/croutine.c.s
+
+.PHONY : envs/x86/freertos/croutine.s
+
+# target to generate assembly for a file
+envs/x86/freertos/croutine.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/croutine.c.s
+.PHONY : envs/x86/freertos/croutine.c.s
+
+envs/x86/freertos/event_groups.o: envs/x86/freertos/event_groups.c.o
+
+.PHONY : envs/x86/freertos/event_groups.o
+
+# target to build an object file
+envs/x86/freertos/event_groups.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/event_groups.c.o
+.PHONY : envs/x86/freertos/event_groups.c.o
+
+envs/x86/freertos/event_groups.i: envs/x86/freertos/event_groups.c.i
+
+.PHONY : envs/x86/freertos/event_groups.i
+
+# target to preprocess a source file
+envs/x86/freertos/event_groups.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/event_groups.c.i
+.PHONY : envs/x86/freertos/event_groups.c.i
+
+envs/x86/freertos/event_groups.s: envs/x86/freertos/event_groups.c.s
+
+.PHONY : envs/x86/freertos/event_groups.s
+
+# target to generate assembly for a file
+envs/x86/freertos/event_groups.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/event_groups.c.s
+.PHONY : envs/x86/freertos/event_groups.c.s
+
+envs/x86/freertos/list.o: envs/x86/freertos/list.c.o
+
+.PHONY : envs/x86/freertos/list.o
+
+# target to build an object file
+envs/x86/freertos/list.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/list.c.o
+.PHONY : envs/x86/freertos/list.c.o
+
+envs/x86/freertos/list.i: envs/x86/freertos/list.c.i
+
+.PHONY : envs/x86/freertos/list.i
+
+# target to preprocess a source file
+envs/x86/freertos/list.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/list.c.i
+.PHONY : envs/x86/freertos/list.c.i
+
+envs/x86/freertos/list.s: envs/x86/freertos/list.c.s
+
+.PHONY : envs/x86/freertos/list.s
+
+# target to generate assembly for a file
+envs/x86/freertos/list.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/list.c.s
+.PHONY : envs/x86/freertos/list.c.s
+
+envs/x86/freertos/portable/MemMang/heap_3.o: envs/x86/freertos/portable/MemMang/heap_3.c.o
+
+.PHONY : envs/x86/freertos/portable/MemMang/heap_3.o
+
+# target to build an object file
+envs/x86/freertos/portable/MemMang/heap_3.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/MemMang/heap_3.c.o
+.PHONY : envs/x86/freertos/portable/MemMang/heap_3.c.o
+
+envs/x86/freertos/portable/MemMang/heap_3.i: envs/x86/freertos/portable/MemMang/heap_3.c.i
+
+.PHONY : envs/x86/freertos/portable/MemMang/heap_3.i
+
+# target to preprocess a source file
+envs/x86/freertos/portable/MemMang/heap_3.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/MemMang/heap_3.c.i
+.PHONY : envs/x86/freertos/portable/MemMang/heap_3.c.i
+
+envs/x86/freertos/portable/MemMang/heap_3.s: envs/x86/freertos/portable/MemMang/heap_3.c.s
+
+.PHONY : envs/x86/freertos/portable/MemMang/heap_3.s
+
+# target to generate assembly for a file
+envs/x86/freertos/portable/MemMang/heap_3.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/MemMang/heap_3.c.s
+.PHONY : envs/x86/freertos/portable/MemMang/heap_3.c.s
+
+envs/x86/freertos/portable/port.o: envs/x86/freertos/portable/port.c.o
+
+.PHONY : envs/x86/freertos/portable/port.o
+
+# target to build an object file
+envs/x86/freertos/portable/port.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/port.c.o
+.PHONY : envs/x86/freertos/portable/port.c.o
+
+envs/x86/freertos/portable/port.i: envs/x86/freertos/portable/port.c.i
+
+.PHONY : envs/x86/freertos/portable/port.i
+
+# target to preprocess a source file
+envs/x86/freertos/portable/port.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/port.c.i
+.PHONY : envs/x86/freertos/portable/port.c.i
+
+envs/x86/freertos/portable/port.s: envs/x86/freertos/portable/port.c.s
+
+.PHONY : envs/x86/freertos/portable/port.s
+
+# target to generate assembly for a file
+envs/x86/freertos/portable/port.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/port.c.s
+.PHONY : envs/x86/freertos/portable/port.c.s
+
+envs/x86/freertos/portable/utils/wait_for_event.o: envs/x86/freertos/portable/utils/wait_for_event.c.o
+
+.PHONY : envs/x86/freertos/portable/utils/wait_for_event.o
+
+# target to build an object file
+envs/x86/freertos/portable/utils/wait_for_event.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/utils/wait_for_event.c.o
+.PHONY : envs/x86/freertos/portable/utils/wait_for_event.c.o
+
+envs/x86/freertos/portable/utils/wait_for_event.i: envs/x86/freertos/portable/utils/wait_for_event.c.i
+
+.PHONY : envs/x86/freertos/portable/utils/wait_for_event.i
+
+# target to preprocess a source file
+envs/x86/freertos/portable/utils/wait_for_event.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/utils/wait_for_event.c.i
+.PHONY : envs/x86/freertos/portable/utils/wait_for_event.c.i
+
+envs/x86/freertos/portable/utils/wait_for_event.s: envs/x86/freertos/portable/utils/wait_for_event.c.s
+
+.PHONY : envs/x86/freertos/portable/utils/wait_for_event.s
+
+# target to generate assembly for a file
+envs/x86/freertos/portable/utils/wait_for_event.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/portable/utils/wait_for_event.c.s
+.PHONY : envs/x86/freertos/portable/utils/wait_for_event.c.s
+
+envs/x86/freertos/queue.o: envs/x86/freertos/queue.c.o
+
+.PHONY : envs/x86/freertos/queue.o
+
+# target to build an object file
+envs/x86/freertos/queue.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/queue.c.o
+.PHONY : envs/x86/freertos/queue.c.o
+
+envs/x86/freertos/queue.i: envs/x86/freertos/queue.c.i
+
+.PHONY : envs/x86/freertos/queue.i
+
+# target to preprocess a source file
+envs/x86/freertos/queue.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/queue.c.i
+.PHONY : envs/x86/freertos/queue.c.i
+
+envs/x86/freertos/queue.s: envs/x86/freertos/queue.c.s
+
+.PHONY : envs/x86/freertos/queue.s
+
+# target to generate assembly for a file
+envs/x86/freertos/queue.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/queue.c.s
+.PHONY : envs/x86/freertos/queue.c.s
+
+envs/x86/freertos/stream_buffer.o: envs/x86/freertos/stream_buffer.c.o
+
+.PHONY : envs/x86/freertos/stream_buffer.o
+
+# target to build an object file
+envs/x86/freertos/stream_buffer.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/stream_buffer.c.o
+.PHONY : envs/x86/freertos/stream_buffer.c.o
+
+envs/x86/freertos/stream_buffer.i: envs/x86/freertos/stream_buffer.c.i
+
+.PHONY : envs/x86/freertos/stream_buffer.i
+
+# target to preprocess a source file
+envs/x86/freertos/stream_buffer.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/stream_buffer.c.i
+.PHONY : envs/x86/freertos/stream_buffer.c.i
+
+envs/x86/freertos/stream_buffer.s: envs/x86/freertos/stream_buffer.c.s
+
+.PHONY : envs/x86/freertos/stream_buffer.s
+
+# target to generate assembly for a file
+envs/x86/freertos/stream_buffer.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/stream_buffer.c.s
+.PHONY : envs/x86/freertos/stream_buffer.c.s
+
+envs/x86/freertos/tasks.o: envs/x86/freertos/tasks.c.o
+
+.PHONY : envs/x86/freertos/tasks.o
+
+# target to build an object file
+envs/x86/freertos/tasks.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/tasks.c.o
+.PHONY : envs/x86/freertos/tasks.c.o
+
+envs/x86/freertos/tasks.i: envs/x86/freertos/tasks.c.i
+
+.PHONY : envs/x86/freertos/tasks.i
+
+# target to preprocess a source file
+envs/x86/freertos/tasks.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/tasks.c.i
+.PHONY : envs/x86/freertos/tasks.c.i
+
+envs/x86/freertos/tasks.s: envs/x86/freertos/tasks.c.s
+
+.PHONY : envs/x86/freertos/tasks.s
+
+# target to generate assembly for a file
+envs/x86/freertos/tasks.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/tasks.c.s
+.PHONY : envs/x86/freertos/tasks.c.s
+
+envs/x86/freertos/timers.o: envs/x86/freertos/timers.c.o
+
+.PHONY : envs/x86/freertos/timers.o
+
+# target to build an object file
+envs/x86/freertos/timers.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/timers.c.o
+.PHONY : envs/x86/freertos/timers.c.o
+
+envs/x86/freertos/timers.i: envs/x86/freertos/timers.c.i
+
+.PHONY : envs/x86/freertos/timers.i
+
+# target to preprocess a source file
+envs/x86/freertos/timers.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/timers.c.i
+.PHONY : envs/x86/freertos/timers.c.i
+
+envs/x86/freertos/timers.s: envs/x86/freertos/timers.c.s
+
+.PHONY : envs/x86/freertos/timers.s
+
+# target to generate assembly for a file
+envs/x86/freertos/timers.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/freertos/timers.c.s
+.PHONY : envs/x86/freertos/timers.c.s
+
+envs/x86/src/hal.o: envs/x86/src/hal.c.o
+
+.PHONY : envs/x86/src/hal.o
+
+# target to build an object file
+envs/x86/src/hal.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal.c.o
+.PHONY : envs/x86/src/hal.c.o
+
+envs/x86/src/hal.i: envs/x86/src/hal.c.i
+
+.PHONY : envs/x86/src/hal.i
+
+# target to preprocess a source file
+envs/x86/src/hal.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal.c.i
+.PHONY : envs/x86/src/hal.c.i
+
+envs/x86/src/hal.s: envs/x86/src/hal.c.s
+
+.PHONY : envs/x86/src/hal.s
+
+# target to generate assembly for a file
+envs/x86/src/hal.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal.c.s
+.PHONY : envs/x86/src/hal.c.s
+
+envs/x86/src/hal_io.o: envs/x86/src/hal_io.c.o
+
+.PHONY : envs/x86/src/hal_io.o
+
+# target to build an object file
+envs/x86/src/hal_io.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_io.c.o
+.PHONY : envs/x86/src/hal_io.c.o
+
+envs/x86/src/hal_io.i: envs/x86/src/hal_io.c.i
+
+.PHONY : envs/x86/src/hal_io.i
+
+# target to preprocess a source file
+envs/x86/src/hal_io.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_io.c.i
+.PHONY : envs/x86/src/hal_io.c.i
+
+envs/x86/src/hal_io.s: envs/x86/src/hal_io.c.s
+
+.PHONY : envs/x86/src/hal_io.s
+
+# target to generate assembly for a file
+envs/x86/src/hal_io.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_io.c.s
+.PHONY : envs/x86/src/hal_io.c.s
+
+envs/x86/src/hal_time.o: envs/x86/src/hal_time.c.o
+
+.PHONY : envs/x86/src/hal_time.o
+
+# target to build an object file
+envs/x86/src/hal_time.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_time.c.o
+.PHONY : envs/x86/src/hal_time.c.o
+
+envs/x86/src/hal_time.i: envs/x86/src/hal_time.c.i
+
+.PHONY : envs/x86/src/hal_time.i
+
+# target to preprocess a source file
+envs/x86/src/hal_time.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_time.c.i
+.PHONY : envs/x86/src/hal_time.c.i
+
+envs/x86/src/hal_time.s: envs/x86/src/hal_time.c.s
+
+.PHONY : envs/x86/src/hal_time.s
+
+# target to generate assembly for a file
+envs/x86/src/hal_time.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_time.c.s
+.PHONY : envs/x86/src/hal_time.c.s
+
+envs/x86/src/hal_uart.o: envs/x86/src/hal_uart.c.o
+
+.PHONY : envs/x86/src/hal_uart.o
+
+# target to build an object file
+envs/x86/src/hal_uart.c.o:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_uart.c.o
+.PHONY : envs/x86/src/hal_uart.c.o
+
+envs/x86/src/hal_uart.i: envs/x86/src/hal_uart.c.i
+
+.PHONY : envs/x86/src/hal_uart.i
+
+# target to preprocess a source file
+envs/x86/src/hal_uart.c.i:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_uart.c.i
+.PHONY : envs/x86/src/hal_uart.c.i
+
+envs/x86/src/hal_uart.s: envs/x86/src/hal_uart.c.s
+
+.PHONY : envs/x86/src/hal_uart.s
+
+# target to generate assembly for a file
+envs/x86/src/hal_uart.c.s:
+	$(MAKE) -f CMakeFiles/whistler-blackcomb.dir/build.make CMakeFiles/whistler-blackcomb.dir/envs/x86/src/hal_uart.c.s
+.PHONY : envs/x86/src/hal_uart.c.s
+
 source/Whistler-Blackcomb.o: source/Whistler-Blackcomb.c.o
 
 .PHONY : source/Whistler-Blackcomb.o
@@ -587,6 +1019,54 @@ help:
 	@echo "... ContinuousMemCheck"
 	@echo "... ContinuousTest"
 	@echo "... ContinuousSubmit"
+	@echo "... common/src/IMU_interpret.o"
+	@echo "... common/src/IMU_interpret.i"
+	@echo "... common/src/IMU_interpret.s"
+	@echo "... common/src/prediction.o"
+	@echo "... common/src/prediction.i"
+	@echo "... common/src/prediction.s"
+	@echo "... envs/x86/freertos/croutine.o"
+	@echo "... envs/x86/freertos/croutine.i"
+	@echo "... envs/x86/freertos/croutine.s"
+	@echo "... envs/x86/freertos/event_groups.o"
+	@echo "... envs/x86/freertos/event_groups.i"
+	@echo "... envs/x86/freertos/event_groups.s"
+	@echo "... envs/x86/freertos/list.o"
+	@echo "... envs/x86/freertos/list.i"
+	@echo "... envs/x86/freertos/list.s"
+	@echo "... envs/x86/freertos/portable/MemMang/heap_3.o"
+	@echo "... envs/x86/freertos/portable/MemMang/heap_3.i"
+	@echo "... envs/x86/freertos/portable/MemMang/heap_3.s"
+	@echo "... envs/x86/freertos/portable/port.o"
+	@echo "... envs/x86/freertos/portable/port.i"
+	@echo "... envs/x86/freertos/portable/port.s"
+	@echo "... envs/x86/freertos/portable/utils/wait_for_event.o"
+	@echo "... envs/x86/freertos/portable/utils/wait_for_event.i"
+	@echo "... envs/x86/freertos/portable/utils/wait_for_event.s"
+	@echo "... envs/x86/freertos/queue.o"
+	@echo "... envs/x86/freertos/queue.i"
+	@echo "... envs/x86/freertos/queue.s"
+	@echo "... envs/x86/freertos/stream_buffer.o"
+	@echo "... envs/x86/freertos/stream_buffer.i"
+	@echo "... envs/x86/freertos/stream_buffer.s"
+	@echo "... envs/x86/freertos/tasks.o"
+	@echo "... envs/x86/freertos/tasks.i"
+	@echo "... envs/x86/freertos/tasks.s"
+	@echo "... envs/x86/freertos/timers.o"
+	@echo "... envs/x86/freertos/timers.i"
+	@echo "... envs/x86/freertos/timers.s"
+	@echo "... envs/x86/src/hal.o"
+	@echo "... envs/x86/src/hal.i"
+	@echo "... envs/x86/src/hal.s"
+	@echo "... envs/x86/src/hal_io.o"
+	@echo "... envs/x86/src/hal_io.i"
+	@echo "... envs/x86/src/hal_io.s"
+	@echo "... envs/x86/src/hal_time.o"
+	@echo "... envs/x86/src/hal_time.i"
+	@echo "... envs/x86/src/hal_time.s"
+	@echo "... envs/x86/src/hal_uart.o"
+	@echo "... envs/x86/src/hal_uart.i"
+	@echo "... envs/x86/src/hal_uart.s"
 	@echo "... source/Whistler-Blackcomb.o"
 	@echo "... source/Whistler-Blackcomb.i"
 	@echo "... source/Whistler-Blackcomb.s"

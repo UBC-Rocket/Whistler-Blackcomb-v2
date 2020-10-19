@@ -61,7 +61,6 @@ quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
 	omega.i = gx;
 	omega.j = gy;
 	omega.k = gz;
-	printQuaternion(qMult(qPrev, omega));
 	return qNorm(qSum(qPrev, qMult(omega, qPrev)));
 }
 
@@ -370,8 +369,6 @@ void updateFilter(double position[], double velocity[], double gpsPos[],
 				stateCovariance[axis][i][j] = PPred[i][j];
 			}
 		}
-
-		printMat(K);
 	}
 }
 

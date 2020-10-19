@@ -13,12 +13,6 @@ typedef struct quaternions {
 	double k;
 } quaternion;
 
-void printMat(double mat[][MATRIX_SIZE]);
-
-void printVec(double vec[], int size);
-
-void printQuaternion(quaternion q);
-
 quaternion qUnit();
 
 quaternion qMult(quaternion qA, quaternion qB);

@@ -32,3 +32,13 @@
 /mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles/ContinuousMemCheck.dir
 /mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles/ContinuousTest.dir
 /mnt/d/rocket/workspace/Whistler-Blackcomb/build/CMakeFiles/ContinuousSubmit.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/envs/x86/CMakeFiles/edit_cache.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/envs/x86/CMakeFiles/test.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/envs/x86/CMakeFiles/package_source.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/envs/x86/CMakeFiles/rebuild_cache.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/envs/x86/CMakeFiles/package.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/common/CMakeFiles/edit_cache.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/common/CMakeFiles/test.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/common/CMakeFiles/package_source.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/common/CMakeFiles/rebuild_cache.dir
+/mnt/d/rocket/workspace/Whistler-Blackcomb/build/common/CMakeFiles/package.dir
