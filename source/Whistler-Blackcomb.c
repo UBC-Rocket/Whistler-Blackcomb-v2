@@ -8,17 +8,12 @@
  * @brief   Application entry point.
  */
 
-#include "env_config.h"
-
 /*******************************************************************************
  * Includes
  ******************************************************************************/
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
-#ifndef x86_compilation
-#endif
 
 // Pin definitions
 #include "board.h"

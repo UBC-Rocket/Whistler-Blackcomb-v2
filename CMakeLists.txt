@@ -16,7 +16,6 @@ target_include_directories(whistler-blackcomb PUBLIC
     board
     device
     CMSIS
-    envs/x86
     envs/x86/include
     envs/x86/freertos/include
     envs/x86/freertos/portable/utils
