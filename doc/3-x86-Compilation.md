@@ -10,7 +10,7 @@ To enable this, two seperate build systems are used. MCUXpresso is used for the 
 
 ### File Structure
 
-The way that this is accomplished is by using a different set of includes for each compilation. These two sets of includes are in the [envs](../envs) folder. Each has a seperate set of implementations for extremely similar implementations of the hardware abstraction layer, abbreviated HAL. For example, the toggle example above would have the implementation for the physical board as the [hal_io.h](../envs/board/include/hal_io.h) file in the board folder but for x86 compilation it would be [hal_io.h](../envs/x86/include/hal_io.h) in the x86 folder. The [CMakeLists.txt](../CMakeLists.txt) specifies x86 HAL files to be included, and a similar functionality is achieved through MCUXpresso. 
+The way that this is accomplished is by using a different set of includes for each compilation. These two sets of includes are in the [envs](../envs) folder. Each has a seperate set of implementations for extremely similar implementations of the hardware abstraction layer, abbreviated HAL. For example, the toggle example above would have the implementation for the physical board as the [hal_io.h](../envs/board/include/hal_io.h) file in the board folder but for x86 compilation it would be [hal_io.h](../envs/x86/include/hal_io.h) in the x86 folder. The [CMakeLists.txt](../CMakeLists.txt) specifies x86 HAL files to be included, and a similar functionality is achieved through MCUXpresso. All code that we've written that is common between the two applications is in the [common](../common) folder, with the exception of the main executable file which is ine [source](../source). 
 
 ## Setup
 

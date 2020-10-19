@@ -35,4 +35,4 @@ All documentation are currently kept in the /doc folder.
 
 1. Uploading to Teensy [guide](doc/1-Teensy-Upload.md).
 2. freeRTOS installation and usage [guide](doc/2-RTOS-Basics.md).
-2. x86 Compilation explanation and setup [guide](doc/3-x86-compilation.md)
+2. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md)
