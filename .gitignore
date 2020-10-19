@@ -1,12 +1,30 @@
-Debug/
 *.opendb
 *.DS_Store
 
+# VS/VSCode
 .vscode
 .vs
 
+# Eclipse
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+*.launch
+
+
+# Build folders
+Debug/
 build/
 
+# CMake
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
