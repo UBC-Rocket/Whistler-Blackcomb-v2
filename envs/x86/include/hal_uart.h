@@ -4,7 +4,11 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+
 #include "MK66F18.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 #include <stddef.h>
 
 /*******************************************************************************
@@ -14,6 +18,12 @@
 /* Struct for uart creation with rtos */
 typedef struct _hal_uart_handle_t {
 	UART_Type* base;
+	uint32_t baudrate;
+	uint8_t buffer[200];
+	uint32_t buffer_size;
+	uint32_t cur_buffer_size;
+
+	SemaphoreHandle_t mutex;
 } hal_uart_handle_t;
 
 enum{
@@ -28,7 +38,7 @@ enum{
 /**
  * Initializes uart in the RTOS.
  * @param handle a pointer to the handle of the new uart instance to be created
- * @return kStatusSuccess if success, otherwise fail
+ * @return kStatus_Success if success, otherwise fail
  */
 int uartInit(hal_uart_handle_t *handle);
 

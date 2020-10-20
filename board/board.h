@@ -61,6 +61,22 @@ void BOARD_InitDebugConsole(void);
 #define BOARD_LED_BUILTIN_GPIO GPIOC
 #endif
 
+/* Blink */
+#define BOARD_LED_GPIO     BOARD_LED_BUILTIN_GPIO
+#define BOARD_LED_GPIO_PIN BOARD_INITPINS_LED_BUILTIN_PIN
+
+/* FreeRTOS UART Debug */
+#define DEBUG_UART            UART1
+#define DEBUG_UART_CLKSRC     SYS_CLK
+#define DEBUG_UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
+#define DEBUG_UART_RX_TX_IRQn UART1_RX_TX_IRQn
+
+/* FreeRTOS UART IMU */
+#define IMU_UART            UART0
+#define IMU_UART_CLKSRC     SYS_CLK
+#define IMU_UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
+#define IMU_UART_RX_TX_IRQn UART0_RX_TX_IRQn
+
 #endif /* _BOARD_H_ */
 
 

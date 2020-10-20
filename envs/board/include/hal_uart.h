@@ -24,8 +24,6 @@ typedef struct _hal_uart_handle_t {
 #define UART_CLKSRC     SYS_CLK
 #define UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
 
-
-
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
