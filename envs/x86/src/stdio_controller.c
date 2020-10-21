@@ -11,10 +11,12 @@
 #include "console.h"
 #include "hal_uart.h"
 #include "board.h"
+#include "semphr.h"
 
 #include <stdio.h>
 #include <pthread.h>
 #include <time.h>
+#include <unistd.h>
 
 /*******************************************************************************
  * Variables
@@ -38,19 +40,40 @@ static void generateImuLoop(void * pv);
  * Loop for interacting with ground station interface
  */
 static void inputLoop(void *pv){
-    vTaskDelay(pdMS_TO_TICKS(5000));
     for(;;){
-        console_print("stdio polling...\n");
+        // console_print("stdio polling...\n");
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
 static void generateImuLoop(void *pv){
-    FILE *fp = fopen("../../../data/imu/imu_uart_data_2.txt", "r");
+    /* Useful for checking current working directory */
+    // char cwd[PATH_MAX];
+    // if (getcwd(cwd, sizeof(cwd)) != NULL) 
+    //     printf("Current working dir: %s\n", cwd);
+
+    while(uart_handles[0]->base != IMU_UART)
+        vTaskDelay(pdMS_TO_TICKS(1));
+
+    FILE *fp = fopen("../data/imu/imu_uart_data_2.txt", "r");
 
     while(1){
-        vTaskDelay(pdMS_TO_TICKS(0.5));
-        printf("Hello");
+        int i = 0;
+        xSemaphoreTake(uart_handles[0]->mutex, portMAX_DELAY);
+        while(i < 40){
+            vTaskDelay(pdMS_TO_TICKS(10));
+            if(uart_handles[0]->buffer_size - uart_handles[0]->cur_buffer_size <= 40)
+                continue;
+            if(!fscanf(fp, "%hhu", &(uart_handles[0]->buffer[uart_handles[0]->cur_buffer_size + i]))){
+                return;
+            }
+            uart_handles[0]->cur_buffer_size++;
+            i++;
+        }
+        xSemaphoreGive(uart_handles[0]->mutex);
+
+        // printf("%hhu\n", uart_handles[0]->buffer[0]);
+        // printf("fast");
     }
 }
 
@@ -86,7 +109,7 @@ void stdioInit(){
 }
 
 void stdioAssignUart(hal_uart_handle_t *handle){
-    if(handle->base == IMU_UART){
+    if((void*)handle->base == (void*)IMU_UART){
 		uart_handles[0] = handle;
 	}
 }
