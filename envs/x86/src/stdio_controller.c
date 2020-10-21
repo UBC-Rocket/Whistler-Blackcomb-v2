@@ -38,20 +38,20 @@ static void generateImuLoop(void * pv);
  * Loop for interacting with ground station interface
  */
 static void inputLoop(void *pv){
-    int t = 5;
-    printf("Print something, quick!");
     vTaskDelay(pdMS_TO_TICKS(5000));
-    if(scanf("%d", &t)){
-        printf("read");
-    }
     for(;;){
-        console_print("stdio polling...%d\n", t);
+        console_print("stdio polling...\n");
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
 static void generateImuLoop(void *pv){
+    FILE *fp = fopen("../../../data/imu/imu_uart_data_2.txt", "r");
 
+    while(1){
+        vTaskDelay(pdMS_TO_TICKS(0.5));
+        printf("Hello");
+    }
 }
 
 void stdioInit(){
