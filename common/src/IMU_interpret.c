@@ -1,5 +1,7 @@
 #include "IMU_interpret.h"
 
+//TODO: Better status byte stuff
+
 int to_2C(int value) {
 	const int MODULO = 1 << 24;
 	const int MAX_VALUE = (1 << 23) - 1;
@@ -9,20 +11,86 @@ int to_2C(int value) {
 	return value;
 }
 
-int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
-		unsigned char statusBytes[]) {
+int get_ID(struct IMUStruct *imu) {
+	if (imu->interpAux == 1) {
+		if (imu->interpTemp == 1) {
+			if (imu->interpAccel == 1) {
+				if (imu->interpIncl == 1) {
+					return 0xAF;
+				}
+				else {
+					return 0xAD;
+				}
+			}
+			else if (imu->interpIncl == 1) {
+				return 0xAE;
+			}
+			else {
+				return 0x9C;
+			}
+		}
+		else if (imu->interpAccel == 1) {
+			if (imu->interpIncl == 1) {
+				return 0x9B;
+			}
+			else {
+				return 0x99;
+			}
+		}
+		else if (imu->interpIncl == 1) {
+			return 0x9A;
+		}
+		else {
+			return 0x98;
+		}
+
+	}
+	else {
+		if (imu->interpTemp == 1) {
+			if (imu->interpAccel == 1) {
+				if (imu->interpIncl == 1) {
+					return 0xA7;
+				}
+				else {
+					return 0xA5;
+				}
+			}
+			else if (imu->interpIncl == 1) {
+				return 0xA6;
+			}
+			else {
+				return 0x94;
+			}
+		}
+		else if (imu->interpAccel == 1) {
+			if (imu->interpIncl == 1) {
+				return 0x93;
+			}
+			else {
+				return 0x91;
+			}
+		}
+		else if (imu->interpIncl == 1) {
+			return 0x92;
+		}
+		else {
+			return 0x90;
+		}
+	}
+}
+
+
+int interpretImuData(struct IMUStruct *imu) {
 	//IMPORTANT: This is not well made, so you better make sure that the length of the arrays you pass are right...
 
 	//these variables keep track of where the program is in the datagram[], dataout[], and statusBytes[] arrays, respectivly
 	int datagramCount = 0;
-	int dataOutCount = 0;
-	int statusCount = 0;
 
 	//we'll use this to see if any of the status bytes are in non-OK states
 	int statusFlag = 0;
 
 	//quick check to make sure the identifier from the packet = identifier it expects.
-	if (datagram[datagramCount] != identifier) {
+	if (imu->datagram[datagramCount] != get_ID(imu)) {
 		//return error 
 		return DATAGRAM_PARSE_ID_MISMATCH;
 	}
@@ -31,120 +99,99 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 
 	//gyro parse loop
 	//There is no option for a normal mode datapacket without gyro data, so we evaluate it every time.
-	for (int i = dataOutCount; i < dataOutCount + 3; i++) {
-		unsigned int bitrep = (datagram[datagramCount] << 16)
-				+ (datagram[datagramCount + 1] << 8)
-				+ datagram[datagramCount + 2];
-		dataout[i] = to_2C(bitrep) / 1.0 / (1 << 14);
+	for (int i = 0; i < 3; i++) {
+		unsigned int bitrep = (imu->datagram[datagramCount] << 16)
+				+ (imu->datagram[datagramCount + 1] << 8)
+				+ imu->datagram[datagramCount + 2];
+		imu->rate[i] = to_2C(bitrep) / 1.0 / (1 << 14);
 		datagramCount += 3;		//move 3 bytes forward in the datagram
 	}
-	dataOutCount += 3;
 
 	//status byte output and engage flag
-	if (datagram[datagramCount] != 0) {
+	if (imu->datagram[datagramCount] != 0) {
 		statusFlag = 1;
 	}
-	statusBytes[statusCount] = datagram[datagramCount];
-	statusCount++;
+
 	//move past status byte
 	datagramCount += 1;
 
 	//evaluate if datagram includes accelerometer data
-	if ((identifier == 0x91) || (identifier == 0x93) || (identifier = 0xA5)
-			|| (identifier = 0xA7) || (identifier = 0x9B) || (identifier = 0x99)
-			|| (identifier = 0xAD) || (identifier = 0xAF)) {
+	if (imu->interpAccel==1) {
 		//accelerometer parse loop
-		for (int i = dataOutCount; i < dataOutCount + 3; i++) {
-			unsigned int bitrep = (datagram[datagramCount] << 16)
-					+ (datagram[datagramCount + 1] << 8)
-					+ datagram[datagramCount + 2];
-			dataout[i] = to_2C(bitrep) / 1.0 / (1 << 20);
+		for (int i = 0; i < 3; i++) {
+			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
+					+ (imu->datagram[datagramCount + 1] << 8)
+					+ imu->datagram[datagramCount + 2];
+			imu->accel[i] = to_2C(bitrep) / 1.0 / (1 << 20);
 			datagramCount += 3;
 			//this only works in the "5g" range
 			//IDK if that's something you set on the IMU or something that would change over the course of the flight.
 		}
-		dataOutCount += 3;
 
 		//status byte output and engage flag
-		if (datagram[datagramCount] != 0) {
+		if (imu->datagram[datagramCount] != 0) {
 			statusFlag = 1;
 		}
-		statusBytes[statusCount] = datagram[datagramCount];
-		statusCount++;
+
 		//move past status byte
 		datagramCount += 1;
 	}
 
-	//evaluate if datagram includes accelerometer data
-	if ((identifier == 0x92) || (identifier == 0x93) || (identifier == 0xA6)
-			|| (identifier == 0xA7) || (identifier == 0x9A)
-			|| (identifier == 0x9B) || (identifier == 0xAE)
-			|| (identifier == 0xAF)) {
+	//evaluate if datagram includes inlc data
+	if (imu->interpIncl == 1) {
 		//inclinometer parse loop
 		//assuming that the inclinometer output unit is accel
-		for (int i = dataOutCount; i < dataOutCount + 3; i++) {
-			unsigned int bitrep = (datagram[datagramCount] << 16)
-					+ (datagram[datagramCount + 1] << 8)
-					+ datagram[datagramCount + 2];
-			dataout[i] = to_2C(bitrep) / 1.0 / (1 << 22);
+		for (int i =0; i < 3; i++) {
+			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
+					+ (imu->datagram[datagramCount + 1] << 8)
+					+ imu->datagram[datagramCount + 2];
+			imu->incl[i] = to_2C(bitrep) / 1.0 / (1 << 22);
 			datagramCount += 3;
 		}
-		dataOutCount += 3;
 		//status byte output and engage flag
-		if (datagram[datagramCount] != 0) {
+		if (imu->datagram[datagramCount] != 0) {
 			statusFlag = 1;
 		}
-		statusBytes[statusCount] = datagram[datagramCount];
-		statusCount++;
+
 		//move past status byte
 		datagramCount += 1;
 	}
 	//evaluate if datagram includes temp
-	if ((identifier == 0x94) || (identifier == 0xA5) || (identifier == 0xA6)
-			|| (identifier == 0xA7) || (identifier == 0x9C)
-			|| (identifier == 0xAD) || (identifier == 0xAE)
-			|| (identifier == 0xAF)) {
+	if (imu->interpTemp ==1) {
 		//there are 3 different temp readings, so we loop this 3x
 		for (int ii = 0; ii <= 3; ii++) {
 			//temp parse loop
-			for (int i = dataOutCount; i < dataOutCount + 3; i++) {
-				unsigned int bitrep = (datagram[datagramCount] << 8)
-						+ (datagram[datagramCount + 1]);
-				dataout[i] = to_2C(bitrep) / 1.0 / (1 << 8);
+			for (int i = ii*3; i < ii*3+3; i++) {
+				unsigned int bitrep = (imu->datagram[datagramCount] << 8)
+						+ (imu->datagram[datagramCount + 1]);
+				imu->temp[i] = to_2C(bitrep) / 1.0 / (1 << 8);
 				datagramCount += 2;
 			}
-			dataOutCount += 3;
 			//status byte output and engage flag
-			if (datagram[datagramCount] != 0) {
+			if (imu->datagram[datagramCount] != 0) {
 				statusFlag = 1;
 			}
-			statusBytes[statusCount] = datagram[datagramCount];
-			statusCount++;
+
 			//move past status byte
 			datagramCount += 1;
 		}
 	}
 	//evaluate if datagram includes aux
-	if ((identifier == 0x98) || (identifier == 0x99) || (identifier == 0x9A)
-			|| (identifier == 0x9B) || (identifier == 0x9C)
-			|| (identifier == 0xAD) || (identifier == 0xAE)
-			|| (identifier == 0xAF)) {
+	if (imu->interpAux ==1) {
 		//aux parse loop
-		for (int i = dataOutCount; i < dataOutCount + 3; i++) {
-			unsigned int bitrep = (datagram[datagramCount] << 16)
-					+ (datagram[datagramCount + 1] << 8)
-					+ datagram[datagramCount + 2];
-			dataout[i] = to_2C(bitrep) / 1.0 / (1 << 25) * 5;
+		for (int i = 0; i < 3; i++) {
+			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
+					+ (imu->datagram[datagramCount + 1] << 8)
+					+ imu->datagram[datagramCount + 2];
+			imu->aux = to_2C(bitrep) / 1.0 / (1 << 25) * 5;
 			datagramCount += 3;
 		}
-		dataOutCount += 3;
 
 		//status byte output and engage flag
-		if (datagram[datagramCount] != 0) {
+		if (imu->datagram[datagramCount] != 0) {
 			statusFlag = 1;
 		}
-		statusBytes[statusCount] = datagram[datagramCount];
-		statusCount++;
+
 		//move past status byte
 		datagramCount += 1;
 	}
@@ -156,11 +203,10 @@ int interpretImuData(unsigned char datagram[], int identifier, double dataout[],
 	datagramCount += 1;
 
 	//evaluate latency
-	unsigned int bitrep = (datagram[datagramCount] << 8)
-			+ (datagram[datagramCount + 1]);
-	dataout[dataOutCount] = to_2C(bitrep) / 1.0;
+	unsigned int bitrep = (imu->datagram[datagramCount] << 8)
+			+ (imu->datagram[datagramCount + 1]);
+	imu->latency = to_2C(bitrep);
 	datagramCount += 2;
-	dataOutCount += 1;
 
 	//evaluate crc
 	datagramCount += 3;
