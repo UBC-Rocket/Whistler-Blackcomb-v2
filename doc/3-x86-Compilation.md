@@ -50,3 +50,15 @@ sudo apt install cmake
 Open main project folder in vscode, and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
 
 ![](images/vscode-x86-build.png)
+
+### Troubleshooting
+If you are using Ubuntu and get an error along the lines of 
+```
+No CMAKE_C_COMPILER could be found.
+No CMAKE_CXX_COMPILER could be found.
+```
+try running 
+```
+sudo apt-get update && sudo apt-get install build-essential
+```
+and then try building again. 
