@@ -8,6 +8,7 @@
 #include "MK66F18.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "event_groups.h"
 
 #include <stddef.h>
 
@@ -23,7 +24,12 @@ typedef struct _hal_uart_handle_t {
 	uint32_t buffer_size;
 	uint32_t cur_buffer_size;
 
-	SemaphoreHandle_t mutex;
+	/* FreeRTOS stuff. Most of this was taken from uart_freertos handle 
+	 * implementation
+	 */
+	SemaphoreHandle_t rxSemaphore;
+	EventGroupHandle_t rxEvent;
+    EventGroupHandle_t txEvent;
 } hal_uart_handle_t;
 
 enum{

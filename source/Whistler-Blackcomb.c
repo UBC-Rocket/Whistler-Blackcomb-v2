@@ -191,7 +191,7 @@ static void ReadImuTask(void *pv)
     /* Receive input from imu and parse it. */
     do
     {
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		// vTaskDelay(pdMS_TO_TICKS(5));
         uart_error = uartReceive(&hal_uart_imu, imu_datagram, 40, &n);//UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
         if (uart_error == kStatus_UART_RxHardwareOverrun)
         {
@@ -210,48 +210,48 @@ static void ReadImuTask(void *pv)
                 vTaskSuspend(NULL);
             }
         }
-        // if (n > 0 && imu_datagram[0] == 0x93)
-        // {
-        // 	// Parse Datagram
-		// 	parse_error = interpretImuData(imu_datagram, 0x93, parsed_imu_data, statusBytes);
+        if (n > 0 && imu_datagram[0] == 0x93)
+        {
+        	// Parse Datagram
+			parse_error = interpretImuData(imu_datagram, 0x93, parsed_imu_data, statusBytes);
 
-		// 	int len;
-		// 	if(parse_error == DATAGRAM_PARSE_ID_MISMATCH)
-		// 		len = sprintf(toPrint, "ID_MISMATCH\n");
-		// 	else if(parse_error == DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK)
-		// 		len = sprintf(toPrint, "STATUS_BYTE_FAIL\n");
-		// 	else if(parse_error == DATAGRAM_PARSE_SUCCESS){
+			int len;
+			if(parse_error == DATAGRAM_PARSE_ID_MISMATCH)
+				len = sprintf(toPrint, "ID_MISMATCH\n");
+			else if(parse_error == DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK)
+				len = sprintf(toPrint, "STATUS_BYTE_FAIL\n");
+			else if(parse_error == DATAGRAM_PARSE_SUCCESS){
 
-		// 		double gx = parsed_imu_data[0] * PI / 180;
-		// 		double gy = parsed_imu_data[1] * PI / 180;
-		// 		double gz = parsed_imu_data[2] * PI / 180;
+				double gx = parsed_imu_data[0] * PI / 180;
+				double gy = parsed_imu_data[1] * PI / 180;
+				double gz = parsed_imu_data[2] * PI / 180;
 
 
-		// 		int cur_time = timeSinceStartup();
+				int cur_time = timeSinceStartup();
 
-		// 		// Get calculated orientation quaternion
-		// 		orientation = getOrientation((cur_time - imu_last_time) / 1000000.0, orientation, gx, gy, gz);
+				// Get calculated orientation quaternion
+				orientation = getOrientation((cur_time - imu_last_time) / 1000000.0, orientation, gx, gy, gz);
 
-		// 		quaternion o;
-		// 		o.re = 0;
-		// 		o.i = vecOrientation[0];
-		// 		o.j = vecOrientation[1];
-		// 		o.k = vecOrientation[2];
+				quaternion o;
+				o.re = 0;
+				o.i = vecOrientation[0];
+				o.j = vecOrientation[1];
+				o.k = vecOrientation[2];
 
-		// 		o = qMult(orientation, qMult(o, qConjugate(orientation)));
+				o = qMult(orientation, qMult(o, qConjugate(orientation)));
 
-		// 		len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
-		// 				(int)(o.i*100),
-		// 				(int)(o.j*100),
-		// 				(int)(o.k*100),
-		// 				(int)(100*sqrt(o.i*o.i+o.j*o.j+o.k*o.k)));
+				len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
+						(int)(o.i*100),
+						(int)(o.j*100),
+						(int)(o.k*100),
+						(int)(100*sqrt(o.i*o.i+o.j*o.j+o.k*o.k)));
 
-		// 		imu_last_time = cur_time;
-		// 	}
+				imu_last_time = cur_time;
+			}
 
-		// 	uartSend(&hal_uart_debug, (uint8_t *)toPrint, len);
+			uartSend(&hal_uart_debug, (uint8_t *)toPrint, len);
 
-        // }
+        }
     } while (kStatus_Success == uart_error);
 
     uartDeinit(&hal_uart_debug);

@@ -59,7 +59,7 @@ static void generateImuLoop(void *pv){
 
     while(1){
         int i = 0;
-        xSemaphoreTake(uart_handles[0]->mutex, portMAX_DELAY);
+        xSemaphoreTake(uart_handles[0]->rxSemaphore, portMAX_DELAY);
         while(i < 40){
             vTaskDelay(pdMS_TO_TICKS(10));
             if(uart_handles[0]->buffer_size - uart_handles[0]->cur_buffer_size <= 40)
@@ -70,7 +70,7 @@ static void generateImuLoop(void *pv){
             uart_handles[0]->cur_buffer_size++;
             i++;
         }
-        xSemaphoreGive(uart_handles[0]->mutex);
+        xSemaphoreGive(uart_handles[0]->rxSemaphore);
 
         // printf("%hhu\n", uart_handles[0]->buffer[0]);
         // printf("fast");
