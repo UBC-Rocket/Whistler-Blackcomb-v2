@@ -192,7 +192,7 @@ static void ReadImuTask(void *pv)
     do
     {
 		// vTaskDelay(pdMS_TO_TICKS(5));
-        uart_error = uartReceive(&hal_uart_imu, imu_datagram, 40, &n);//UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
+        uart_error = uartReceive(&hal_uart_imu, imu_datagram, 40, &n);
         if (uart_error == kStatus_UART_RxHardwareOverrun)
         {
             /* Notify about hardware buffer overrun */
@@ -245,6 +245,7 @@ static void ReadImuTask(void *pv)
 						(int)(o.j*100),
 						(int)(o.k*100),
 						(int)(100*sqrt(o.i*o.i+o.j*o.j+o.k*o.k)));
+				// len = sprintf(toPrint, "t = %d", cur_time - imu_last_time);
 
 				imu_last_time = cur_time;
 			}

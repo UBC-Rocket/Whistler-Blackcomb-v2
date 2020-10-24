@@ -16,6 +16,10 @@
  * Definitions
  ******************************************************************************/
 
+#define HAL_UART_COMPLETE 0b00000001
+#define HAL_UART_RING_BUFFER_OVERRUN 0b00000010
+#define HAL_UART_HARDWARE_BUFFER_OVERRUN 0b00000100
+
 /* Struct for uart creation with rtos */
 typedef struct _hal_uart_handle_t {
 	UART_Type* base;

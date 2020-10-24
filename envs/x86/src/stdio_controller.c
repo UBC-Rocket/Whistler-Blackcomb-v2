@@ -52,25 +52,25 @@ static void generateImuLoop(void *pv){
     // if (getcwd(cwd, sizeof(cwd)) != NULL) 
     //     printf("Current working dir: %s\n", cwd);
 
-    while(uart_handles[0]->base != IMU_UART)
-        vTaskDelay(pdMS_TO_TICKS(1));
+    printf("Starting IMU loop");
 
-    FILE *fp = fopen("../data/imu/imu_uart_data_2.txt", "r");
+    FILE *fp = fopen("../data/imu/imu_uart_data_3.txt", "r");
 
     while(1){
+        vTaskDelay(pdMS_TO_TICKS(8));
         int i = 0;
         xSemaphoreTake(uart_handles[0]->rxSemaphore, portMAX_DELAY);
-        while(i < 40){
-            vTaskDelay(pdMS_TO_TICKS(10));
+        for(int i = 0; i < 40; ++i){
             if(uart_handles[0]->buffer_size - uart_handles[0]->cur_buffer_size <= 40)
                 continue;
-            if(!fscanf(fp, "%hhu", &(uart_handles[0]->buffer[uart_handles[0]->cur_buffer_size + i]))){
+            if(!fscanf(fp, "%hhu ", &(uart_handles[0]->buffer[uart_handles[0]->cur_buffer_size]))){
                 return;
             }
             uart_handles[0]->cur_buffer_size++;
-            i++;
         }
         xSemaphoreGive(uart_handles[0]->rxSemaphore);
+
+        xEventGroupSetBits(uart_handles[0]->rxEvent, HAL_UART_COMPLETE);
 
         // printf("%hhu\n", uart_handles[0]->buffer[0]);
         // printf("fast");
@@ -95,8 +95,12 @@ void stdioInit(){
 			) != pdPASS) {
     	for(;;);
     }
+}
 
-    if (xTaskCreate( 
+void stdioAssignUart(hal_uart_handle_t *handle){
+    if((void*)handle->base == (void*)IMU_UART){
+		uart_handles[0] = handle;
+        if (xTaskCreate( 
 			generateImuLoop, 
 			"imu generator controller",
 			200/sizeof(StackType_t),
@@ -106,10 +110,5 @@ void stdioInit(){
 			) != pdPASS) {
     	for(;;);
     }
-}
-
-void stdioAssignUart(hal_uart_handle_t *handle){
-    if((void*)handle->base == (void*)IMU_UART){
-		uart_handles[0] = handle;
 	}
 }
