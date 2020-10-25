@@ -5,3 +5,4 @@ compiler: gcc
 script: 
 - cmake .
 - cmake --build .
+- ctest -j14 -C Debug -T test --output-on-failure
