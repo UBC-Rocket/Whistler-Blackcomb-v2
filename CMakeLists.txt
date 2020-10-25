@@ -10,6 +10,8 @@ add_executable(whistler-blackcomb source/Whistler-Blackcomb.c)
 
 add_subdirectory(envs/x86)
 add_subdirectory(common)
+add_subdirectory(external)
+add_subdirectory(test)
 
 target_include_directories(whistler-blackcomb PUBLIC
     common/include

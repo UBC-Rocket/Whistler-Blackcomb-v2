@@ -11,16 +11,42 @@
 
 
 typedef struct imu_config {
+	unsigned char 	interpGyro;
+	/* 	0 = Setting this to zero will definitly break something. Rate is always included in datagram.
+		1 = [° / s] - Angular Rate or Avg. Angular rate. [DEFAULT]
+		2 = [°/sample] - Incremental Angle or Integrated angle
+	*/
 	unsigned char	interpAccel;
+	/*	accelerometer
+		0 = not included in datagram
+
+		1 = [g] - Acceleration or Avg. Acceleration, 5g range
+		2 = [g] - Acceleration or Avg. Acceleration, 10g range
+		3 = [g] - Acceleration or Avg. Acceleration, 30g range
+		4 = [g] - Acceleration or Avg. Acceleration, 80g range
+
+		5 = [m/s/sample] - Incremented or Integrated Velocity, 5g range
+		6 = [m/s/sample] - Incremented or Integrated Velocity, 10g range
+		7 = [m/s/sample] - Incremented or Integrated Velocity, 30g range
+		8 = [m/s/sample] - Incremented or Integrated Velocity, 80g range
+	*/
 	unsigned char	interpIncl;
+	/*	inclinometer
+		0 = not included in datagram
+		1 = [g] - Acceleration or. Avg. Acceleration
+		2 = [m/s/sample] - Incremental or Integrated Velocity
+	*/
 	unsigned char	interpTemp;
+	/*	temperature
+		0 = not included in datagram
+		1 = [°C]
+	*/
 	unsigned char	interpAux;
-	unsigned int	gyroOutUnit;
-	/*	1 = [° / s] - ANGULAR RATE
-		2 =
-		3 =*/
-	unsigned int	AccelOutUnit;
-	unsigned int	inclOutUnit;
+	/*	auxillary 
+		0 = not included in datagram
+		1 = [V]
+	*/
+
 	unsigned int	sampleRate;
 	unsigned int	bitRate;
 
