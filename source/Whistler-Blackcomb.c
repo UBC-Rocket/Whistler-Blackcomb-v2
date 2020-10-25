@@ -139,7 +139,8 @@ static void BlinkTask(void *pv) {
  */
 static void ReadImuTask(void *pv)
 {
-	struct IMUStruct IMU;
+	imu_config_t IMU;
+	configImu(&IMU);
 
     int uart_error;
     size_t n = 0;

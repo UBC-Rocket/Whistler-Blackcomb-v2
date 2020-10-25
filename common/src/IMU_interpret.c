@@ -1,4 +1,37 @@
+
+/*******************************************************************************
+ * Includes
+ ******************************************************************************/
+
 #include "IMU_interpret.h"
+#include <math.h>
+#include <stdio.h>
+
+
+/*******************************************************************************
+ * Declarations
+ ******************************************************************************/
+
+int to_2C(int value);
+
+int get_ID(imu_config_t *imu);
+
+/*******************************************************************************
+ * Implementations
+ ******************************************************************************/
+
+void configImu(imu_config_t *imu){
+	imu->interpAccel = 1;
+	imu->interpIncl = 1;
+	imu->interpTemp = 0;
+	imu->interpAux = 0;
+	/* Note sure what these should be set to */
+	imu->gyroOutUnit = 1;
+	imu->AccelOutUnit = 1;
+	
+	imu->sampleRate = 125;
+	imu->bitRate = 374400;
+}
 
 //TODO: Better status byte stuff
 
@@ -11,7 +44,7 @@ int to_2C(int value) {
 	return value;
 }
 
-int get_ID(struct IMUStruct *imu) {
+int get_ID(imu_config_t *imu) {
 	if (imu->interpAux == 1) {
 		if (imu->interpTemp == 1) {
 			if (imu->interpAccel == 1) {
@@ -80,7 +113,7 @@ int get_ID(struct IMUStruct *imu) {
 }
 
 
-int interpretImuData(struct IMUStruct *imu) {
+int interpretImuData(imu_config_t *imu) {
 	//IMPORTANT: This is not well made, so you better make sure that the length of the arrays you pass are right...
 
 	//these variables keep track of where the program is in the datagram[], dataout[], and statusBytes[] arrays, respectivly

@@ -1,19 +1,16 @@
 #ifndef _IMU_INTERPRET_
 #define _IMU_INTERPRET_
 
-#include <math.h>
-#include <stdio.h>
-
 // Error/success codes
 #define DATAGRAM_PARSE_SUCCESS						0
 #define DATAGRAM_PARSE_ID_MISMATCH					1
 #define DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK		2
 
 
-// InterpretImuData takes an IMUstruct and interprets into usable double precision values. Output is mostly in .rate[], .accel[], .incl[] with index 0, 1, and 2 holding x, y, and z.
+// InterpretImuData takes an imu_config_t and interprets into usable double precision values. Output is mostly in .rate[], .accel[], .incl[] with index 0, 1, and 2 holding x, y, and z.
 
 
-struct IMUStruct {
+typedef struct imu_config {
 	unsigned char	interpAccel;
 	unsigned char	interpIncl;
 	unsigned char	interpTemp;
@@ -58,9 +55,17 @@ struct IMUStruct {
 	int latency;
 	unsigned char auxStatus[8];
 
-};
+} imu_config_t;
 
-int interpretImuData(struct IMUStruct *imu);
+/**
+ * Configures IMU struct with parameters. To change these parameters change
+ * implementation of this function. This is a pretty ugly way to do it, might
+ * want to make it more elegant somehow. 
+ * @param imu the imu struct to configure
+ */
+void configImu(imu_config_t *imu);
 
-//int get_ID(struct IMUStruct *imu);
+int interpretImuData(imu_config_t *imu);
+
+//int get_ID(struct imu_config_t *imu);
 #endif
