@@ -19,6 +19,15 @@
 #include <unistd.h>
 
 /*******************************************************************************
+ * Declarations
+ ******************************************************************************/
+
+enum sensors {
+    uart_index_imu = 0, 
+    uart_index_debug = 1, 
+};
+
+/*******************************************************************************
  * Variables
  ******************************************************************************/
 
@@ -54,26 +63,26 @@ static void generateImuLoop(void *pv){
 
     printf("Starting IMU loop");
 
+    /* Convenience variable to reduce repetition */
+    const int ind = uart_index_imu;
+
     FILE *fp = fopen("../data/imu/imu_uart_data_3.txt", "r");
 
     while(1){
         vTaskDelay(pdMS_TO_TICKS(8));
         int i = 0;
-        xSemaphoreTake(uart_handles[0]->rxSemaphore, portMAX_DELAY);
+        xSemaphoreTake(uart_handles[ind]->rxSemaphore, portMAX_DELAY);
         for(int i = 0; i < 40; ++i){
-            if(uart_handles[0]->buffer_size - uart_handles[0]->cur_buffer_size <= 40)
+            if(uart_handles[ind]->buffer_size - uart_handles[ind]->cur_buffer_size <= 40)
                 continue;
-            if(!fscanf(fp, "%hhu ", &(uart_handles[0]->buffer[uart_handles[0]->cur_buffer_size]))){
+            if(!fscanf(fp, "%hhu ", &(uart_handles[ind]->buffer[uart_handles[ind]->cur_buffer_size]))){
                 return;
             }
             uart_handles[0]->cur_buffer_size++;
         }
-        xSemaphoreGive(uart_handles[0]->rxSemaphore);
+        xSemaphoreGive(uart_handles[ind]->rxSemaphore);
 
         xEventGroupSetBits(uart_handles[0]->rxEvent, HAL_UART_COMPLETE);
-
-        // printf("%hhu\n", uart_handles[0]->buffer[0]);
-        // printf("fast");
     }
 }
 
