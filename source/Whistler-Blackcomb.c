@@ -1,6 +1,7 @@
 /*
  * Main flight computer code
  * Right now this is pretty much just a blink sketch but more will be added
+ * UPDATE 2020/10/20: Now it's a blink sketch that prints hello world and you might be able to plug an IMU into.
  */
 
 /**
@@ -138,6 +139,8 @@ static void BlinkTask(void *pv) {
  */
 static void ReadImuTask(void *pv)
 {
+	struct IMUStruct IMU;
+
     int uart_error;
     size_t n = 0;
 
@@ -145,8 +148,8 @@ static void ReadImuTask(void *pv)
 
 	/* TODO: change sizes to match IMU config automatically */
 	uint8_t * imu_datagram = (uint8_t*) pvPortMalloc(100 * sizeof(uint8_t));
-	double * parsed_imu_data = (double*) pvPortMalloc(13 * sizeof(double));
-	unsigned char * statusBytes = (unsigned char*) pvPortMalloc(3 * sizeof(unsigned char));
+	//double * parsed_imu_data = (double*) pvPortMalloc(13 * sizeof(double));
+	//unsigned char * statusBytes = (unsigned char*) pvPortMalloc(3 * sizeof(unsigned char));
 
 	quaternion orientation = qUnit();
 	quaternion acceleration;
@@ -191,8 +194,7 @@ static void ReadImuTask(void *pv)
     /* Receive input from imu and parse it. */
     do
     {
-		// vTaskDelay(pdMS_TO_TICKS(5));
-        uart_error = uartReceive(&hal_uart_imu, imu_datagram, 40, &n);
+        uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);//UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
         if (uart_error == kStatus_UART_RxHardwareOverrun)
         {
             /* Notify about hardware buffer overrun */
@@ -210,10 +212,10 @@ static void ReadImuTask(void *pv)
                 vTaskSuspend(NULL);
             }
         }
-        if (n > 0 && imu_datagram[0] == 0x93)
+        if (n > 0 && IMU.datagram[0] == 0x93)
         {
         	// Parse Datagram
-			parse_error = interpretImuData(imu_datagram, 0x93, parsed_imu_data, statusBytes);
+			parse_error = interpretImuData(&IMU);
 
 			int len;
 			if(parse_error == DATAGRAM_PARSE_ID_MISMATCH)
@@ -222,9 +224,9 @@ static void ReadImuTask(void *pv)
 				len = sprintf(toPrint, "STATUS_BYTE_FAIL\n");
 			else if(parse_error == DATAGRAM_PARSE_SUCCESS){
 
-				double gx = parsed_imu_data[0] * PI / 180;
-				double gy = parsed_imu_data[1] * PI / 180;
-				double gz = parsed_imu_data[2] * PI / 180;
+				double gx = IMU.rate[0] * PI / 180;
+				double gy = IMU.rate[1] * PI / 180;
+				double gz = IMU.rate[2] * PI / 180;
 
 
 				int cur_time = timeSinceStartup();
