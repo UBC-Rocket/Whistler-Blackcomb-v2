@@ -21,14 +21,12 @@ int get_ID(imu_config_t *imu);
  ******************************************************************************/
 
 void configImu(imu_config_t *imu){
-	imu->interpAccel = 1;
-	imu->interpIncl = 1;
-	imu->interpTemp = 0;
-	imu->interpAux = 0;
-	/* Note sure what these should be set to */
-	imu->gyroOutUnit = 1;
-	imu->AccelOutUnit = 1;
-	
+	imu->interpGyro 	= 1;
+	imu->interpAccel 	= 1;
+	imu->interpIncl 	= 1;
+	imu->interpTemp 	= 0;
+	imu->interpAux 		= 0;
+
 	imu->sampleRate = 125;
 	imu->bitRate = 374400;
 }
@@ -45,32 +43,32 @@ int to_2C(int value) {
 }
 
 int get_ID(imu_config_t *imu) {
-	if (imu->interpAux == 1) {
-		if (imu->interpTemp == 1) {
-			if (imu->interpAccel == 1) {
-				if (imu->interpIncl == 1) {
+	if (imu->interpAux) {
+		if (imu->interpTemp) {
+			if (imu->interpAccel) {
+				if (imu->interpIncl) {
 					return 0xAF;
 				}
 				else {
 					return 0xAD;
 				}
 			}
-			else if (imu->interpIncl == 1) {
+			else if (imu->interpIncl) {
 				return 0xAE;
 			}
 			else {
 				return 0x9C;
 			}
 		}
-		else if (imu->interpAccel == 1) {
-			if (imu->interpIncl == 1) {
+		else if (imu->interpAccel) {
+			if (imu->interpIncl) {
 				return 0x9B;
 			}
 			else {
 				return 0x99;
 			}
 		}
-		else if (imu->interpIncl == 1) {
+		else if (imu->interpIncl) {
 			return 0x9A;
 		}
 		else {
@@ -79,31 +77,31 @@ int get_ID(imu_config_t *imu) {
 
 	}
 	else {
-		if (imu->interpTemp == 1) {
-			if (imu->interpAccel == 1) {
-				if (imu->interpIncl == 1) {
+		if (imu->interpTemp) {
+			if (imu->interpAccel) {
+				if (imu->interpIncl) {
 					return 0xA7;
 				}
 				else {
 					return 0xA5;
 				}
 			}
-			else if (imu->interpIncl == 1) {
+			else if (imu->interpIncl) {
 				return 0xA6;
 			}
 			else {
 				return 0x94;
 			}
 		}
-		else if (imu->interpAccel == 1) {
-			if (imu->interpIncl == 1) {
+		else if (imu->interpAccel) {
+			if (imu->interpIncl) {
 				return 0x93;
 			}
 			else {
 				return 0x91;
 			}
 		}
-		else if (imu->interpIncl == 1) {
+		else if (imu->interpIncl) {
 			return 0x92;
 		}
 		else {
@@ -132,11 +130,12 @@ int interpretImuData(imu_config_t *imu) {
 
 	//gyro parse loop
 	//There is no option for a normal mode datapacket without gyro data, so we evaluate it every time.
+	int gyro_divisor[2]={14,21};
 	for (int i = 0; i < 3; i++) {
 		unsigned int bitrep = (imu->datagram[datagramCount] << 16)
 				+ (imu->datagram[datagramCount + 1] << 8)
 				+ imu->datagram[datagramCount + 2];
-		imu->rate[i] = to_2C(bitrep) / 1.0 / (1 << 14);
+		imu->rate[i] = to_2C(bitrep) / 1.0 / (1 << gyro_divisor[imu->interpGyro-1]);
 		datagramCount += 3;		//move 3 bytes forward in the datagram
 	}
 
@@ -149,16 +148,15 @@ int interpretImuData(imu_config_t *imu) {
 	datagramCount += 1;
 
 	//evaluate if datagram includes accelerometer data
-	if (imu->interpAccel==1) {
+	if (imu->interpAccel) {
 		//accelerometer parse loop
+		int accel_divisor[8]={20,19,18,16,23,22,21,19};
 		for (int i = 0; i < 3; i++) {
 			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
 					+ (imu->datagram[datagramCount + 1] << 8)
 					+ imu->datagram[datagramCount + 2];
-			imu->accel[i] = to_2C(bitrep) / 1.0 / (1 << 20);
+			imu->accel[i] = to_2C(bitrep) / 1.0 / (1 << accel_divisor[imu->interpAccel-1]);
 			datagramCount += 3;
-			//this only works in the "5g" range
-			//IDK if that's something you set on the IMU or something that would change over the course of the flight.
 		}
 
 		//status byte output and engage flag
@@ -171,14 +169,14 @@ int interpretImuData(imu_config_t *imu) {
 	}
 
 	//evaluate if datagram includes inlc data
-	if (imu->interpIncl == 1) {
+	if (imu->interpIncl) {
 		//inclinometer parse loop
-		//assuming that the inclinometer output unit is accel
+		int incl_divisor[2]= {22,25};
 		for (int i =0; i < 3; i++) {
 			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
 					+ (imu->datagram[datagramCount + 1] << 8)
 					+ imu->datagram[datagramCount + 2];
-			imu->incl[i] = to_2C(bitrep) / 1.0 / (1 << 22);
+			imu->incl[i] = to_2C(bitrep) / 1.0 / (1 << incl_divisor[imu->interpAccel-1]);
 			datagramCount += 3;
 		}
 		//status byte output and engage flag
@@ -190,7 +188,7 @@ int interpretImuData(imu_config_t *imu) {
 		datagramCount += 1;
 	}
 	//evaluate if datagram includes temp
-	if (imu->interpTemp ==1) {
+	if (imu->interpTemp) {
 		//there are 3 different temp readings, so we loop this 3x
 		for (int ii = 0; ii <= 3; ii++) {
 			//temp parse loop
@@ -210,7 +208,7 @@ int interpretImuData(imu_config_t *imu) {
 		}
 	}
 	//evaluate if datagram includes aux
-	if (imu->interpAux ==1) {
+	if (imu->interpAux) {
 		//aux parse loop
 		for (int i = 0; i < 3; i++) {
 			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
