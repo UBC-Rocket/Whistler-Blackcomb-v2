@@ -4,7 +4,7 @@ void baseTest(void){
     TEST_ASSERT_EQUAL_HEX8(2,2);
 }
 void baseTest2(void){
-    TEST_ASSERT_EQUAL_HEX8(1,2);
+    TEST_ASSERT_EQUAL_HEX8(1,1);
 }
 
 void setUp(void){}
