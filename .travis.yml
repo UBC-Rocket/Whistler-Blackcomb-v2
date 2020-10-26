@@ -1,6 +1,14 @@
 language: c
 os: linux
 compiler: gcc
+sudo: required
+
+services: 
+    - docker
+
+before_install:
+    - docker run whistler-blackcomb:mcuxpressoide /bin/sh -c "ls; pwd; mcuxpressoide -nosplash --launcher.suppressErrors -application org.eclipse.cdt.managedbuilder.core.headlessBuild -data "/home" -cleanBuild Whistler-Blackcomb-v2"
+    -
 
 script: 
 - cmake .
