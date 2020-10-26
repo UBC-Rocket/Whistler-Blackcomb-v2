@@ -74,6 +74,7 @@ hal_uart_handle_t hal_uart_imu;
 double position[] = {0, 0, 0};
 double velocity[] = {0, 0, 0};
 double accel[] = {0, 0, 0};
+imu_config_t IMU;
 
 /*******************************************************************************
  * Main
@@ -127,7 +128,6 @@ int main(void) {
 static void BlinkTask(void *pv) {
     while (1){
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
-		printf("Blink Task\n");
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -139,16 +139,12 @@ static void BlinkTask(void *pv) {
  */
 static void ReadImuTask(void *pv)
 {
-	imu_config_t IMU;
 	configImu(&IMU);
 
     int uart_error;
     size_t n = 0;
 
     int parse_error;
-
-	/* TODO: change sizes to match IMU config automatically */
-	uint8_t * imu_datagram = (uint8_t*) pvPortMalloc(100 * sizeof(uint8_t));
 	//double * parsed_imu_data = (double*) pvPortMalloc(13 * sizeof(double));
 	//unsigned char * statusBytes = (unsigned char*) pvPortMalloc(3 * sizeof(unsigned char));
 
