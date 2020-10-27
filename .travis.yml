@@ -1,15 +1,20 @@
+branches:
+    only: 
+      - master
+
 language: c
 os: linux
 compiler: gcc
 sudo: required
 
-services: 
-    - docker
+# services: 
+#     - docker
 
-before_install:
-    - printf "FROM misprit7/whistler-blackcomb:mcuxpressoide\nRUN mkdir -p /home/Whistler-Blackcomb\nCOPY ./* /home/Whistler-Blackcomb/" > Dockerfile
-    - docker build -t new_image .
-    - docker run new_image /bin/sh -c "ls; pwd; mcuxpressoide -nosplash --launcher.suppressErrors -application org.eclipse.cdt.managedbuilder.core.headlessBuild -data /home -cleanBuild Whistler-Blackcomb"
+# If we get headless builds on MCUXpresso working this is a potential start
+# before_install:
+#     - printf "FROM misprit7/whistler-blackcomb:mcuxpressoide\nRUN mkdir -p /home/Whistler-Blackcomb\nCOPY . /home/Whistler-Blackcomb" > Dockerfile
+#     - docker build -t whistler-blackcomb-source .
+#     - docker run whistler-blackcomb-source /bin/sh -c "ls; pwd; mcuxpressoide -nosplash --launcher.suppressErrors -application org.eclipse.cdt.managedbuilder.core.headlessbuild -data /home -cleanBuild Whistler-Blackcomb"
 
 script: 
 - cmake .
