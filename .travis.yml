@@ -1,0 +1,22 @@
+branches:
+    only: 
+      - master
+
+language: c
+os: linux
+compiler: gcc
+sudo: required
+
+# services: 
+#     - docker
+
+# If we get headless builds on MCUXpresso working this is a potential start
+# before_install:
+#     - printf "FROM misprit7/whistler-blackcomb:mcuxpressoide\nRUN mkdir -p /home/Whistler-Blackcomb\nCOPY . /home/Whistler-Blackcomb" > Dockerfile
+#     - docker build -t whistler-blackcomb-source .
+#     - docker run whistler-blackcomb-source /bin/sh -c "ls; pwd; mcuxpressoide -nosplash --launcher.suppressErrors -application org.eclipse.cdt.managedbuilder.core.headlessbuild -data /home -cleanBuild Whistler-Blackcomb"
+
+script: 
+- cmake .
+- cmake --build .
+- ctest -j14 -C Debug -T test --output-on-failure

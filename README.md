@@ -1,5 +1,10 @@
 # Whistler Blackcomb Flight Computer Firmware
 
+[![Build Status](https://travis-ci.com/UBC-Rocket/Whistler-Blackcomb-v2.svg?branch=master)](https://travis-ci.com/UBC-Rocket/Whistler-Blackcomb-v2)
+![Commit Activity](https://img.shields.io/github/commit-activity/w/UBC-Rocket/Whistler-Blackcomb-v2)
+![Pull Requests](https://img.shields.io/github/issues-pr/UBC-Rocket/Whistler-Blackcomb-v2)
+
+
 This is a repository with the code for the flight computer set up using MCUExpresso, not Arduino/Teensy. 
 
 ## Setup
