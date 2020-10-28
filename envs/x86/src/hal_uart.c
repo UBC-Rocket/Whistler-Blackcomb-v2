@@ -5,6 +5,8 @@
 
 #include "hal_uart.h"
 #include "hal.h"
+#include "stdio_controller.h"
+
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "board.h"

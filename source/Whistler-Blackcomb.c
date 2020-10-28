@@ -83,7 +83,6 @@ imu_config_t IMU;
  * @brief   Application entry point.
  */
 int main(void) {
-
 	initHal();
     initTimers();
 

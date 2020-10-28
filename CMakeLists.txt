@@ -27,6 +27,10 @@ target_include_directories(whistler-blackcomb PUBLIC
 
 target_link_libraries(whistler-blackcomb m)
 
+# This is to disable a warning from core_cm4.h on compilation
+# Might be bad to disable it this way, not entirely sure
+target_compile_options(whistler-blackcomb PRIVATE -Wno-int-to-pointer-cast -Werror -Wall -Wextra)
+
 find_package(Threads REQUIRED)
 if(THREADS_HAVE_PTHREAD_ARG)
   set_property(TARGET whistler-blackcomb PROPERTY COMPILE_OPTIONS "-pthread")
