@@ -9,7 +9,5 @@ add_library(IMU_interpret STATIC
     src/IMU_interpret.c
 )
 
-target_include_directories(IMU_interpret PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/include
-    ${CMAKE_CURRENT_LIST_DIR}/src
-)
+add_subdirectory(include)
+add_subdirectory(src)
