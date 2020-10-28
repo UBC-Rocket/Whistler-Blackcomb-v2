@@ -8,3 +8,14 @@ target_link_libraries(basic_test_app
 )
 
 add_test(basic_test basic_test_app)
+
+add_executable(IMU_test_app
+    test_IMU_interp.c
+)
+
+target_link_libraries(IMU_test_app
+    IMU_interpret
+    Unity
+)
+
+add_test(IMU_test IMU_test_app)

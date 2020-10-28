@@ -3,7 +3,7 @@
  * Includes
  ******************************************************************************/
 
-#include "IMU_interpret.h"
+#include <IMU_interpret.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -14,21 +14,23 @@
 
 int to_2C(int value);
 
-int get_ID(imu_config_t *imu);
+int get_ID(IMU_1 *imu);
 
 /*******************************************************************************
  * Implementations
  ******************************************************************************/
 
-void configImu(imu_config_t *imu){
+void configImu(IMU_1 *imu){
+	
 	imu->interpGyro 	= 1;
 	imu->interpAccel 	= 1;
 	imu->interpIncl 	= 1;
 	imu->interpTemp 	= 0;
 	imu->interpAux 		= 0;
-
-	imu->sampleRate = 125;
-	imu->bitRate = 374400;
+	imu->datagramID		=get_ID(imu);
+	//these guys don't do anything right now.
+	imu->sampleRate 	= 125;
+	imu->bitRate 		= 374400;
 }
 
 //TODO: Better status byte stuff
@@ -42,7 +44,7 @@ int to_2C(int value) {
 	return value;
 }
 
-int get_ID(imu_config_t *imu) {
+int get_ID(IMU_1 *imu) {
 	if (imu->interpAux) {
 		if (imu->interpTemp) {
 			if (imu->interpAccel) {
@@ -111,7 +113,8 @@ int get_ID(imu_config_t *imu) {
 }
 
 
-int interpretImuData(imu_config_t *imu) {
+
+int interpretImuData(IMU_1 *imu) {
 	//IMPORTANT: This is not well made, so you better make sure that the length of the arrays you pass are right...
 
 	//these variables keep track of where the program is in the datagram[], dataout[], and statusBytes[] arrays, respectivly
@@ -121,7 +124,7 @@ int interpretImuData(imu_config_t *imu) {
 	int statusFlag = 0;
 
 	//quick check to make sure the identifier from the packet = identifier it expects.
-	if (imu->datagram[datagramCount] != get_ID(imu)) {
+	if (imu->datagram[datagramCount] != imu->datagramID) {
 		//return error 
 		return DATAGRAM_PARSE_ID_MISMATCH;
 	}
