@@ -74,7 +74,7 @@ hal_uart_handle_t hal_uart_imu;
 double position[] = {0, 0, 0};
 double velocity[] = {0, 0, 0};
 double accel[] = {0, 0, 0};
-imu_config_t IMU;
+IMU_1 IMU;
 
 /*******************************************************************************
  * Main
