@@ -315,7 +315,7 @@ struct timespec t;
 }
 
 static uint64_t prvStartTimeNs;
-static uint64_t prvTickCount;
+// static uint64_t prvTickCount;
 
 /*
  * Setup the systick timer to generate the tick interrupts at the required
@@ -356,7 +356,7 @@ static void vPortSystemTickHandler( int sig )
 {
 Thread_t *pxThreadToSuspend;
 Thread_t *pxThreadToResume;
-uint64_t xExpectedTicks;
+// uint64_t xExpectedTicks;
 
 	uxCriticalNesting++; /* Signals are blocked in this signal handler. */
 
@@ -456,7 +456,7 @@ BaseType_t uxSavedCriticalNesting;
 
 static void prvSuspendSelf( Thread_t *thread )
 {
-int iSig;
+// int iSig;
 
 	/*
 	 * Suspend this thread by waiting for a pthread_cond_signal event.
