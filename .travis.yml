@@ -18,7 +18,6 @@ sudo: required
 
 script: 
     - mkdir -p build
-    - cd build
-    - cmake -S .. -B .
-    - cmake --build .
-    - ctest -j14 -C Debug -T test --output-on-failure
+    - cmake -S . -B build
+    - cmake --build build
+    - cd build & ctest -j14 -C Debug -T test --output-on-failure
