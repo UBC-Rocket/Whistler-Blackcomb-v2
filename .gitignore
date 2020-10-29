@@ -37,3 +37,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 /Release/
+# Don't really know why these are generated, but we don't want them
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+
