@@ -70,7 +70,6 @@ static void generateImuLoop(void *pv){
 
     while(1){
         vTaskDelay(pdMS_TO_TICKS(8));
-        int i = 0;
         xSemaphoreTake(uart_handles[ind]->rxSemaphore, portMAX_DELAY);
         for(int i = 0; i < 40; ++i){
             if(uart_handles[ind]->buffer_size - uart_handles[ind]->cur_buffer_size <= 40)

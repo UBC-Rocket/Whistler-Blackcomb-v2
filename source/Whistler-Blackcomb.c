@@ -1,7 +1,5 @@
 /*
  * Main flight computer code
- * Right now this is pretty much just a blink sketch but more will be added
- * UPDATE 2020/10/20: Now it's a blink sketch that prints hello world and you might be able to plug an IMU into.
  */
 
 /**
@@ -36,7 +34,6 @@
 #include "hal_io.h"
 #include "hal_uart.h"
 
-
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -57,8 +54,8 @@ static void BlinkTask(void *pv);
 /*******************************************************************************
  * UART Variables
  ******************************************************************************/
-const char *debug_intro_message               = "Debug session started\n";
-const char *send_ring_overrun     = "\r\nRing buffer overrun!\r\n";
+const char *debug_intro_message = "Debug session started\n";
+const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
 uint8_t background_buffer_debug[200];
@@ -71,9 +68,9 @@ hal_uart_handle_t hal_uart_imu;
  * Positioning Variables
  ******************************************************************************/
 
-double position[] = {0, 0, 0};
-double velocity[] = {0, 0, 0};
-double accel[] = {0, 0, 0};
+double position[] = { 0, 0, 0 };
+double velocity[] = { 0, 0, 0 };
+double accel[] = { 0, 0, 0 };
 IMU_1 IMU;
 
 /*******************************************************************************
@@ -83,39 +80,38 @@ IMU_1 IMU;
  * @brief   Application entry point.
  */
 int main(void) {
-
 	initHal();
-    initTimers();
+	initTimers();
 
-    halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
-    halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
+	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
+	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
 
-    /* Copy the following to create a new task */
-    if (xTaskCreate(  /* create task */
-			BlinkTask,  /* pointer to the task */
-			"Blink Task", /* task name for kernel awareness debugging */
-			200/sizeof(StackType_t), /* task stack size */
-			(void*)NULL, /* optional task startup argument */
-			tskIDLE_PRIORITY+2,  /* initial priority */
-			(TaskHandle_t*)NULL /* optional task handle_debug to create */
-			) != pdPASS) {
-    	for(;;); /* error! probably out of memory */
-    }
-
-    if (xTaskCreate(
-    		ReadImuTask,
-			"UART Task",
-			configMINIMAL_STACK_SIZE + 100,
-			NULL,
-			debug_uart_task_PRIORITY,
-			NULL
-			) != pdPASS){
-    	for(;;);
+	/* Copy the following to create a new task */
+	if (xTaskCreate( /* create task */
+	BlinkTask, /* pointer to the task */
+	"Blink Task", /* task name for kernel awareness debugging */
+	200 / sizeof(StackType_t), /* task stack size */
+	(void*) NULL, /* optional task startup argument */
+	tskIDLE_PRIORITY + 2, /* initial priority */
+	(TaskHandle_t*) NULL /* optional task handle_debug to create */
+	) != pdPASS) {
+		for (;;)
+			; /* error! probably out of memory */
 	}
 
-     vTaskStartScheduler();
+	if (xTaskCreate(ReadImuTask, "UART Task",
+	configMINIMAL_STACK_SIZE + 100,
+	NULL,
+	debug_uart_task_PRIORITY,
+	NULL) != pdPASS) {
+		for (;;)
+			;
+	}
 
-	for(;;);
+	vTaskStartScheduler();
+
+	for (;;)
+		;
 }
 
 /*******************************************************************************
@@ -126,45 +122,44 @@ int main(void) {
  * @brief Simple blink Task as sanity check for program working
  */
 static void BlinkTask(void *pv) {
-    while (1){
+	while (1) {
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+	}
 }
 
 /*!
  * @brief Task responsible for IMU UART read and parse
- * Note: much of this was based from freertos_uart example
+ * Note: this whole function is a mess for now before we start actually
+ * implementing library code. 
  */
-static void ReadImuTask(void *pv)
-{
+static void ReadImuTask(void *pv) {
 	configImu(&IMU);
 
-    int uart_error;
-    size_t n = 0;
+	int uart_error;
+	size_t n = 0;
 
-    int parse_error;
+	int parse_error;
 	//double * parsed_imu_data = (double*) pvPortMalloc(13 * sizeof(double));
 	//unsigned char * statusBytes = (unsigned char*) pvPortMalloc(3 * sizeof(unsigned char));
 
 	quaternion orientation = qUnit();
-	quaternion acceleration;
+	// quaternion acceleration;
 
-	double * gravityAccel = (double*) pvPortMalloc(3 * sizeof(double));
-	double * vecOrientation = (double*) pvPortMalloc(3 * sizeof(double));
+	// double * gravityAccel = (double*) pvPortMalloc(3 * sizeof(double));
+	double *vecOrientation = (double*) pvPortMalloc(3 * sizeof(double));
 
 	// Dummy covariance matrices for now since these are yet to be determined
 //	double stateCovariance[][2][2] = {{{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}};
 //	double processCovariance[2][2] = {{0, 0}, {0, 0}};
 
-	double * stateCovariance = (double*) pvPortMalloc(3 * 2 * 2 * sizeof(double));
-	double * processCovariance = (double*) pvPortMalloc(2 * 2 * sizeof(double));
+	// double * stateCovariance = (double*) pvPortMalloc(3 * 2 * 2 * sizeof(double));
+	// double * processCovariance = (double*) pvPortMalloc(2 * 2 * sizeof(double));
 
 	vecOrientation[0] = 0;
 	vecOrientation[1] = 0;
 	vecOrientation[2] = 1;
-
 
 	uartConfig(&hal_uart_debug, DEBUG_UART, 374400);
 	uartConfig(&hal_uart_imu, IMU_UART, 374400);
@@ -172,64 +167,62 @@ static void ReadImuTask(void *pv)
 	unsigned long imu_last_time = 0;
 
 	/* Initialize UART interfaces. */
-    if (kStatus_Success != uartInit(&hal_uart_debug))
-    {
-        vTaskSuspend(NULL);
-    }
-
-    if (kStatus_Success != uartInit(&hal_uart_imu))
-	{
+	if (kStatus_Success != uartInit(&hal_uart_debug)) {
 		vTaskSuspend(NULL);
 	}
 
-    /* Send introduction message. */
-    if (kStatus_Success != uartSend(&hal_uart_debug, (uint8_t *)debug_intro_message, strlen(debug_intro_message)))//UART_RTOS_Send(&handle_debug, (uint8_t *)debug_intro_message, strlen(debug_intro_message)))
-    {
-        vTaskSuspend(NULL);
-    }
+	if (kStatus_Success != uartInit(&hal_uart_imu)) {
+		vTaskSuspend(NULL);
+	}
 
-    /* Receive input from imu and parse it. */
-    do
-    {
-        uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);//UART_RTOS_Receive(&handle_imu, imu_datagram, 40, &n);
-        if (uart_error == kStatus_UART_RxHardwareOverrun)
-        {
-            /* Notify about hardware buffer overrun */
-            if (kStatus_Success !=
-                uartSend(&hal_uart_debug, (uint8_t *)send_hardware_overrun, strlen(send_hardware_overrun)))
-            {
-                vTaskSuspend(NULL);
-            }
-        }
-        if (uart_error == kStatus_UART_RxRingBufferOverrun)
-        {
-            /* Notify about ring buffer overrun */
-            if (kStatus_Success != uartSend(&hal_uart_debug, (uint8_t *)send_ring_overrun, strlen(send_ring_overrun)))
-            {
-                vTaskSuspend(NULL);
-            }
-        }
-        if (n > 0 && IMU.datagram[0] == 0x93)
-        {
-        	// Parse Datagram
+	/* Send introduction message. */
+	if (kStatus_Success
+			!= uartSend(&hal_uart_debug, (uint8_t*) debug_intro_message,
+					strlen(debug_intro_message))) {
+		vTaskSuspend(NULL);
+	}
+
+	/* Receive input from imu and parse it. */
+	do {
+		uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);
+		if (uart_error == kStatus_UART_RxHardwareOverrun) {
+			/* Notify about hardware buffer overrun */
+			if (kStatus_Success
+					!= uartSend(&hal_uart_debug,
+							(uint8_t*) send_hardware_overrun,
+							strlen(send_hardware_overrun))) {
+				vTaskSuspend(NULL);
+			}
+		}
+		if (uart_error == kStatus_UART_RxRingBufferOverrun) {
+			/* Notify about ring buffer overrun */
+			if (kStatus_Success
+					!= uartSend(&hal_uart_debug, (uint8_t*) send_ring_overrun,
+							strlen(send_ring_overrun))) {
+				vTaskSuspend(NULL);
+			}
+		}
+		if (n > 0 && IMU.datagram[0] == 0x93) {
+			// Parse Datagram
 			parse_error = interpretImuData(&IMU);
 
 			int len;
-			if(parse_error == DATAGRAM_PARSE_ID_MISMATCH)
+			if (parse_error == DATAGRAM_PARSE_ID_MISMATCH)
 				len = sprintf(toPrint, "ID_MISMATCH\n");
-			else if(parse_error == DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK)
+			else if (parse_error == DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK)
 				len = sprintf(toPrint, "STATUS_BYTE_FAIL\n");
-			else if(parse_error == DATAGRAM_PARSE_SUCCESS){
+			else if (parse_error == DATAGRAM_PARSE_SUCCESS) {
 
 				double gx = IMU.rate[0] * PI / 180;
 				double gy = IMU.rate[1] * PI / 180;
 				double gz = IMU.rate[2] * PI / 180;
 
-
 				int cur_time = timeSinceStartup();
 
 				// Get calculated orientation quaternion
-				orientation = getOrientation((cur_time - imu_last_time) / 1000000.0, orientation, gx, gy, gz);
+				orientation = getOrientation(
+						(cur_time - imu_last_time) / 1000000.0, orientation, gx,
+						gy, gz);
 
 				quaternion o;
 				o.re = 0;
@@ -240,24 +233,20 @@ static void ReadImuTask(void *pv)
 				o = qMult(orientation, qMult(o, qConjugate(orientation)));
 
 				len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
-						(int)(o.i*100),
-						(int)(o.j*100),
-						(int)(o.k*100),
-						(int)(100*sqrt(o.i*o.i+o.j*o.j+o.k*o.k)));
+						(int) (o.i * 100), (int) (o.j * 100), (int) (o.k * 100),
+						(int) (100 * sqrt(o.i * o.i + o.j * o.j + o.k * o.k)));
 				// len = sprintf(toPrint, "t = %d", cur_time - imu_last_time);
 
 				imu_last_time = cur_time;
 			}
 
-			uartSend(&hal_uart_debug, (uint8_t *)toPrint, len);
+			uartSend(&hal_uart_debug, (uint8_t*) toPrint, len);
 
-        }
-    } while (kStatus_Success == uart_error);
+		}
+	} while (kStatus_Success == uart_error);
 
-    uartDeinit(&hal_uart_debug);
-    uartDeinit(&hal_uart_imu);
-    vTaskSuspend(NULL);
+	uartDeinit(&hal_uart_debug);
+	uartDeinit(&hal_uart_imu);
+	vTaskSuspend(NULL);
 }
-
-
 

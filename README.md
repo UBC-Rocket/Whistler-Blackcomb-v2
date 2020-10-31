@@ -5,7 +5,7 @@
 ![Pull Requests](https://img.shields.io/github/issues-pr/UBC-Rocket/Whistler-Blackcomb-v2)
 
 
-This is a repository with the code for the flight computer set up using MCUExpresso, not Arduino/Teensy. 
+This is a repository with the code for the UBC Rocket Whistler Blackcomb flight computer. A compiled version of it should hopefully at some point be in [space](https://en.wikipedia.org/wiki/K%C3%A1rm%C3%A1n_line). 
 
 ## Setup
 ### Download Tools
@@ -24,7 +24,7 @@ After the SDK is installed open the Installed SDK window (if this isn't visible 
 
 ![](doc/images/InstalledSDKs.png)
 
-Since this process is a bit of a pain and takes a while, the SDK is also available [here](https://drive.google.com/file/d/1W3uJRgZEQmULOGBuqZKy3pOs45sVxxFm/view?usp=sharing) on the Google Drive. Note that might not be consistently updated so ideally download using method above. 
+Since this process is a bit of a pain and takes a while, the SDK is also available [here](https://drive.google.com/file/d/1W3uJRgZEQmULOGBuqZKy3pOs45sVxxFm/view?usp=sharing) on the Google Drive. Note that it might not be consistently updated so ideally download using method above. 
 
 ### Setup Project
 

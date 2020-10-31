@@ -6,8 +6,6 @@ enable_testing()
 
 add_executable(whistler-blackcomb source/Whistler-Blackcomb.c)
 
-# add_compile_definitions(_POSIX_C_SOURCE=200809L)
-
 add_subdirectory(envs/x86)
 add_subdirectory(common)
 add_subdirectory(external)
@@ -35,6 +33,11 @@ endif()
 if(CMAKE_THREAD_LIBS_INIT)
   target_link_libraries(whistler-blackcomb "${CMAKE_THREAD_LIBS_INIT}")
 endif()
+
+# Wno-int-to-pointer-cast is to disable a warning from core_cm4.h on compilation
+# Might be bad to disable it this way, not entirely sure
+# Wno-unused-parameter is to enable hal taking parameters and not using them
+target_compile_options(whistler-blackcomb PRIVATE -Wno-int-to-pointer-cast -Wno-unused-parameter -Werror -Wall -Wextra)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
