@@ -38,6 +38,7 @@ install:
   # don't forget to switch back to the main build directory once you are done
   - cd ${TRAVIS_BUILD_DIR}
 
+# Sets up build environment
 before_script:
     - cmake --version
     - mkdir -p build
@@ -45,5 +46,7 @@ before_script:
     - cmake ..
 
 script: 
-    - cmake --build build
+    # Builds project
+    - cmake --build .
+    # Runs tests
     - cd build && ctest -j14 -C Debug -T test --output-on-failure
