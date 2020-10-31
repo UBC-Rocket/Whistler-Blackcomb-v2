@@ -39,9 +39,10 @@ install:
   - cd ${TRAVIS_BUILD_DIR}
 
 before_script:
+    - cmake --version
     - mkdir -p build
     - cd build
-    - cmake -S .. -B .
+    - cmake ..
 
 script: 
     - cmake --build build
