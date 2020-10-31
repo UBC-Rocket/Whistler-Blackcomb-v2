@@ -49,4 +49,4 @@ script:
     # Builds project
     - cmake --build .
     # Runs tests
-    - cd build && ctest -j14 -C Debug -T test --output-on-failure
+    - ctest -j14 -C Debug -T test --output-on-failure
