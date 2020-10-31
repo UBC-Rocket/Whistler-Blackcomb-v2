@@ -17,6 +17,7 @@ sudo: required
 #     - docker run whistler-blackcomb-source /bin/sh -c "ls; pwd; mcuxpressoide -nosplash --launcher.suppressErrors -application org.eclipse.cdt.managedbuilder.core.headlessbuild -data /home -cleanBuild Whistler-Blackcomb"
 
 script: 
+    - mkdir -p build
     - cmake -S . -B build
     - cmake --build build
-    - cd build & ctest -j14 -C Debug -T test --output-on-failure
+    - cd build && ctest -j14 -C Debug -T test --output-on-failure
