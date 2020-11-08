@@ -13,6 +13,8 @@ add_subdirectory(test)
 
 target_include_directories(whistler-blackcomb PUBLIC
     common/include
+    common/xbee/include/
+    common/xbee/ports/
     board
     device
     CMSIS
@@ -37,7 +39,19 @@ endif()
 # Wno-int-to-pointer-cast is to disable a warning from core_cm4.h on compilation
 # Might be bad to disable it this way, not entirely sure
 # Wno-unused-parameter is to enable hal taking parameters and not using them
-target_compile_options(whistler-blackcomb PRIVATE -Wno-int-to-pointer-cast -Wno-unused-parameter -Werror -Wall -Wextra)
+target_compile_options(whistler-blackcomb PRIVATE 
+    -Wno-int-to-pointer-cast 
+    -Wno-unused-parameter 
+    #-Werror 
+    -Wall 
+    -Wextra
+    -DPOSIX
+    -DZCL_ENABLE_TIME_SERVER
+    -DXBEE_CELLULAR_ENABLED
+    -DXBEE_DEVICE_ENABLE_ATMODE
+    -DXBEE_XMODEM_TESTING)
+
+add_definitions( -DXBEE_PLATFORM_HEADER=\"posix/platform_config.h\" )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

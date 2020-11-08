@@ -1,0 +1,59 @@
+# POSIX/digiapix executables
+**/posix/*
+!**/posix/*.*
+!**/posix/Makefile
+**/digiapix/*
+!**/digiapix/*.*
+!**/digiapix/Makefile
+
+# Files for Eclipse CDT
+.cproject
+.project
+/build/
+
+# Win32, POSIX
+*.d
+*.o
+*.exe
+
+# DOS
+*/dos/*.err
+*/dos/*.lib
+*/dos/*.lb1
+*/dos/*.lk1
+*/dos/*.map
+*/dos/*.mk
+*/dos/*.mk1
+*/dos/*.obj
+*/dos/*.sym
+
+# Rabbit/Dynamic C
+*/rabbit/*.bak
+*/rabbit/*.dbg
+*/rabbit/*.dcp
+*/rabbit/*.bdl
+*/rabbit/*.bin
+*/rabbit/*.brk
+*/rabbit/*.hdl
+*/rabbit/*.hex
+*/rabbit/*.lst
+*/rabbit/*.map
+*/rabbit/*.org
+*/rabbit/*.rom
+*/rabbit/*.upl
+*.hx1
+*.md1
+vssver.scc
+samples/rabbit/common
+src/xbee/rabbit
+src/xbee/util
+
+# other files
+*.orig
+doc
+lib
+coverity
+
+# auto-generated files
+samples/rabbit/main-node_discovery.c
+samples/rabbit/my_config.h

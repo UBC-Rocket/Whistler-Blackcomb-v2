@@ -73,6 +73,18 @@ double velocity[] = { 0, 0, 0 };
 double accel[] = { 0, 0, 0 };
 IMU_1 IMU;
 
+
+#include "xbee/atcmd.h"
+#include "xbee/device.h"
+const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
+{
+    XBEE_FRAME_HANDLE_LOCAL_AT,
+    XBEE_FRAME_MODEM_STATUS_DEBUG,
+    XBEE_FRAME_TABLE_END
+};
+
+
+
 /*******************************************************************************
  * Main
  ******************************************************************************/
