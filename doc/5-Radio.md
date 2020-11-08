@@ -6,7 +6,7 @@ All the radio code is taken from [this](https://github.com/digidotcom/xbee_ansic
 
 1. Target declaration
 
-The build tool must first declare the target, and this is done through a preprocessor define statement. For x86 this is done in the CMakeLists.txt in the main directory, whereas in MCUXpresso it is done through the UI. 
+The build tool must first declare the target, and this is done through a preprocessor define statement. For x86 this is done in the CMakeLists.txt in the main directory, whereas in MCUXpresso it is done through the UI, through Project->Properties->C/C++ General->Paths and Symbols->Symbols. 
 
 2. Removal of uncessesary files
 
