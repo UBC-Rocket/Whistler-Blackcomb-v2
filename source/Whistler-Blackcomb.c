@@ -14,7 +14,7 @@
 #include <string.h>
 #include <math.h>
 
-// Pin definitions
+/* Pin definitions */
 #include "board.h"
 #include "pin_mux.h"
 
