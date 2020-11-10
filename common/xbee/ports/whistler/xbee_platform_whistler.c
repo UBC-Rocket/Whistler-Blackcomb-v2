@@ -5,12 +5,13 @@
  ******************************************************************************/
 
 #include "hal_time.h"
+#include <stdint.h>
 
 uint32_t xbee_seconds_timer(){
     return timeSinceStartup()/1000;
 }
 
-uint32_t xbee_millsecond_timer(){
+uint32_t xbee_millisecond_timer(){
     return timeSinceStartup();
 }
 
@@ -22,9 +23,12 @@ uint32_t xbee_millsecond_timer(){
 #include "xbee/serial.h"
 #include "hal_uart.h"
 
+#define XBEE_SER_CHECK(ptr) \
+    do { if (xbee_ser_invalid(ptr)) return -EINVAL; } while (0)
+
 int xbee_ser_invalid( xbee_serial_t *serial){
     /* TODO: Do some actual checking here */
-    return 1;
+    return 0;
 }
 
 const char *xbee_ser_portname( xbee_serial_t *serial){
@@ -40,8 +44,8 @@ int xbee_ser_write( xbee_serial_t *serial, const void FAR *buffer,
     if (length < 0){
         return -EINVAL;
     }
-    uartSend(serial->handle, buffer, length);
-    return uartTxUsed(serial->handle);
+    uartSend(&(serial->uart_handle), buffer, length);
+    return uartTxUsed(&(serial->uart_handle));
 }
 
 int xbee_ser_read( xbee_serial_t *serial, void FAR *buffer, int bufsize){
@@ -53,7 +57,7 @@ int xbee_ser_read( xbee_serial_t *serial, void FAR *buffer, int bufsize){
         return -EINVAL;
     }
 
-    uartReceive(serial->handle, buffer, bufsize, &received);
+    uartReceive(&(serial->uart_handle), buffer, bufsize, &received);
 
     return received;
 }
@@ -99,7 +103,7 @@ int xbee_ser_tx_free( xbee_serial_t *serial){
 
 int xbee_ser_tx_used( xbee_serial_t *serial){
     XBEE_SER_CHECK( serial);
-    return uartTxUsed(serial->handle);
+    return uartTxUsed(&(serial->uart_handle));
 }
 
 
@@ -117,7 +121,7 @@ int xbee_ser_rx_free( xbee_serial_t *serial){
 
 int xbee_ser_rx_used( xbee_serial_t *serial){
     XBEE_SER_CHECK( serial);
-    return uartRxUsed(serial->handle);
+    return uartRxUsed(&(serial->uart_handle));
 }
 
 int xbee_ser_rx_flush( xbee_serial_t *serial){
@@ -128,17 +132,20 @@ int xbee_ser_rx_flush( xbee_serial_t *serial){
 
 int xbee_ser_baudrate( xbee_serial_t *serial, uint32_t baudrate){
     XBEE_SER_CHECK( serial);
-    uartSetBaudrate(serial->handle, baudrate);
+    serial->baudrate = baudrate;
+    uartSetBaudrate(&(serial->uart_handle), baudrate);
     return 0;
 }
 
 int xbee_ser_open( xbee_serial_t *serial, uint32_t baudrate){
-    xbee_ser_baudrate(serial, baudrate);
-    uartInit();
+    int ret = xbee_ser_baudrate(serial, baudrate);
+    uartInit(&(serial->uart_handle));
+    return ret;
 }
 
 int xbee_ser_close( xbee_serial_t *serial){
-    uartDeinit();
+    uartDeinit(&(serial->uart_handle));
+    return 0;
 }
 
 int xbee_ser_break( xbee_serial_t *serial, int enabled){

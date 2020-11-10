@@ -6,7 +6,7 @@ target_sources(
 )
 
 file(GLOB_RECURSE SRCS ${CMAKE_CURRENT_LIST_DIR}/xbee/src/*.c)
-file(GLOB_RECURSE PORT ${CMAKE_CURRENT_LIST_DIR}/xbee/ports/posix/*.c)
+file(GLOB_RECURSE PORT ${CMAKE_CURRENT_LIST_DIR}/xbee/ports/whistler/*.c)
 
 target_sources(whistler-blackcomb PUBLIC ${SRCS})
 target_sources(whistler-blackcomb PUBLIC ${PORT})

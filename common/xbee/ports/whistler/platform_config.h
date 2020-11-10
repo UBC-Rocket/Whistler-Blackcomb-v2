@@ -25,8 +25,11 @@ typedef int bool_t;
 
 #define FAR
 
+#include "hal_uart.h"
+
 typedef struct xbee_serial_t
 {
+    uint32_t baudrate;
 	hal_uart_handle_t uart_handle;
 } xbee_serial_t;
 
@@ -36,6 +39,7 @@ typedef struct xbee_serial_t
 #define XBEE_MS_TIMER_RESOLUTION 1
 
 #define XBEE_SERIAL_MAX_BAUDRATE 921600
-    
+   
+#define XBEE_WIFI_ENABLED 0
 
 #endif

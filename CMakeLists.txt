@@ -51,7 +51,7 @@ target_compile_options(whistler-blackcomb PRIVATE
     -DXBEE_DEVICE_ENABLE_ATMODE
     -DXBEE_XMODEM_TESTING)
 
-add_definitions( -DXBEE_PLATFORM_HEADER=\"posix/platform_config.h\" )
+add_definitions( -DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\" )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
