@@ -37,3 +37,16 @@ int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 		size_t *received){
 	return UART_RTOS_Receive(&handle->rtos_handle, buffer, length, received);
 }
+
+
+size_t uartRxUsed(hal_uart_handle_t *handle){
+	return (handle->uart_handle).rxDataSizeAll;
+}
+
+size_t uartTxUsed(hal_uart_handle_t *handle){
+	return (handle->uart_handle).txDataSizeAll;
+}
+
+void uartSetBaudrate(hal_uart_handle_t *handle, uint32_t baudrate){
+	(handle->rtos_config).baudrate = baudrate;
+}

@@ -57,3 +57,16 @@ int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 
 	return kStatus_Success;
 }
+
+size_t uartRxUsed(hal_uart_handle_t *handle){
+	return handle->cur_buffer_size;
+}
+
+size_t uartTxUsed(hal_uart_handle_t *handle){
+	/* Since this serial port is only being emulated it just returns 0 */
+	return 0;
+}
+
+void uartSetBaudrate(hal_uart_handle_t *handle, uint32_t baudrate){
+	handle->baudrate = baudrate;
+}

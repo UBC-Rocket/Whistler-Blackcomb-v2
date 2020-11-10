@@ -79,4 +79,25 @@ int uartSend(hal_uart_handle_t *handle, const uint8_t *buffer, uint32_t length);
 int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 		size_t *received);
 
+/**
+ * Gets the number of bytes in the rx buffer
+ * @param handle a pointer to the uart instance struct
+ * @return the number of bytes in the rx buffer at the moment
+ */
+size_t uartRxUsed(hal_uart_handle_t *handle);
+
+/**
+ * Gets the number of bytes in the tx buffer
+ * @param handle a pointer to the uart instance struct
+ * @return the number of bytes in the tx buffer at the moment
+ */
+size_t uartTxUsed(hal_uart_handle_t *handle);
+
+/**
+ * Sets the baud rate for the given handle. Must be called before uartInit().
+ * @param handle pointer to the handle in question
+ * @param baudrate the baudrate to set the configuration to
+ */
+void uartSetBaudrate(hal_uart_handle_t *handle, uint32_t baudrate);
+
 #endif
