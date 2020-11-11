@@ -147,8 +147,7 @@ int main(void) {
  */
 static void BlinkTask(void *pv) {
 	while (1) {
-		printf("Hello\n");
-		// digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
+		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
@@ -276,9 +275,19 @@ static void ReadImuTask(void *pv) {
 }
 
 static void RadioTask(void *pv) {
-	printf("Task Starting");
+
+	xbee_dev_t radio;
+	xbee_serial_t serial;
+
+	// TODO: Urgently need to change DEBUG_UART to proper pointer for MCU
+	uartConfig(&(serial.uart_handle), (UART_Type *) NULL, 9600);
+
+	xbee_dev_init(&radio, &serial, NULL, NULL);
+
+	xbee_frame_write(&radio, NULL, NULL, "Hello World\n", 12, XBEE_WRITE_FLAG_NONE);
+
 	while (1) {
-		printf("Radio");
+		// printf("Radio\n");
 		vTaskDelay(pdMS_TO_TICKS(700));
 	}
 }
