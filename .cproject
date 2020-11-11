@@ -78,7 +78,9 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="FSL_RTOS_FREE_RTOS"/>
 									<listOptionValue builtIn="false" value="SDK_OS_FREE_RTOS"/>
-									<listOptionValue builtIn="false" value="&quot;XBEE_PLATFORM_HEADER=\&quot;posix/platform_config.h\&quot;// comment for string termination&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;XBEE_PLATFORM_HEADER=\&quot;whistler/platform_config.h\&quot;// comment for string termination&quot;"/>
+									<listOptionValue builtIn="false" value="XBEE_CELLULAR_ENABLED"/>
+									<listOptionValue builtIn="false" value="MBEDTLS_NO_PLATFORM_ENTROPY"/>
 								</option>
 								<option id="com.crt.advproject.gcc.fpu.230139008" name="Floating point" superClass="com.crt.advproject.gcc.fpu" useByScannerDiscovery="true" value="com.crt.advproject.gcc.fpu.fpv4.hard" valueType="enumerated"/>
 								<option id="com.crt.advproject.gcc.thumb.727756457" name="Thumb mode" superClass="com.crt.advproject.gcc.thumb" useByScannerDiscovery="false" value="true" valueType="boolean"/>
@@ -359,7 +361,7 @@
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="CMSIS"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="board"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="common/src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="common/xbee/ports"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="common/xbee/ports/whistler"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="common/xbee/src"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="device"/>
 						<entry flags="LOCAL|VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>

@@ -44,12 +44,14 @@
 /* Task priorities. */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define radio_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
 static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
+static void RadioTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -74,6 +76,7 @@ double accel[] = { 0, 0, 0 };
 IMU_1 IMU;
 
 
+/* TEMP: Should probably move soon */
 #include "xbee/atcmd.h"
 #include "xbee/device.h"
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
@@ -111,10 +114,19 @@ int main(void) {
 			; /* error! probably out of memory */
 	}
 
-	if (xTaskCreate(ReadImuTask, "UART Task",
+	// if (xTaskCreate(ReadImuTask, "UART Task",
+	// configMINIMAL_STACK_SIZE + 100,
+	// NULL,
+	// debug_uart_task_PRIORITY,
+	// NULL) != pdPASS) {
+	// 	for (;;)
+	// 		;
+	// }
+
+	if (xTaskCreate(RadioTask, "Radio Task",
 	configMINIMAL_STACK_SIZE + 100,
 	NULL,
-	debug_uart_task_PRIORITY,
+	radio_task_PRIORITY,
 	NULL) != pdPASS) {
 		for (;;)
 			;
@@ -135,7 +147,8 @@ int main(void) {
  */
 static void BlinkTask(void *pv) {
 	while (1) {
-		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
+		printf("Hello\n");
+		// digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
@@ -262,3 +275,10 @@ static void ReadImuTask(void *pv) {
 	vTaskSuspend(NULL);
 }
 
+static void RadioTask(void *pv) {
+	printf("Task Starting");
+	while (1) {
+		printf("Radio");
+		vTaskDelay(pdMS_TO_TICKS(700));
+	}
+}

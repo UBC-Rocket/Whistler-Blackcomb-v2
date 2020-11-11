@@ -26,6 +26,11 @@ uint32_t xbee_millisecond_timer(){
 #define XBEE_SER_CHECK(ptr) \
     do { if (xbee_ser_invalid(ptr)) return -EINVAL; } while (0)
 
+/* For MCU build */
+#ifndef INT_MAX
+#define INT_MAX 0x7fffffff
+#endif
+
 int xbee_ser_invalid( xbee_serial_t *serial){
     /* TODO: Do some actual checking here */
     return 0;
