@@ -34,6 +34,9 @@
 #include "hal_io.h"
 #include "hal_uart.h"
 
+/* Radio Stuff */
+#include "xbee/wpan.h"
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -91,9 +94,6 @@ const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
 /*******************************************************************************
  * Main
  ******************************************************************************/
-/*
- * @brief   Application entry point.
- */
 int main(void) {
 	initHal();
 	initTimers();
@@ -278,16 +278,28 @@ static void RadioTask(void *pv) {
 
 	xbee_dev_t radio;
 	xbee_serial_t serial;
+	xbee_header_transmit_t header;
+
+	header.frame_id = xbee_next_frame_id(&radio);
+	header.frame_type = 0x10;
+	/* Use 16 bit addressing */
+	addr64 addr;
+	addr.l[0] = 0xFFFFFFFF;
+	addr.l[1] = 0xFFFFFFFF;
+	header.ieee_address = addr;
+	header.network_address_be = 0xFFFF;
+	header.broadcast_radius = 0;
+	/* Use no transmit options */
+	header.options = 0;
 
 	// TODO: Urgently need to change DEBUG_UART to proper pointer for MCU
-	uartConfig(&(serial.uart_handle), (UART_Type *) NULL, 9600);
+	uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
 
 	xbee_dev_init(&radio, &serial, NULL, NULL);
 
-	xbee_frame_write(&radio, NULL, NULL, "Hello World\n", 12, XBEE_WRITE_FLAG_NONE);
+	xbee_frame_write(&radio, &header, sizeof(header), "Hello World\n", 12, XBEE_WRITE_FLAG_NONE);
 
 	while (1) {
-		// printf("Radio\n");
-		vTaskDelay(pdMS_TO_TICKS(700));
+		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
