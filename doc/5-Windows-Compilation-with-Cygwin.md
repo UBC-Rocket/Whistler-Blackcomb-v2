@@ -1,5 +1,4 @@
-# Purpose
-This doc covers setting up visual studio and cygwin to create a `.exe` file for windows. 
+This doc covers setting up visual studio code and cygwin to create a `.exe` file for windows. 
 
 # Create a separate repository
 For now, at least, we think it's best to use separate repository for the windows compilation and linux compilation. 
@@ -37,8 +36,14 @@ Follow the same steps as above and select the latest versions of `gcc-g++`, `cma
 Select 'next' and confirm your instalations. Other packages required by the `gcc-core`,`gcc-g++`, `cmake`, and `make` will be installed as well. Select next again to install. Select 'Finish' to complete the instalation. 
 
 # Adding Cygwin to Path
-Search windows for 'environment' and select 'edit the system environment variables', or find it from `Control Panel>System and Security>System>Advanced System Settings`. Click on 'Environment Variables...'
+Use the Windows start menu search to search for 'environment' and select 'edit the system environment variables', or find it from `Control Panel>System and Security>System>Advanced System Settings`. Click on 'Environment Variables...'
 
 Under 'System variables', select `Path` and choose 'Edit'
 ![Select 'Path' and 'Edit'](images/5-Cygwin-edit-path.png)
+
+Choose 'browse' and find the location of the Cygwin `bin` directory; it should be by default `C:\cygwin64\bin`. 
+
+Confirm that Cygwin is in path, and restart your computer.
+
+# Configure Visual Studio Code
 
