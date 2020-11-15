@@ -36,6 +36,7 @@
 
 /* Radio Stuff */
 #include "xbee/wpan.h"
+#include "radio.h"
 
 /*******************************************************************************
  * Definitions
@@ -77,17 +78,6 @@ double position[] = { 0, 0, 0 };
 double velocity[] = { 0, 0, 0 };
 double accel[] = { 0, 0, 0 };
 IMU_1 IMU;
-
-
-/* TEMP: Should probably move soon */
-#include "xbee/atcmd.h"
-#include "xbee/device.h"
-const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
-{
-    XBEE_FRAME_HANDLE_LOCAL_AT,
-    XBEE_FRAME_MODEM_STATUS_DEBUG,
-    XBEE_FRAME_TABLE_END
-};
 
 
 
@@ -279,41 +269,15 @@ static void RadioTask(void *pv) {
 
 	xbee_dev_t radio;
 	xbee_serial_t serial;
-	xbee_header_transmit_t header;
-
-	header.frame_id = xbee_next_frame_id(&radio);
-	header.frame_type = 0x10;
-	/* Broadcast */
-	addr64 addr;
-	addr.b[0] = 0x0;
-	addr.b[1] = 0x13;
-	addr.b[2] = 0xA2;
-	addr.b[3] = 0x0;
-	addr.b[4] = 0x41;
-	addr.b[5] = 0x67;
-	addr.b[6] = 0x8F;
-	addr.b[7] = 0xC0;
-	header.ieee_address = addr;
-	/* Note: there are some weird endianness issues, so this is actually
-	 * transmitted as 0xFFFE. Not sure exactly what's up here, but as long as
-	 * we assign the bytes manually for the 64 bit addresses above it should
-	 * be fine */
-	header.network_address_be = 0xFEFF;
-	header.broadcast_radius = 0;
-	/* Use no transmit options */
-	header.options = 0;
+	
 
 	serial.baudrate = 9600;
 	uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
-//	uartInit(&(serial.uart_handle));
-//	uartSend(&(serial.uart_handle), (uint8_t*) debug_intro_message,
-//						strlen(debug_intro_message));
 
 	xbee_dev_init(&radio, &serial, NULL, NULL);
 
-	xbee_frame_write(&radio, &header, sizeof(header), "Hello World\n", 12, XBEE_WRITE_FLAG_NONE);
-
 	while (1) {
+		radioTxRequest(&radio, &serial, debug_intro_message, strlen(debug_intro_message));
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

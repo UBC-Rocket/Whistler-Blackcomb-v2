@@ -146,6 +146,7 @@ int xbee_dev_init( xbee_dev_t *xbee, const xbee_serial_t *serport,
     /* Note: this taken out by us (UBC Rocket), not sure exactly why but was
      * causing a seg fault */
 //   memset( xbee, 0, sizeof( xbee_dev_t));
+   xbee->frame_id = 0;
 
    // configuration for serial XBee
    xbee->is_awake = is_awake; // function to read XBee's "ON" pin

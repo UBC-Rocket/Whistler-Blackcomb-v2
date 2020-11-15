@@ -40,7 +40,7 @@ endif()
 # Might be bad to disable it this way, not entirely sure
 # Wno-unused-parameter is to enable hal taking parameters and not using them
 target_compile_options(whistler-blackcomb PRIVATE 
-    -Wno-int-to-pointer-cast 
+    -Wno-int-to-pointer-cast
     -Wno-unused-parameter 
     #-Werror 
     -Wall 

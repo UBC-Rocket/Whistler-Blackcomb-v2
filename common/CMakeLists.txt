@@ -3,6 +3,7 @@ target_sources(
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/src/prediction.c
         ${CMAKE_CURRENT_LIST_DIR}/src/IMU_interpret.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/radio.c
 )
 
 file(GLOB_RECURSE SRCS ${CMAKE_CURRENT_LIST_DIR}/xbee/src/*.c)
