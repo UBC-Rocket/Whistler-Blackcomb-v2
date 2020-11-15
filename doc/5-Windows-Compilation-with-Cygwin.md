@@ -32,10 +32,9 @@ Find `gcc-core` under packages and in the `new` column, select the most recent v
 *Note that you should not select `cygwin32-gcc-core` or any other similary named package that is not exactly `gcc-core`.*
 ![Select gcc-core](images/5-Cygwin-gcc-core.png)
 
-Follow the same steps as above and select the latest versions of `gcc-g++` and `cmake`.
+Follow the same steps as above and select the latest versions of `gcc-g++`, `cmake`, and `make`.
 
-Select next and confirm your instalations. Other packages required by the ones you select may be installed as well. Select next again to install. Select 'Finish' to complete the instalation. 
+Select 'next' and confirm your instalations. Other packages required by the `gcc-core`,`gcc-g++`, `cmake`, and `make` will be installed as well. Select next again to install. Select 'Finish' to complete the instalation. 
 
-
-
-
+# Adding Cygwin to PATH
+Search windows for 'environment' and select 'edit the system environment variables', or find it 
