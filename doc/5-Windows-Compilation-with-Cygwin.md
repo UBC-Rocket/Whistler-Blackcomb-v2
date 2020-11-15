@@ -30,7 +30,7 @@ Once the 'select packages' screen appears, change the view to 'full' and search 
 Find `gcc-core` under packages and in the `new` column, select the most recent version.
 
 *Note that you should not select `cygwin32-gcc-core` or any other similary named package that is not exactly `gcc-core`.*
-
+![Select gcc-core](images/5-Cygwin-gcc-core.png)
 
 Follow the same steps as above and select `gcc-g++` and `cmake`.
 
