@@ -49,7 +49,11 @@ int xbee_ser_write( xbee_serial_t *serial, const void FAR *buffer,
     if (length < 0){
         return -EINVAL;
     }
+
+    // uint8_t toSend = 17;
+
     uartSend(&(serial->uart_handle), buffer, length);
+    // uartSend(&(serial->uart_handle), &toSend, 1);
     return uartTxUsed(&(serial->uart_handle));
 }
 

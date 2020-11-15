@@ -142,7 +142,10 @@ int xbee_dev_init( xbee_dev_t *xbee, const xbee_serial_t *serport,
    // try communicating with the XBee module
    // set xbee to all zeros, then
    // set up serial port and attempt communications with module
-   memset( xbee, 0, sizeof( xbee_dev_t));
+
+    /* Note: this taken out by us (UBC Rocket), not sure exactly why but was
+     * causing a seg fault */
+//   memset( xbee, 0, sizeof( xbee_dev_t));
 
    // configuration for serial XBee
    xbee->is_awake = is_awake; // function to read XBee's "ON" pin

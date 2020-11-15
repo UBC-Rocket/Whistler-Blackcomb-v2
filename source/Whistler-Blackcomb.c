@@ -100,6 +100,7 @@ int main(void) {
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
+	halNvicSetPriority(RADIO_UART_RX_TX_IRQn, 5);
 
 	/* Copy the following to create a new task */
 	if (xTaskCreate( /* create task */
@@ -282,18 +283,31 @@ static void RadioTask(void *pv) {
 
 	header.frame_id = xbee_next_frame_id(&radio);
 	header.frame_type = 0x10;
-	/* Use 16 bit addressing */
+	/* Broadcast */
 	addr64 addr;
-	addr.l[0] = 0xFFFFFFFF;
-	addr.l[1] = 0xFFFFFFFF;
+	addr.b[0] = 0x0;
+	addr.b[1] = 0x13;
+	addr.b[2] = 0xA2;
+	addr.b[3] = 0x0;
+	addr.b[4] = 0x41;
+	addr.b[5] = 0x67;
+	addr.b[6] = 0x8F;
+	addr.b[7] = 0xC0;
 	header.ieee_address = addr;
-	header.network_address_be = 0xFFFF;
+	/* Note: there are some weird endianness issues, so this is actually
+	 * transmitted as 0xFFFE. Not sure exactly what's up here, but as long as
+	 * we assign the bytes manually for the 64 bit addresses above it should
+	 * be fine */
+	header.network_address_be = 0xFEFF;
 	header.broadcast_radius = 0;
 	/* Use no transmit options */
 	header.options = 0;
 
-	// TODO: Urgently need to change DEBUG_UART to proper pointer for MCU
+	serial.baudrate = 9600;
 	uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
+//	uartInit(&(serial.uart_handle));
+//	uartSend(&(serial.uart_handle), (uint8_t*) debug_intro_message,
+//						strlen(debug_intro_message));
 
 	xbee_dev_init(&radio, &serial, NULL, NULL);
 
