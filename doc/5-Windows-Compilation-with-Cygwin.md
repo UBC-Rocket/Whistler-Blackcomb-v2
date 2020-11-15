@@ -36,5 +36,9 @@ Follow the same steps as above and select the latest versions of `gcc-g++`, `cma
 
 Select 'next' and confirm your instalations. Other packages required by the `gcc-core`,`gcc-g++`, `cmake`, and `make` will be installed as well. Select next again to install. Select 'Finish' to complete the instalation. 
 
-# Adding Cygwin to PATH
-Search windows for 'environment' and select 'edit the system environment variables', or find it 
+# Adding Cygwin to Path
+Search windows for 'environment' and select 'edit the system environment variables', or find it from `Control Panel>System and Security>System>Advanced System Settings`. Click on 'Environment Variables...'
+
+Under 'System variables', select `Path` and choose 'Edit'
+![Select 'Path' and 'Edit'](images/5-Cygwin-edit-path.png)
+
