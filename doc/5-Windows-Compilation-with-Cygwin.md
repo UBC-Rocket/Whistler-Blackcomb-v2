@@ -31,4 +31,7 @@ Find `gcc-core` under packages and in the `new` column, select the most recent v
 
 *Note that you should not select `cygwin32-gcc-core` or any other similary named package that is not exactly `gcc-core`.*
 
-Follow the same steps as above to install `
+
+Follow the same steps as above and select `gcc-g++` and `cmake`.
+
+
