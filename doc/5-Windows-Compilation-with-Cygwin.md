@@ -29,4 +29,6 @@ Once the 'select packages' screen appears, change the view to 'full' and search 
 
 Find `gcc-core` under packages and in the `new` column, select the most recent version.
 
-*note that you should not select `cygwin32-gcc-core` or any other similary named package that is not exactly `gcc-core`.*
+*Note that you should not select `cygwin32-gcc-core` or any other similary named package that is not exactly `gcc-core`.*
+
+Follow the same steps as above to install `
