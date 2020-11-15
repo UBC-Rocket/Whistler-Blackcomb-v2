@@ -3,23 +3,61 @@
  ******************************************************************************/
 #include "xbee/wpan.h"
 #include "radio.h"
+#include <string.h>
+
+/*******************************************************************************
+ * Declarations
+ ******************************************************************************/
+int _xbee_handle_receive( xbee_dev_t *xbee, const void FAR *raw,
+   uint16_t length, void FAR *context);
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+
+
+#define XBEE_FRAME_HANDLE_RX  \
+   { XBEE_FRAME_RECEIVE, 0, _xbee_handle_receive, NULL }
+
 const xbee_dispatch_table_entry_t xbee_frame_handlers[] =
 {
     XBEE_FRAME_HANDLE_LOCAL_AT,
     XBEE_FRAME_MODEM_STATUS_DEBUG,
+    XBEE_FRAME_HANDLE_RX, 
     XBEE_FRAME_TABLE_END
 };
+
+static int receive_packet_length;
+static uint8_t receive_packet[256];
 
 /*******************************************************************************
  * Implementations
  ******************************************************************************/
 
-void radioTxRequest(xbee_dev_t * radio, xbee_serial_t * serial, 
-        uint8_t * buffer, unsigned int length){
+int _xbee_handle_receive( xbee_dev_t *xbee, const void FAR *raw,
+        uint16_t length, void FAR *context){
+
+    // this XBee frame handler (standard API) doesn't use the context parameter
+    XBEE_UNUSED_PARAMETER( context);
+
+    const xbee_frame_receive_t FAR *frame = raw;
+    
+    memcpy(receive_packet, &frame->payload, length);
+    receive_packet_length = length - 
+            offsetof( xbee_frame_receive_t, payload);
+    return 0;
+}
+
+int radioReceive(xbee_dev_t * radio, uint8_t * packet){
+    if(xbee_dev_tick(radio)){
+        memcpy(packet, receive_packet, receive_packet_length);
+        return receive_packet_length;
+    }
+    return 0;
+}
+
+void radioTxRequest(xbee_dev_t * radio, const uint8_t * buffer, 
+            unsigned int length){
     
     xbee_header_transmit_t header;
 

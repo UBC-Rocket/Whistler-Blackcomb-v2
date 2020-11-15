@@ -265,19 +265,28 @@ static void ReadImuTask(void *pv) {
 	vTaskSuspend(NULL);
 }
 
+
+/* TEMP */
+uint8_t radioPacket[] = {0x7E, 0x00, 0x18, 0x90, 0x00, 0x13, 0xA2, 0x00, 0x41, 0x67, 0x8F, 0xC0, 0xFF, 0xFE, 0xC2, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0xC7};
 static void RadioTask(void *pv) {
 
 	xbee_dev_t radio;
 	xbee_serial_t serial;
 	
+	static uint8_t packet[256];
 
 	serial.baudrate = 9600;
 	uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
 
 	xbee_dev_init(&radio, &serial, NULL, NULL);
+	// memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
+	// radio.serport.uart_handle.cur_buffer_size = sizeof(radioPacket);
 
 	while (1) {
-		radioTxRequest(&radio, &serial, debug_intro_message, strlen(debug_intro_message));
+		int len = radioReceive(&radio, packet);
+
+		if(len > 0)
+			radioTxRequest(&radio, packet, len);
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

@@ -48,12 +48,15 @@ int uartSend(hal_uart_handle_t *handle, const uint8_t *buffer, uint32_t length){
 
 int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 		size_t *received){
-	xEventGroupWaitBits(handle->rxEvent, 
-			HAL_UART_COMPLETE | HAL_UART_RING_BUFFER_OVERRUN | HAL_UART_HARDWARE_BUFFER_OVERRUN,
-			pdTRUE, pdFALSE, portMAX_DELAY);
+	if(handle->cur_buffer_size < length)
+		xEventGroupWaitBits(handle->rxEvent, 
+				HAL_UART_COMPLETE | HAL_UART_RING_BUFFER_OVERRUN 
+				| HAL_UART_HARDWARE_BUFFER_OVERRUN,
+				pdTRUE, pdFALSE, portMAX_DELAY);
 
 	memcpy(buffer, &(handle->buffer[0]), length);
-	memcpy(&(handle->buffer[0]), &(handle->buffer[length]), handle->buffer_size - length);
+	memcpy(&(handle->buffer[0]), &(handle->buffer[length]), 
+			handle->buffer_size - length);
 	handle->cur_buffer_size -= length;
 	*received = length;
 

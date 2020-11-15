@@ -1,5 +1,3 @@
-
-
 /*******************************************************************************
  * Time
  ******************************************************************************/
@@ -26,7 +24,7 @@ uint32_t xbee_millisecond_timer(){
 #define XBEE_SER_CHECK(ptr) \
     do { if (xbee_ser_invalid(ptr)) return -EINVAL; } while (0)
 
-/* For MCU build */
+/* For MCU build, don't remove */
 #ifndef INT_MAX
 #define INT_MAX 0x7fffffff
 #endif
@@ -64,6 +62,10 @@ int xbee_ser_read( xbee_serial_t *serial, void FAR *buffer, int bufsize){
 
     if (! buffer || bufsize < 0){
         return -EINVAL;
+    }
+
+    if(xbee_ser_rx_used(serial) <= 0){
+        return 0;
     }
 
     uartReceive(&(serial->uart_handle), buffer, bufsize, &received);
