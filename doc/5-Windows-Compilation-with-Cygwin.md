@@ -13,3 +13,20 @@ From https://www.cygwin.com/, select `Install Cygwin by running setup-x86_64.exe
 
 # Configuring Cygwin Installation
 Under 'Choose a download source', select 'install from internet'
+![select 'install from internet](images/5-Cygwin-choose-download.png)
+
+Leave the default settings unchanged for
+* Select Root Install Directory
+* Select Local Package Directory
+* Select Your Internet Connection
+
+and select any mirror of your choice for 'choose a download site'. 
+
+Select 'next' to begin the installation
+
+# Installing Packages
+Once the 'select packages' screen appears, change the view to 'full' and search for `gcc-core`.
+
+Find `gcc-core` under packages and in the `new` column, select the most recent version.
+
+*note that you should not select `cygwin32-gcc-core` or any other similary named package that is not exactly `gcc-core`.*
