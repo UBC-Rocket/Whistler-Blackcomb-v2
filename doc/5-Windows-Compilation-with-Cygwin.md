@@ -2,7 +2,7 @@ This doc covers setting up visual studio code and cygwin to create a `.exe` file
 
 # Create a separate repository
 For now, at least, we think it's best to use separate repository for the windows compilation and linux compilation. 
-Create a new reposityory with `git pull` or `git clone`.
+Create a new repository with `git pull` or `git clone`.
 
 # Install Cygwin
 Cygwin is "a large collection of GNU and Open Source tools which provide functionality similar to a Linux distribution on Windows and 
