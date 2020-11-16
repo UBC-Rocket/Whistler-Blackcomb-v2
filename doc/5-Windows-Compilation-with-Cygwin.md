@@ -46,4 +46,16 @@ Choose 'browse' and find the location of the Cygwin `bin` directory; it should b
 Confirm that Cygwin is in path, and restart your computer.
 
 # Configure Visual Studio Code
+Navagate in Powershell (or equivalant) to the directory you created above and launch Visual Studio Code with `code .`.
 
+Ensure that you have the VSCode addons:
+* `C/C++`
+* `CMake`
+* `CMake Tools`
+
+In VSCode, change the kit to GCC x.x.x. 
+
+You should now be able to build a `.exe`!
+
+# Issues
+If this isn't working, contact Xander or Eric on slack. Hopefully they can figure out where Eric messed up this documentation!
