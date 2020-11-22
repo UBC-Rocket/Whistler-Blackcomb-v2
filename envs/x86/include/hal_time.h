@@ -1,5 +1,5 @@
-#ifndef _TIME_H_
-#define _TIME_H_
+#ifndef _HAL_TIME_H_
+#define _HAL_TIME_H_
 
 /*******************************************************************************
  * Includes
