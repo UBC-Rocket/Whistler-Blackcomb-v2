@@ -79,8 +79,6 @@ double velocity[] = { 0, 0, 0 };
 double accel[] = { 0, 0, 0 };
 IMU_1 IMU;
 
-
-
 /*******************************************************************************
  * Main
  ******************************************************************************/
@@ -105,17 +103,17 @@ int main(void) {
 			; /* error! probably out of memory */
 	}
 
-	// if (xTaskCreate(ReadImuTask, "UART Task",
-	// configMINIMAL_STACK_SIZE + 100,
-	// NULL,
-	// debug_uart_task_PRIORITY,
-	// NULL) != pdPASS) {
-	// 	for (;;)
-	// 		;
-	// }
+	if (xTaskCreate(ReadImuTask, "IMU Task",
+	configMINIMAL_STACK_SIZE + 300,
+	NULL,
+	debug_uart_task_PRIORITY,
+	NULL) != pdPASS) {
+		for (;;)
+			;
+	}
 
 	if (xTaskCreate(RadioTask, "Radio Task",
-	configMINIMAL_STACK_SIZE + 100,
+	configMINIMAL_STACK_SIZE + 1000,
 	NULL,
 	radio_task_PRIORITY,
 	NULL) != pdPASS) {
@@ -265,30 +263,34 @@ static void ReadImuTask(void *pv) {
 	vTaskSuspend(NULL);
 }
 
+/* Temporary, can be used to test right now before we get stdioController
+ * working for radio */
+//uint8_t radioPacket[] = { 0x7E, 0x00, 0x18, 0x90, 0x00, 0x13, 0xA2, 0x00, 0x41,
+//		0x67, 0x8F, 0xC0, 0xFF, 0xFE, 0xC2, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20,
+//		0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0xC7 };
 
-/* TEMP */
-uint8_t radioPacket[] = {0x7E, 0x00, 0x18, 0x90, 0x00, 0x13, 0xA2, 0x00, 0x41, 0x67, 0x8F, 0xC0, 0xFF, 0xFE, 0xC2, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0xC7};
+/* Right now just echoes anything sent to the radio */
 static void RadioTask(void *pv) {
 
 	xbee_dev_t radio;
 	xbee_serial_t serial;
-	
-	static uint8_t packet[256];
+
+	uint8_t *packet = (uint8_t*) pvPortMalloc(256 * sizeof(uint8_t));
 
 	serial.baudrate = 9600;
 	uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
 
 	xbee_dev_init(&radio, &serial, NULL, NULL);
+	/* Add this for x86 testing */
 	// memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
 	// radio.serport.uart_handle.cur_buffer_size = sizeof(radioPacket);
 
 	while (1) {
 		int len = radioReceive(&radio, packet);
 
-		if(len > 0)
+		if (len > 0) {
 			radioTxRequest(&radio, packet, len);
-//		size_t ret = uartRxUsed(&radio.serport.uart_handle);
-//		radioTxRequest(&radio, &ret, sizeof(ret));
+		}
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

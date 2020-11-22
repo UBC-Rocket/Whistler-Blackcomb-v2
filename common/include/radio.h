@@ -26,7 +26,7 @@ void radioTxRequest(xbee_dev_t * radio, const uint8_t * buffer,
  * Receives data from the radio. Block until data is received. 
  * @param radio pointer to handle of radio to receive from
  * @param packet the packet to receive data into. Must be pointing to at least
- * 256 bytes of free space, as taht is maximum packet size. 
+ * 256 bytes of free space, as that is maximum packet size.
  * @return number of bytes read, i.e. how many bytes are in packet
  */
 int radioReceive(xbee_dev_t * radio, uint8_t * packet);

@@ -40,9 +40,10 @@ void uartConfig(hal_uart_handle_t *handle, UART_Type *base, uint32_t baudrate) {
 
 int uartSend(hal_uart_handle_t *handle, const uint8_t *buffer, uint32_t length){
 	for(unsigned int i = 0; i < length; ++i){
-		printf("%02hhX ", buffer[i]);
+		// printf("%02hhX ", buffer[i]);
+		printf("%c", buffer[i]);
 	}
-	printf("\n");
+	// printf("\n");
 	return kStatus_Success;
 }
 

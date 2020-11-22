@@ -15,6 +15,10 @@ int arr[20];
 int* arr = (int*) malloc(20 * sizeof(int));
 ```
 
+* Stack size
+  * If your program seems to be working up until you add a seemingly innocent line, you're stack size might be too low
+  * To fix this change the stack size parameter when creating the task
+
 ## General
 
 * Don't forget to flush the buffer for things to be printed
