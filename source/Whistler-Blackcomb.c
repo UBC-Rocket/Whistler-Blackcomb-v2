@@ -287,6 +287,8 @@ static void RadioTask(void *pv) {
 
 		if(len > 0)
 			radioTxRequest(&radio, packet, len);
+//		size_t ret = uartRxUsed(&radio.serport.uart_handle);
+//		radioTxRequest(&radio, &ret, sizeof(ret));
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

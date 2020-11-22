@@ -40,7 +40,7 @@ int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 
 
 size_t uartRxUsed(hal_uart_handle_t *handle){
-	return (handle->uart_handle).rxDataSizeAll;
+	return UART_TransferGetRxRingBufferLength(&handle->uart_handle);
 }
 
 size_t uartTxUsed(hal_uart_handle_t *handle){
