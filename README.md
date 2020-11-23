@@ -36,8 +36,12 @@ For now since we're prototyping on a Teensy 3.6 and can't use an external progra
 
 ## Project Documentation
 
-All documentation are currently kept in the /doc folder. 
+All documentation are currently kept in the [doc/](doc/) directory. 
 
 1. Uploading to Teensy [guide](doc/1-Teensy-Upload.md).
 2. freeRTOS installation and usage [guide](doc/2-RTOS-Basics.md).
-2. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md). 
+3. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md). 
+4. How Travis CI works and how to access ours in this [guide](doc/4-Travis-CI.md). 
+5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md)
+. 
+6. Radio system [guide](doc/4-Radio.h). 

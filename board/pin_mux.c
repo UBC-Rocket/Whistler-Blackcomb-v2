@@ -18,6 +18,8 @@ pin_labels:
 - {pin_num: '96', pin_signal: TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1, label: DEBUG_UART_TX, identifier: DEBUG_UART_TX;DEBUG_UART_RX}
 - {pin_num: '106', pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, label: IMU_UART_TX, identifier: IMU_UART_TX;IMU_UART_RX}
 - {pin_num: '109', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, label: IMU_UART_RX, identifier: IMU_UART_RX;IMU_UART_TX}
+- {pin_num: '129', pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, label: RADIO_UART_RX, identifier: RADIO_UART_RX}
+- {pin_num: '130', pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA, label: RADIO_UART_TX, identifier: RADIO_UART_TX}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -49,6 +51,8 @@ BOARD_InitPins:
   - {pin_num: '96', peripheral: UART0, signal: TX, pin_signal: TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1, identifier: DEBUG_UART_RX}
   - {pin_num: '106', peripheral: UART1, signal: RX, pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, identifier: IMU_UART_RX}
   - {pin_num: '109', peripheral: UART1, signal: TX, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, identifier: IMU_UART_TX}
+  - {pin_num: '129', peripheral: UART2, signal: RX, pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, digital_filter: disable}
+  - {pin_num: '130', peripheral: UART2, signal: TX, pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -65,6 +69,8 @@ void BOARD_InitPins(void)
     CLOCK_EnableClock(kCLOCK_PortB);
     /* Port C Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortC);
+    /* Port D Clock Gate Control: Clock enabled */
+    CLOCK_EnableClock(kCLOCK_PortD);
 
     gpio_pin_config_t LED_BUILTIN_config = {
         .pinDirection = kGPIO_DigitalOutput,
@@ -85,14 +91,22 @@ void BOARD_InitPins(void)
     /* PORTC4 (pin 109) is configured as UART1_TX */
     PORT_SetPinMux(BOARD_INITPINS_IMU_UART_TX_PORT, BOARD_INITPINS_IMU_UART_TX_PIN, kPORT_MuxAlt3);
 
-    /* PORTC3 (pin 106) is configured as UART1_RX */
-    PORT_SetPinMux(BOARD_INITPINS_IMU_UART_TX_PORT, BOARD_INITPINS_IMU_UART_TX_PIN, kPORT_MuxAlt3);
-
-    /* PORTC4 (pin 109) is configured as UART1_TX */
-    PORT_SetPinMux(BOARD_INITPINS_IMU_UART_RX_PORT, BOARD_INITPINS_IMU_UART_RX_PIN, kPORT_MuxAlt3);
-
     /* PORTC5 (pin 110) is configured as PTC5 */
     PORT_SetPinMux(BOARD_INITPINS_LED_BUILTIN_PORT, BOARD_INITPINS_LED_BUILTIN_PIN, kPORT_MuxAsGpio);
+    /* Configure digital filter */
+    PORT_EnablePinsDigitalFilter(
+        /* Digital filter is configured on port D */
+        PORTD,
+        /* Digital filter is configured for PORTD0 */
+        PORT_DFER_DFE_2_MASK,
+        /* Disable digital filter */
+        false);
+
+    /* PORTD2 (pin 129) is configured as UART2_RX */
+    PORT_SetPinMux(BOARD_INITPINS_RADIO_UART_RX_PORT, BOARD_INITPINS_RADIO_UART_RX_PIN, kPORT_MuxAlt3);
+
+    /* PORTD3 (pin 130) is configured as UART2_TX */
+    PORT_SetPinMux(BOARD_INITPINS_RADIO_UART_TX_PORT, BOARD_INITPINS_RADIO_UART_TX_PIN, kPORT_MuxAlt3);
 
     SIM->SOPT5 = ((SIM->SOPT5 &
                    /* Mask bits to zero which are setting */

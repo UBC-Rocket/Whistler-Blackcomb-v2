@@ -54,16 +54,3 @@ vTaskStartScheduler(); //start running tasks
 ```
 
 Read more at the freeRTOS API documentation [here](https://www.freertos.org/a00106.html). A very good and easy to read guide on general usage can be found [here](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf). 
-
-## Misc. RTOS Notes
-
-If anyone ever encounters something using RTOS that makes you think "wow, I really wish I had known that beforehand", __write it here!__ There's not point in struggling with the same bug twice. 
-
-* Do not dynamically allocate memory/arrays inside tasks
-  * This will mess with execution flow and cause tasks to fail
-  * If you really need to there are special functions to do so
-  * For example, **do not** do either of the following inside the task: 
-```C
-int arr[20];
-int* arr = (int*) malloc(20 * sizeof(int));
-```

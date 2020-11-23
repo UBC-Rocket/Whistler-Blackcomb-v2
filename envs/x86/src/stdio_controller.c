@@ -93,6 +93,8 @@ void stdioInit(){
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
 
+    
+
     if (xTaskCreate( 
 			inputLoop, 
 			"stdio controller",

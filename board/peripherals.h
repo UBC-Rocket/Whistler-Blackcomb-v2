@@ -29,12 +29,17 @@ extern "C" {
 #define UART1_PERIPHERAL UART1
 /* Definition of the clock source frequency */
 #define UART1_CLOCK_SOURCE CLOCK_GetFreq(UART1_CLK_SRC)
+/* Definition of peripheral ID */
+#define UART2_PERIPHERAL UART2
+/* Definition of the clock source frequency */
+#define UART2_CLOCK_SOURCE CLOCK_GetFreq(UART2_CLK_SRC)
 
 /***********************************************************************************************************************
  * Global variables
  **********************************************************************************************************************/
 extern const uart_config_t UART0_config;
 extern const uart_config_t UART1_config;
+extern const uart_config_t UART2_config;
 
 /***********************************************************************************************************************
  * Initialization functions
