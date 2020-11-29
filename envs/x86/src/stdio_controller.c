@@ -17,6 +17,7 @@
 #include <pthread.h>
 #include <time.h>
 #include <unistd.h>
+#include <string.h>
 
 /*******************************************************************************
  * Definitions
@@ -39,6 +40,7 @@ static hal_uart_handle_t *uart_handles[1];
  ******************************************************************************/
 
 static void inputLoop(void * pv);
+static void outputLoop(void * pv);
 static void generateImuLoop(void * pv);
 
 /*******************************************************************************
@@ -49,10 +51,26 @@ static void generateImuLoop(void * pv);
  * Loop for interacting with ground station interface
  */
 static void inputLoop(void *pv){
+    printf("input loop starting");
+    /*handshake*/
+    /*check for handshake acknowedgement*/
+    int  handShakeRecieved = 0;
+    char ack[4];
+    while(!handShakeRecieved){
+            scanf("%s",&ack);
+            if(strcmp(&ack,"ACK")==0){
+                handShakeRecieved=1;
+            }
+    }
+    printf("Handshake Recieved!");
     for(;;){
-        // console_print("stdio polling...\n");
+        //console_print("stdio polling...\n");
         vTaskDelay(pdMS_TO_TICKS(500));
     }
+}
+
+static void outputLoop(void *pv){
+    printf("SYN"); /*this has to be the first thing to go out, I think*/
 }
 
 static void generateImuLoop(void *pv){
@@ -61,7 +79,7 @@ static void generateImuLoop(void *pv){
     // if (getcwd(cwd, sizeof(cwd)) != NULL) 
     //     printf("Current working dir: %s\n", cwd);
 
-    printf("Starting IMU loop");
+    //printf("Starting IMU loop");
 
     /* Convenience variable to reduce repetition */
     const int ind = uart_index_imu;
@@ -93,18 +111,26 @@ void stdioInit(){
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
 
-    
-
-    if (xTaskCreate( 
-			inputLoop, 
-			"stdio controller",
-			200/sizeof(StackType_t),
-			(void*)NULL,
-			tskIDLE_PRIORITY+2,
-			(TaskHandle_t*)NULL
-			) != pdPASS) {
-    	for(;;);
-    }
+    //  if (xTaskCreate( 
+	//  		outputLoop, 
+	//  		"stdio out controller",
+	//  		1000/sizeof(StackType_t),
+	//  		(void*)NULL,
+	//  		tskIDLE_PRIORITY+2,
+	//  		(TaskHandle_t*)NULL
+	//  		) != pdPASS) {
+    //  	for(;;);
+    //  }
+     if (xTaskCreate( 
+	 		inputLoop, 
+	 		"stdio in controller",
+	 		1000/sizeof(StackType_t),
+	 		(void*)NULL,
+	 		tskIDLE_PRIORITY+2,
+	 		(TaskHandle_t*)NULL
+	 		) != pdPASS) {
+     	for(;;);
+     }
 }
 
 void stdioAssignUart(hal_uart_handle_t *handle){

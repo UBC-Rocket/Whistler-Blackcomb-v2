@@ -60,7 +60,7 @@ static void RadioTask(void *pv);
 /*******************************************************************************
  * UART Variables
  ******************************************************************************/
-const char *debug_intro_message = "Debug session started\n";
+const char *debug_intro_message = "";
 const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
@@ -245,9 +245,9 @@ static void ReadImuTask(void *pv) {
 
 				o = qMult(orientation, qMult(o, qConjugate(orientation)));
 
-				len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
-						(int) (o.i * 100), (int) (o.j * 100), (int) (o.k * 100),
-						(int) (100 * sqrt(o.i * o.i + o.j * o.j + o.k * o.k)));
+				// len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
+				// 		(int) (o.i * 100), (int) (o.j * 100), (int) (o.k * 100),
+				// 		(int) (100 * sqrt(o.i * o.i + o.j * o.j + o.k * o.k)));
 				// len = sprintf(toPrint, "t = %d", cur_time - imu_last_time);
 
 				imu_last_time = cur_time;
