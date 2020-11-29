@@ -60,7 +60,7 @@ static void RadioTask(void *pv);
 /*******************************************************************************
  * UART Variables
  ******************************************************************************/
-const char *debug_intro_message = "\r\n";
+const char *debug_intro_message = "";
 const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
@@ -83,12 +83,8 @@ IMU_1 IMU;
  * Main
  ******************************************************************************/
 int main(void) {
-	//FILE *logfile = fopen("log.txt", "w");
-    //fprintf(logfile,"program executed");
-	//fclose(logfile);
 	initHal();
 	initTimers();
-	
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
@@ -124,19 +120,9 @@ int main(void) {
 		for (;;)
 			;
 	}
-	// if (xTaskCreate(logWrite, "logWrite",
-	// configMINIMAL_STACK_SIZE + 1000,
-	// NULL,
-	// radio_task_PRIORITY,
-	// NULL) != pdPASS) {
-	// 	for (;;)
-	// 		;
-	// }
-    
+
 	vTaskStartScheduler();
-	//fprintf(logfile,"beyond task start point\n");
-    //fclose(logfile);
-	
+
 	for (;;)
 		;
 }
@@ -155,8 +141,6 @@ static void BlinkTask(void *pv) {
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
-
-
 
 /*!
  * @brief Task responsible for IMU UART read and parse

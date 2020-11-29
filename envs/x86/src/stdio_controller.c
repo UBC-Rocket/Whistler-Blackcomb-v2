@@ -17,7 +17,6 @@
 #include <pthread.h>
 #include <time.h>
 #include <unistd.h>
-#include <string.h>
 #include <assert.h>
 
 /*******************************************************************************
@@ -40,7 +39,7 @@ static hal_uart_handle_t *uart_handles[1];
  * Declarations
  ******************************************************************************/
 
-//static void inputLoop(void * pv);
+static void inputLoop(void * pv);
 static void outputLoop(void * pv);
 static void generateImuLoop(void * pv);
 
@@ -51,35 +50,34 @@ static void generateImuLoop(void * pv);
 /**
  * Loop for interacting with ground station interface
  */
-//static void inputLoop(void *pv){
+static void inputLoop(void *pv){
     /*handshake*/
     /*check for handshake acknowedgement*/
-    //int  handShakeRecieved = 0;
-    //char ack[4] = "ACK";
-    //char curChar;
-    //while(!handShakeRecieved){
-        //for(int i=0;i<4;i++){
-            //scanf("%c",&curChar);
-            //assert(ack[i]==curChar);
-        //}
-            //scanf("%s",&ack);
-            //if(strcmp(&ack,"ACK")==0){
-               // handShakeRecieved=1;
-            //}
-    //}
+    char ack[4] = "ACK";
+    char readChar;
+    for (int i = 0; i < 3; i++) {
+        scanf("%c",&readChar);
+        assert(ack[i] == readChar);
+    }
+    FILE *logfile = fopen("log2.txt","w");
+    fprintf(logfile,"input loop ran, ACK verified");
+    fclose(logfile);
+    
     //printf("Handshake Recieved!");
-    //FILE *logfile = fopen("log.txt", "a");
-    //fprintf(logfile,"Handshake Recieved\n");
-    //fclose(logfile);
-   // for(;;){
+    for(;;){
         //console_print("stdio polling...\n");
-     //   vTaskDelay(pdMS_TO_TICKS(500));
-    //}
-//}
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
 
 static void outputLoop(void *pv){
     printf("SYN"); /*this has to be the first thing to go out, I think*/
+    fflush(stdout);
+    FILE *logfile = fopen("log.txt","w");
+    fprintf(logfile,"output loop ran");
+    fclose(logfile);
     for(;;){}
+    
 }
 
 static void generateImuLoop(void *pv){
@@ -120,7 +118,7 @@ void stdioInit(){
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
 
-     if (xTaskCreate( 
+    if (xTaskCreate( 
 	  		outputLoop, 
 	  		"stdio out controller",
 	  		50000/sizeof(StackType_t),
@@ -130,16 +128,16 @@ void stdioInit(){
 	  		) != pdPASS) {
       	for(;;);
       }
-    //   if (xTaskCreate( 
-	//   		inputLoop, 
-	//   		"stdio in controller",
-	//   		1000/sizeof(StackType_t),
-	//  		(void*)NULL,
-	//   		tskIDLE_PRIORITY+2,
-	//  		(TaskHandle_t*)NULL
-    //  		) != pdPASS) {
-    //   	for(;;);
-    //   }
+     if (xTaskCreate( 
+	 		inputLoop, 
+	 	"stdio in controller",
+		1000/sizeof(StackType_t),
+	 	(void*)NULL,
+	 	tskIDLE_PRIORITY+2,
+	 	(TaskHandle_t*)NULL
+	 	) != pdPASS) {
+     	for(;;);
+     }
 }
 
 void stdioAssignUart(hal_uart_handle_t *handle){
