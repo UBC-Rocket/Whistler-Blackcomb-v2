@@ -9,7 +9,7 @@ This is a repository with the code for the UBC Rocket Whistler Blackcomb flight 
 
 ## Setup
 ### Download Tools
-1. MCUExpresso
+1. MCUXpresso
 
 Download from [here](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE?tab=Design_Tools_Tab). You will need an account, sign up for one for free. All the default options should be fine. 
 
