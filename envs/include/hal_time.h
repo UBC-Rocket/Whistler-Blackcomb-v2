@@ -1,14 +1,17 @@
-#ifndef _TIME_H_
-#define _TIME_H_
+#ifndef _HAL_TIME_H_
+#define _HAL_TIME_H_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#ifdef COMPILE_BOARD
 #include "fsl_lptmr.h"
+#endif
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+#ifdef COMPILE_BOARD
 /* Timer */
 #define STARTUP_LPTMR_BASE   LPTMR0
 #define STARTUP_LPTMR_IRQn   LPTMR0_IRQn
@@ -17,6 +20,7 @@
 #define LPTMR_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_LpoClk)
 /* Define LPTMR microseconds counts value */
 #define LPTMR_USEC_COUNT 1000000U
+#endif
 
 /*******************************************************************************
  * Declarations

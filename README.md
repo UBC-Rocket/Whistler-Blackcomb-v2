@@ -9,13 +9,13 @@ This is a repository with the code for the UBC Rocket Whistler Blackcomb flight 
 
 ## Setup
 ### Download Tools
-1. MCUExpresso
+1. MCUXpresso
 
 Download from [here](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE?tab=Design_Tools_Tab). You will need an account, sign up for one for free. All the default options should be fine. 
 
 2. Chip SDK
 
-Go to [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
+Go to [here](https://mcuxpresso.nxp.com/download/78d26642c8a4ca1efecebe0f36145702) and download it. If that doesn't work for some reason you can also get the SDK package yourself [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
 
 ![](doc/images/SDKSelect.png)
 ![](doc/images/SDKDownload.png)
@@ -23,8 +23,6 @@ Go to [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click
 After the SDK is installed open the Installed SDK window (if this isn't visible click Windows->Show View->Installed SDKs) on MCUXpresso and drag the SDK zip file. 
 
 ![](doc/images/InstalledSDKs.png)
-
-Since this process is a bit of a pain and takes a while, the SDK is also available [here](https://drive.google.com/file/d/1W3uJRgZEQmULOGBuqZKy3pOs45sVxxFm/view?usp=sharing) on the Google Drive. Note that it might not be consistently updated so ideally download using method above. 
 
 ### Setup Project
 

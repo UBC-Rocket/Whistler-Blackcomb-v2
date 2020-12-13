@@ -26,6 +26,7 @@ target_include_directories(whistler-blackcomb PUBLIC
     board
     device
     CMSIS
+    envs/include
     envs/x86/include
     envs/x86/freertos/include
     envs/x86/freertos/portable/utils
@@ -60,6 +61,7 @@ target_compile_options(whistler-blackcomb PRIVATE
     -DXBEE_XMODEM_TESTING)
 
 add_definitions( -DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\" )
+add_definitions( -DCOMPILE_x86 )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

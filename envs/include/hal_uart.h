@@ -4,17 +4,43 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-
+#ifdef COMPILE_BOARD
+#include "fsl_uart_freertos.h"
+#elif defined(COMPILE_x86)
 #include "MK66F18.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "event_groups.h"
-
 #include <stddef.h>
+#endif
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+
+/*
+ * The way that this works is that the hal_uart_handle_t is defined differently
+ * for both environments. This means the same handle represents different things
+ * in each environment, so don't edit their properties directly (instead make
+ * a new modifier function). 
+ */
+
+#ifdef COMPILE_BOARD
+/* Struct for uart creation with rtos */
+typedef struct _hal_uart_handle_t {
+	uart_rtos_handle_t rtos_handle;
+	uart_handle_t uart_handle;
+	uart_rtos_config_t rtos_config;
+	/* TODO: Figure out how big this buffer should actually be */
+	/* Might need to adjust it in which case it shouldn't be stored here and
+	 * instead should be allocated dynamically. */
+	uint8_t buffer[200];
+} hal_uart_handle_t;
+
+#define UART_CLKSRC     SYS_CLK
+#define UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
+
+#elif defined(COMPILE_x86)
 
 #define HAL_UART_COMPLETE 0b00000001
 #define HAL_UART_RING_BUFFER_OVERRUN 0b00000010
@@ -40,6 +66,7 @@ enum{
 	kStatus_UART_RxRingBufferOverrun = 1, 
 	kStatus_UART_RxHardwareOverrun = 2,
 };
+#endif
 
 /*******************************************************************************
  * Declarations

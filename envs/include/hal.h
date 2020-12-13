@@ -1,28 +1,37 @@
-#ifndef _HAL_TIME_H_
-#define _HAL_TIME_H_
+
+#ifndef _HAL_H_
+#define _HAL_H_
 
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#ifdef COMPILE_BOARD
+#include "peripherals.h"
+#elif defined(COMPILE_x86)
+#include "MK66F18.h"
+#endif
 
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
+
+#ifdef COMPILE_x86
+#define HAL_STATUS_SUCCESS kStatusSuccess
+
+enum{
+    kStatus_Success = 0,
+};
+#endif
 
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
 
 /**
- * Initializes timers. Right now just initializes startup timer, if more are
- * added they will be initialized here. Only call once at startup.
+ * Initializes hardware for board. Must be called at startup.
  */
-void initTimers();
+void initHal();
 
-/**
- * Gets time since startup. Requires initTimers() to be called at startup.
- * @return time since startup in microseconds.
- */
-int timeSinceStartup();
+void halNvicSetPriority(IRQn_Type IRQn, uint32_t priority);
 
 #endif
