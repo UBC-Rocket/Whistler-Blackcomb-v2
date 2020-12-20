@@ -1,7 +1,8 @@
 # Whistler Blackcomb Flight Computer Firmware
 
 [![Build Status](https://travis-ci.com/UBC-Rocket/Whistler-Blackcomb-v2.svg?branch=master)](https://travis-ci.com/UBC-Rocket/Whistler-Blackcomb-v2)
-![Commit Activity](https://img.shields.io/github/commit-activity/w/UBC-Rocket/Whistler-Blackcomb-v2)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/ubc-rocket/whistler-blackcomb-v2)
+![Code Size](https://img.shields.io/github/languages/code-size/ubc-rocket/whistler-blackcomb-v2)
 ![Pull Requests](https://img.shields.io/github/issues-pr/UBC-Rocket/Whistler-Blackcomb-v2)
 
 
@@ -28,10 +29,6 @@ After the SDK is installed open the Installed SDK window (if this isn't visible 
 
 Click File->Import, select Git->Projects from Git (with smart import) and select Clone URI. Enter appropriate information and project should import. Note that you can use console git (wsl, git bash, etc.) but importing the project to the workspace is a bit confusing so it's easier to use the UI. 
 
-## Upload 
-
-For now since we're prototyping on a Teensy 3.6 and can't use an external programmer we're using a Teensyduino to upload the HEX file. Note that once the flight computer PCB is completed we'll be able to upload directly. To upload using this method follow [this guide](doc/1-Teensy-Upload.md). 
-
 ## Project Documentation
 
 All documentation are currently kept in the [doc/](doc/) directory. 
@@ -40,6 +37,5 @@ All documentation are currently kept in the [doc/](doc/) directory.
 2. freeRTOS installation and usage [guide](doc/2-RTOS-Basics.md).
 3. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md). 
 4. How Travis CI works and how to access ours in this [guide](doc/4-Travis-CI.md). 
-5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md)
-. 
+5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md). 
 6. Radio system [guide](doc/4-Radio.h). 
