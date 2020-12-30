@@ -18,6 +18,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <assert.h>
+#include <string.h>
 
 /*******************************************************************************
  * Definitions
@@ -42,6 +43,10 @@ static hal_uart_handle_t *uart_handles[1];
 static void inputLoop(void * pv);
 static void outputLoop(void * pv);
 static void generateImuLoop(void * pv);
+static void output(char c);
+static void synOut(char c);
+static void putPacket(const u_int8_t id, const char *c, char const length);
+static void putConfigPacket();
 
 /*******************************************************************************
  * Implementations
@@ -50,6 +55,57 @@ static void generateImuLoop(void * pv);
 /**
  * Loop for interacting with ground station interface
  */
+
+static void output(char c){
+    printf("%c",c);
+    //TODO:log the output too.
+    FILE *logfile = fopen("SIMlog.txt","a+");
+    fprintf(logfile,"%c",c);
+    fclose(logfile);
+}
+
+static void synOut(char c){
+    // Sends each byte in two bytes to reduce ascii range to [A, A + 16)
+    // Effectively avoiding all special characters that may have varying 
+    // behavior depending on the OS
+
+    //this code taken straight from FLARE
+
+    uint8_t b = c; // char might be unsigned
+
+    char msb = (b >> 4) + 'A';
+    char lsb = (b & 0x0F) + 'A';
+
+    output(msb);
+    output(lsb);
+}
+
+static void putPacket(const u_int8_t id, const char *c, char const length){
+    //TO DO: mutex stuff
+
+    synOut(id);
+
+    synOut((char)(length>>8));
+    synOut((char)(length & 0xFF));
+
+    for (char const *end = c + length; c != end; c++){
+        synOut(*c);
+    }
+
+    fflush(stdout);
+
+}
+static void putConfigPacket() {
+        uint8_t id = 0x01;
+        uint32_t int_test = 0x04030201;
+        float float_test = -2.0; // 0xC000 0000;
+
+        char buf[8];
+        memmove(buf, &int_test, 4);
+        memmove(buf + 4, &float_test, 4);
+        putPacket(id, buf, 8);
+}
+
 static void inputLoop(void *pv){
     /*handshake*/
     /*check for handshake acknowedgement*/
@@ -59,9 +115,7 @@ static void inputLoop(void *pv){
         scanf("%c",&readChar);
         assert(ack[i] == readChar);
     }
-    FILE *logfile = fopen("log2.txt","w");
-    fprintf(logfile,"input loop ran, ACK verified");
-    fclose(logfile);
+    putConfigPacket();
     
     //printf("Handshake Recieved!");
     for(;;){
@@ -73,10 +127,11 @@ static void inputLoop(void *pv){
 static void outputLoop(void *pv){
     printf("SYN"); /*this has to be the first thing to go out, I think*/
     fflush(stdout);
-    FILE *logfile = fopen("log.txt","w");
-    fprintf(logfile,"output loop ran");
-    fclose(logfile);
-    for(;;){}
+    for(;;){
+        //check buffer
+        //send what's in buffer
+        
+    }
     
 }
 
