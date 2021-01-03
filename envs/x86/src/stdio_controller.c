@@ -47,23 +47,98 @@ static void output(char c);
 static void synOut(char c);
 static void putPacket(const u_int8_t id, const char *c, char const length);
 static void putConfigPacket();
+static uint8_t getCinForce();
+static uint8_t getFilteredCin();
+static void extractPacket();
 
 /*******************************************************************************
  * Implementations
  ******************************************************************************/
 
-/**
- * Loop for interacting with ground station interface
+/*
+ * Grabs a char from stdin. Performs some sort of error checking (??)
+ * To Do: Understand what the commented-out section does (It's C++ from FLARE)
  */
+static uint8_t getCinForce() {
+    uint8_t c;
+    for(;;) {
+        scanf("%c",&c);
+        //if (std::cin.fail()) {        //I don't really understand at all what this does, need to ask.
+        //    std::cin.clear();
+        //    continue;
+        //}
+        return c;
+    }
+}
 
+/*
+ * recombines two sequential chars from stdin into a single char that carries
+ * meaning from the groundstation
+ * 
+ * See the confluence docs section on reduced ASCII space
+ */
+static uint8_t getFilteredCin() {
+    uint8_t msb = getCinForce() - 'A';
+    uint8_t lsb = getCinForce() - 'A';
+
+    return (msb << 4) | lsb;
+}
+
+/*
+ * extracts a SIM packet from grounstation via stdin
+ * TODO: Place it into the appropriate buffer
+ */
+static void extractPacket() {
+        uint8_t id;
+        uint16_t length;
+        id = getFilteredCin();
+        length = getFilteredCin();
+        length <<= 8;
+        length |= getFilteredCin();
+
+        //auto buf = std::vector<uint8_t>();
+        char buf[255]={};
+
+        //buf.reserve(length);
+
+
+        for (int i = 0; i < length; i++) {
+            //buf.push_back(getFilteredCin());
+            buf[i]=getFilteredCin();
+        }
+
+
+        //I really do need to figure out this mutex stuff. 
+        //and WTF is istream
+
+        //{ // scope for lock-guard
+        //    const std::lock_guard<std::mutex> lock(istream_mutex_);
+        //    for (auto j : buf) {
+        //        istreams_[id].push(j);
+        //    } // unlock mutex
+        //}
+    }
+
+
+/*
+ * outputs a single char to standard out and logs it in SIMlog.txt
+ * 
+ * @param c Char to output
+ */
 static void output(char c){
     printf("%c",c);
-    //TODO:log the output too.
-    FILE *logfile = fopen("SIMlog.txt","a+");
+    FILE *logfile = fopen("SIMlog.txt","a+"); //This file manipulation code is a little suspect
     fprintf(logfile,"%c",c);
     fclose(logfile);
 }
 
+
+/*
+ * outputs a char to stdio in the SIM format, splitting it up into two chars
+ * due to the reduced ascii space.
+ * 
+ * @param c The char to send out to SIM
+ */
 static void synOut(char c){
     // Sends each byte in two bytes to reduce ascii range to [A, A + 16)
     // Effectively avoiding all special characters that may have varying 
@@ -80,6 +155,13 @@ static void synOut(char c){
     output(lsb);
 }
 
+/*
+ * Sends a SIM packet 
+ * 
+ * @param id packet ID, used in header
+ * @param *c the packet message
+ * @param length length of the packet message  
+ */
 static void putPacket(const u_int8_t id, const char *c, char const length){
     //TO DO: mutex stuff
 
@@ -95,6 +177,10 @@ static void putPacket(const u_int8_t id, const char *c, char const length){
     fflush(stdout);
 
 }
+
+/*
+ * Sends the SIM config packet, consisting of an int and float.
+ */
 static void putConfigPacket() {
         uint8_t id = 0x01;
         uint32_t int_test = 0x04030201;
@@ -106,6 +192,16 @@ static void putConfigPacket() {
         putPacket(id, buf, 8);
 }
 
+/*******************************************************************************
+ * Loops for interacting with ground station interface
+ ******************************************************************************/
+
+
+/*
+ * The input loops handles verification of the handshake from the groundstation 
+ * and sends the config packet. It then continously loops though extractPacket(),
+ * reading SIM packets from stdio.
+ */
 static void inputLoop(void *pv){
     /*handshake*/
     /*check for handshake acknowedgement*/
@@ -117,13 +213,20 @@ static void inputLoop(void *pv){
     }
     putConfigPacket();
     
-    //printf("Handshake Recieved!");
     for(;;){
+
+        //constantly check for new packets
+        //extractPacket()
+        
         //console_print("stdio polling...\n");
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
+/*
+ * Output loop handles sending of rocket side of SIM handshake
+ * Then continoutly loops though sending SIM packets 
+ */
 static void outputLoop(void *pv){
     printf("SYN"); /*this has to be the first thing to go out, I think*/
     fflush(stdout);
