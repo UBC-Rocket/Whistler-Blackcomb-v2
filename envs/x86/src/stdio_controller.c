@@ -29,6 +29,13 @@ enum sensors {
     uart_index_debug = 1, 
 };
 
+#define PACKET_BUFFER_SIZE 8
+
+//are these amounts reasonable?
+uint8_t packetBuffers[0x74][PACKET_BUFFER_SIZE][512] = { 0 };
+//IDs, Packets, Packet Contents..?
+int packetBuffersWriteIndex[0x74][PACKET_BUFFER_SIZE] = { 0 };
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -45,7 +52,7 @@ static void outputLoop(void * pv);
 static void generateImuLoop(void * pv);
 static void output(char c);
 static void synOut(char c);
-static void putPacket(const u_int8_t id, const char *c, char const length);
+static void putPacket(const uint8_t id, const char *c, char const length);
 static void putConfigPacket();
 static uint8_t getCinForce();
 static uint8_t getFilteredCin();
@@ -54,6 +61,46 @@ static void extractPacket();
 /*******************************************************************************
  * Implementations
  ******************************************************************************/
+
+
+/* Craptastic FIFO buffer */
+static uint8_t readFromBuf(uint8_t id,uint8_t data[]){
+    int readpoint = packetBuffersWriteIndex[id]-1;
+
+    //forgive me for this
+    if(readpoint<0){
+        readpoint = PACKET_BUFFER_SIZE-1;
+    } else if(readpoint>=PACKET_BUFFER_SIZE){
+        readpoint=0;
+    }
+
+    data[0]=packetBuffers[id][readpoint][0];
+    for(i=1;i<=packetBuffers[id][readpoint][0];i++){
+        data[i]=packetBuffers[id][readpoint][i];
+    }
+}
+
+static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length){
+    
+    if(packetBuffersWriteIndex[id]>=PACKET_BUFFER_SIZE){
+        packetBuffersWriteIndex[id]=0
+    }
+
+    int writepoint = packetBuffersWriteIndex[id]
+
+    packetBuffers[id][writepoint][0]=length;
+
+    for(int i=1;i<=length;i++){
+        packetBuffers[id][writepoint][i] = data[i];
+    }
+    packetBuffersWriteIndex[id]++;
+    
+}
+
+
+
+
+
 
 /*
  * Grabs a char from stdin. Performs some sort of error checking (??)
@@ -97,7 +144,7 @@ static void extractPacket() {
         length |= getFilteredCin();
 
         //auto buf = std::vector<uint8_t>();
-        char buf[255]={};
+        char buf[512]={};
 
         //buf.reserve(length);
 
@@ -216,7 +263,7 @@ static void inputLoop(void *pv){
     for(;;){
 
         //constantly check for new packets
-        //extractPacket()
+        extractPacket()
         
         //console_print("stdio polling...\n");
         vTaskDelay(pdMS_TO_TICKS(500));
