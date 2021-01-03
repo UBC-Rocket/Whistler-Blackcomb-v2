@@ -34,7 +34,7 @@ enum sensors {
 //are these amounts reasonable?
 uint8_t packetBuffers[0x74][PACKET_BUFFER_SIZE][512] = { 0 };
 //IDs, Packets, Packet Contents..?
-int packetBuffersWriteIndex[0x74][PACKET_BUFFER_SIZE] = { 0 };
+int packetBuffersWriteIndex[0x74] = { 0 };
 
 /*******************************************************************************
  * Variables
@@ -75,7 +75,7 @@ static uint8_t readFromBuf(uint8_t id,uint8_t data[]){
     }
 
     data[0]=packetBuffers[id][readpoint][0];
-    for(i=1;i<=packetBuffers[id][readpoint][0];i++){
+    for(int i=1;i<=packetBuffers[id][readpoint][0];i++){
         data[i]=packetBuffers[id][readpoint][i];
     }
 }
@@ -83,10 +83,10 @@ static uint8_t readFromBuf(uint8_t id,uint8_t data[]){
 static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length){
     
     if(packetBuffersWriteIndex[id]>=PACKET_BUFFER_SIZE){
-        packetBuffersWriteIndex[id]=0
+        packetBuffersWriteIndex[id]=0;
     }
 
-    int writepoint = packetBuffersWriteIndex[id]
+    int writepoint = packetBuffersWriteIndex[id];
 
     packetBuffers[id][writepoint][0]=length;
 
@@ -144,7 +144,7 @@ static void extractPacket() {
         length |= getFilteredCin();
 
         //auto buf = std::vector<uint8_t>();
-        char buf[512]={};
+        char buf[512];
 
         //buf.reserve(length);
 
@@ -263,7 +263,7 @@ static void inputLoop(void *pv){
     for(;;){
 
         //constantly check for new packets
-        extractPacket()
+        extractPacket();
         
         //console_print("stdio polling...\n");
         vTaskDelay(pdMS_TO_TICKS(500));
