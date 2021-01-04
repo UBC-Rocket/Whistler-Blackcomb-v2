@@ -58,14 +58,19 @@ static uint8_t getCinForce();
 static uint8_t getFilteredCin();
 static void extractPacket();
 
+static uint8_t readFromBuf(uint8_t data[],uint8_t id);
+static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length);
+
+
 /*******************************************************************************
  * Implementations
  ******************************************************************************/
 
 
-/* Craptastic FIFO buffer */
-static uint8_t readFromBuf(uint8_t id,uint8_t data[]){
+/* Craptastic FIFO buffer Accidentaly Circular*/
+static uint8_t readFromBuf(uint8_t data[],uint8_t id){
     int readpoint = packetBuffersWriteIndex[id]-1;
+
 
     //forgive me for this
     if(readpoint<0){
@@ -78,6 +83,9 @@ static uint8_t readFromBuf(uint8_t id,uint8_t data[]){
     for(int i=1;i<=packetBuffers[id][readpoint][0];i++){
         data[i]=packetBuffers[id][readpoint][i];
     }
+
+    //return the length (may be useful?)
+    return data[0];
 }
 
 static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length){
@@ -144,7 +152,7 @@ static void extractPacket() {
         length |= getFilteredCin();
 
         //auto buf = std::vector<uint8_t>();
-        char buf[512];
+        uint8_t buf[512];
 
         //buf.reserve(length);
 
@@ -158,11 +166,10 @@ static void extractPacket() {
         //I really do need to figure out this mutex stuff. 
         //and WTF is istream
 
-        //{ // scope for lock-guard
+        { // scope for lock-guard
         //    const std::lock_guard<std::mutex> lock(istream_mutex_);
-        //    for (auto j : buf) {
-        //        istreams_[id].push(j);
-        //    } // unlock mutex
+        writeToBuf(buf,id,length);
+            } // unlock mutex
         //}
     }
 
