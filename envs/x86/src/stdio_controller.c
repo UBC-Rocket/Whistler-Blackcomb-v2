@@ -32,9 +32,11 @@ enum sensors {
 #define PACKET_BUFFER_SIZE 8
 
 //are these amounts reasonable?
-uint8_t packetBuffers[0x74][PACKET_BUFFER_SIZE][512] = { 0 };
+uint8_t packetBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
 //IDs, Packets, Packet Contents..?
-int packetBuffersWriteIndex[0x74] = { 0 };
+int packetBuffersWriteIndex[0x74] = {0};
+
+int packetBuffersReadIndex[0x74] = {0}; 
 
 /*******************************************************************************
  * Variables
@@ -69,20 +71,19 @@ static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length);
 
 /* Craptastic FIFO buffer Accidentaly Circular*/
 static uint8_t readFromBuf(uint8_t data[],uint8_t id){
-    int readpoint = packetBuffersWriteIndex[id]-1;
-
-
-    //forgive me for this
-    if(readpoint<0){
-        readpoint = PACKET_BUFFER_SIZE-1;
-    } else if(readpoint>=PACKET_BUFFER_SIZE){
-        readpoint=0;
+    if(packetBuffersReadIndex[id]>=PACKET_BUFFER_SIZE){
+        packetBuffersReadIndex[id]=0;
     }
+    int readpoint = packetBuffersReadIndex[id];
+
+
 
     data[0]=packetBuffers[id][readpoint][0];
     for(int i=1;i<=packetBuffers[id][readpoint][0];i++){
         data[i]=packetBuffers[id][readpoint][i];
     }
+
+    packetBuffersReadIndex[id]++;
 
     //return the length (may be useful?)
     return data[0];
