@@ -31,16 +31,33 @@ enum sensors {
 
 #define PACKET_BUFFER_SIZE 8
 
-//are these amounts reasonable?
-uint8_t packetBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
-//IDs, Packets, Packet Contents..?
-int packetBuffersWriteIndex[0x74] = {0};
 
-int packetBuffersReadIndex[0x74] = {0}; 
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+
+
+//packet's recieved buffer
+//are these amounts reasonable?
+uint8_t rxPacketBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
+//[ID][Packet][Packet Contents]
+int rxPacketBuffersWriteIndex[0x74] = {0};
+int rxPacketBuffersReadIndex[0x74] = {0}; 
+
+//packet's recieved buffer
+//are these amounts reasonable?
+uint8_t txPacketBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
+//[ID][Packet][Packet Contents]
+int txPacketBuffersWriteIndex[0x74] = {0};
+int txPacketBuffersReadIndex[0x74] = {0}; 
+
+
+
+
+SemaphoreHandle_t simInSemaphore;
+SemaphoreHandle_t simOutSemaphore;
+
 
 /* TODO: update for all sensors */
 static hal_uart_handle_t *uart_handles[1];
@@ -48,7 +65,6 @@ static hal_uart_handle_t *uart_handles[1];
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
-
 static void inputLoop(void * pv);
 static void outputLoop(void * pv);
 static void generateImuLoop(void * pv);
@@ -60,8 +76,8 @@ static uint8_t getCinForce();
 static uint8_t getFilteredCin();
 static void extractPacket();
 
-static uint8_t readFromBuf(uint8_t data[],uint8_t id);
-static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length);
+static uint8_t readFromRxBuf(uint8_t data[],uint8_t id);
+static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
 
 
 /*******************************************************************************
@@ -70,46 +86,42 @@ static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length);
 
 
 /* Craptastic FIFO buffer Accidentaly Circular*/
-static uint8_t readFromBuf(uint8_t data[],uint8_t id){
-    if(packetBuffersReadIndex[id]>=PACKET_BUFFER_SIZE){
-        packetBuffersReadIndex[id]=0;
+/* Good Lord, how ugly*/
+static uint8_t readFromRxBuf(uint8_t data[],uint8_t id){
+    if(rxPacketBuffersReadIndex[id]>=PACKET_BUFFER_SIZE){
+        rxPacketBuffersReadIndex[id]=0;
     }
-    int readpoint = packetBuffersReadIndex[id];
+    int readpoint = rxPacketBuffersReadIndex[id];
 
 
 
-    data[0]=packetBuffers[id][readpoint][0];
-    for(int i=1;i<=packetBuffers[id][readpoint][0];i++){
-        data[i]=packetBuffers[id][readpoint][i];
+    data[0]=rxPacketBuffers[id][readpoint][0];
+    for(int i=1;i<=rxPacketBuffers[id][readpoint][0];i++){
+        data[i]=rxPacketBuffers[id][readpoint][i];
     }
 
-    packetBuffersReadIndex[id]++;
+    rxPacketBuffersReadIndex[id]++;
 
     //return the length (may be useful?)
     return data[0];
 }
 
-static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length){
+static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length){
     
-    if(packetBuffersWriteIndex[id]>=PACKET_BUFFER_SIZE){
-        packetBuffersWriteIndex[id]=0;
+    if(rxPacketBuffersWriteIndex[id]>=PACKET_BUFFER_SIZE){
+        rxPacketBuffersWriteIndex[id]=0;
     }
 
-    int writepoint = packetBuffersWriteIndex[id];
+    int writepoint = rxPacketBuffersWriteIndex[id];
 
-    packetBuffers[id][writepoint][0]=length;
+    rxPacketBuffers[id][writepoint][0]=length;
 
     for(int i=1;i<=length;i++){
-        packetBuffers[id][writepoint][i] = data[i];
+        rxPacketBuffers[id][writepoint][i] = data[i];
     }
-    packetBuffersWriteIndex[id]++;
+    rxPacketBuffersWriteIndex[id]++;
     
 }
-
-
-
-
-
 
 /*
  * Grabs a char from stdin. Performs some sort of error checking (??)
@@ -118,9 +130,12 @@ static void writeToBuf(uint8_t data[],uint8_t id,uint16_t length){
 static uint8_t getCinForce() {
     uint8_t c;
     for(;;) {
-        scanf("%c",&c);
+        if(scanf("%c",&c)!=1){
+
+            //continue;
+        }
         //if (std::cin.fail()) {        //I don't really understand at all what this does, need to ask.
-        //    std::cin.clear();
+        //    std::cin.clear();         
         //    continue;
         //}
         return c;
@@ -147,31 +162,35 @@ static uint8_t getFilteredCin() {
 static void extractPacket() {
         uint8_t id;
         uint16_t length;
+
         id = getFilteredCin();
         length = getFilteredCin();
         length <<= 8;
         length |= getFilteredCin();
 
-        //auto buf = std::vector<uint8_t>();
         uint8_t buf[512];
 
-        //buf.reserve(length);
-
-
         for (int i = 0; i < length; i++) {
-            //buf.push_back(getFilteredCin());
             buf[i]=getFilteredCin();
         }
 
+        xSemaphoreTake(simInSemaphore,portMAX_DELAY);
+        writeToRxBuf(buf,id,length);
+        xSemaphoreGive(simInSemaphore);
 
-        //I really do need to figure out this mutex stuff. 
-        //and WTF is istream
-
-        { // scope for lock-guard
-        //    const std::lock_guard<std::mutex> lock(istream_mutex_);
-        writeToBuf(buf,id,length);
-            } // unlock mutex
-        //}
+        FILE *logfile = fopen("SIMrxlog.txt","a+"); //This file manipulation code is a little suspect
+        char str[512] = {0};
+        int i =0;
+        for(; i<=length;i++){
+            str[i]=buf[i];
+        }
+        str[++i]='\0';
+        fprintf(logfile,"%s",str);
+        fprintf(logfile,"\n");
+        
+        fclose(logfile);
+        
+    
     }
 
 
@@ -182,7 +201,7 @@ static void extractPacket() {
  */
 static void output(char c){
     printf("%c",c);
-    FILE *logfile = fopen("SIMlog.txt","a+"); //This file manipulation code is a little suspect
+    FILE *logfile = fopen("SIMtxlog.txt","a+"); //This file manipulation code is a little suspect
     fprintf(logfile,"%c",c);
     fclose(logfile);
 }
@@ -219,11 +238,12 @@ static void synOut(char c){
  */
 static void putPacket(const u_int8_t id, const char *c, char const length){
     //TO DO: mutex stuff
-
     synOut(id);
 
     synOut((char)(length>>8));
     synOut((char)(length & 0xFF));
+
+    xSemaphoreTake(simOutSemaphore,portMAX_DELAY);
 
     for (char const *end = c + length; c != end; c++){
         synOut(*c);
@@ -231,6 +251,7 @@ static void putPacket(const u_int8_t id, const char *c, char const length){
 
     fflush(stdout);
 
+    xSemaphoreGive(simOutSemaphore);
 }
 
 /*
@@ -264,7 +285,7 @@ static void inputLoop(void *pv){
     char readChar;
     for (int i = 0; i < 3; i++) {
         scanf("%c",&readChar);
-        assert(ack[i] == readChar);
+        //assert(ack[i] == readChar);
     }
     putConfigPacket();
     
@@ -274,7 +295,7 @@ static void inputLoop(void *pv){
         extractPacket();
         
         //console_print("stdio polling...\n");
-        vTaskDelay(pdMS_TO_TICKS(500));
+        //vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
 
@@ -330,6 +351,15 @@ void stdioInit(){
     /* For generation of normal threads if needed for testing */
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
+
+    //todo: verify I am using these correctly. 
+    simInSemaphore = xSemaphoreCreateMutex();
+    assert(simInSemaphore != NULL); //basic error checking
+
+    
+    simOutSemaphore = xSemaphoreCreateMutex();
+    assert(simOutSemaphore !=NULL);
+
 
     if (xTaskCreate( 
 	  		outputLoop, 
