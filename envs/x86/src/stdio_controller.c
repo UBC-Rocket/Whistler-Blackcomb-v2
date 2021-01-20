@@ -30,7 +30,7 @@ enum sensors {
 };
 
 #define PACKET_BUFFER_SIZE 8
-
+#define MAX_PACKET_IDS 0x74
 
 
 /*******************************************************************************
@@ -42,15 +42,18 @@ enum sensors {
 //are these amounts reasonable?
 uint8_t rxPacketBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
 //[ID][Packet][Packet Contents]
-int rxPacketBuffersWriteIndex[0x74] = {0};
-int rxPacketBuffersReadIndex[0x74] = {0}; 
+int rxPacketBuffersWriteIndex[MAX_PACKET_IDS] = {0};
+int rxPacketBuffersReadIndex[MAX_PACKET_IDS] = {0}; 
+int rxPacketBuffersReadLowerLimit[MAX_PACKET_IDS] = {0}; //needs to be initialized in the init function
+//the upper packet limit is the lower limit + the packet buffer size. It's the
+//range of allowable readable values
 
 //packet's recieved buffer
 //are these amounts reasonable?
-uint8_t txPacketBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
+uint8_t txPacketBuffers[MAX_PACKET_IDS][PACKET_BUFFER_SIZE][512] = {0};
 //[ID][Packet][Packet Contents]
-int txPacketBuffersWriteIndex[0x74] = {0};
-int txPacketBuffersReadIndex[0x74] = {0}; 
+int txPacketBuffersWriteIndex[MAX_PACKET_IDS] = {0};
+int txPacketBuffersReadIndex[MAX_PACKET_IDS] = {0}; 
 
 
 
@@ -76,6 +79,7 @@ static uint8_t getCinForce();
 static uint8_t getFilteredCin();
 static void extractPacket();
 
+
 static uint8_t readFromRxBuf(uint8_t data[],uint8_t id);
 static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
 
@@ -87,24 +91,34 @@ static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
 
 /* Craptastic FIFO buffer Accidentaly Circular*/
 /* Good Lord, how ugly*/
+
 static uint8_t readFromRxBuf(uint8_t data[],uint8_t id){
     if(rxPacketBuffersReadIndex[id]>=PACKET_BUFFER_SIZE){
         rxPacketBuffersReadIndex[id]=0;
+        
     }
+
+
     int readpoint = rxPacketBuffersReadIndex[id];
-
-
+    
 
     data[0]=rxPacketBuffers[id][readpoint][0];
     for(int i=1;i<=rxPacketBuffers[id][readpoint][0];i++){
         data[i]=rxPacketBuffers[id][readpoint][i];
     }
 
-    rxPacketBuffersReadIndex[id]++;
+    if(readpoint+1<rxPacketBuffersReadLowerLimit[id]+PACKET_BUFFER_SIZE){
+        rxPacketBuffersReadIndex[id]++;
+    }
+    
 
     //return the length (may be useful?)
     return data[0];
 }
+
+//RULES:
+//> Read Head Cannot get ahead of the write head
+//> Read Head cannot get more than 1 cycle behind the write head
 
 static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length){
     
@@ -115,11 +129,25 @@ static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length){
     int writepoint = rxPacketBuffersWriteIndex[id];
 
     rxPacketBuffers[id][writepoint][0]=length;
+    //printf("Placing '%d' in id %d, bufferloc %d, index %d\n",length,id,writepoint,0);
+
 
     for(int i=1;i<=length;i++){
-        rxPacketBuffers[id][writepoint][i] = data[i];
+        rxPacketBuffers[id][writepoint][i] = data[(i-1)];
+        //printf("Placing '%c' in id %d, bufferloc %d, index %d\n",data[i-1],id,writepoint,i);
     }
     rxPacketBuffersWriteIndex[id]++;
+    rxPacketBuffersReadLowerLimit[id]++;
+    if(rxPacketBuffersReadLowerLimit[id]>=PACKET_BUFFER_SIZE){
+        rxPacketBuffersReadLowerLimit[id]=0;
+    }
+    
+}
+
+static void initRxBuf(void){
+    for(int i =0;i<MAX_PACKET_IDS;i++){
+        rxPacketBuffersReadLowerLimit[i] = 0-PACKET_BUFFER_SIZE;
+    }
     
 }
 
@@ -131,14 +159,16 @@ static uint8_t getCinForce() {
     uint8_t c;
     for(;;) {
         if(scanf("%c",&c)!=1){
-
-            //continue;
+            
+            continue;
         }
         //if (std::cin.fail()) {        //I don't really understand at all what this does, need to ask.
         //    std::cin.clear();         
         //    continue;
         //}
+        //output(c);
         return c;
+        
     }
 }
 
@@ -164,14 +194,17 @@ static void extractPacket() {
         uint16_t length;
 
         id = getFilteredCin();
+        //printf(" ID: %d\n",id);
         length = getFilteredCin();
         length <<= 8;
         length |= getFilteredCin();
+        //printf(" length: %d\n",length);
 
         uint8_t buf[512];
 
-        for (int i = 0; i < length; i++) {
+        for (uint16_t i = 0; i <= length; i++) {
             buf[i]=getFilteredCin();
+            //printf("%d",buf[i]);
         }
 
         xSemaphoreTake(simInSemaphore,portMAX_DELAY);
@@ -187,7 +220,7 @@ static void extractPacket() {
         str[++i]='\0';
         fprintf(logfile,"%s",str);
         fprintf(logfile,"\n");
-        
+        //printf("%s",str);
         fclose(logfile);
         
     
@@ -236,7 +269,7 @@ static void synOut(char c){
  * @param *c the packet message
  * @param length length of the packet message  
  */
-static void putPacket(const u_int8_t id, const char *c, char const length){
+static void putPacket(const uint8_t id, const char *c, char const length){
     //TO DO: mutex stuff
     synOut(id);
 
