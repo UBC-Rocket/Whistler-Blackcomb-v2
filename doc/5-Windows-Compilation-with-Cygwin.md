@@ -29,7 +29,9 @@ Find `gcc-core` under packages and in the `new` column, select the most recent v
 
 Follow the same steps as above and select the latest versions of `gcc-g++`, `cmake`, and `make`.
 
-Select 'next' and confirm your instalations. Other packages required by the `gcc-core`,`gcc-g++`, `cmake`, and `make` will be installed as well. Select next again to install. Select 'Finish' to complete the instalation. 
+If you want to be able to use VSCode's built-in debugger, you'll need to install the `gdb` package as well.
+
+Select 'next' and confirm your instalations. Other packages required by `gcc-core`,`gcc-g++`, `cmake`, `make`, and (optionally) `gdb` will be installed as well. Select next again to install. Select 'Finish' to complete the instalation. 
 
 # Adding Cygwin to Path
 Use the Windows start menu search to search for 'environment' and select 'edit the system environment variables', or find it from `Control Panel>System and Security>System>Advanced System Settings`. Click on 'Environment Variables...'
