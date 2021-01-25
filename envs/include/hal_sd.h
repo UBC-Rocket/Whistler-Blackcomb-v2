@@ -7,6 +7,8 @@
 
 #ifdef COMPILE_BOARD
 #include "ff.h"
+#elif defined(COMPILE_x86)
+#include "stdio.h"
 #endif
 
 /*******************************************************************************
@@ -15,8 +17,8 @@
 
 #ifdef COMPILE_BOARD
 typedef FIL HALFILE;
-#elif COMPILE_X86
-
+#elif defined(COMPILE_x86)
+typedef FILE* HALFILE;
 #endif
 
 /*******************************************************************************

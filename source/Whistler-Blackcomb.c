@@ -318,7 +318,7 @@ static void LogTask(void *pv) {
 	sdInit();
 	for (EVER) {
 		sdMkDir("/testdir");
-		sdOpen(&file, _T("/testdir/testfile.txt"));
+		sdOpen(&file, "/testdir/testfile.txt");
 		sdWrite(&file, "test data\n");
 		sdClose(&file);
 		vTaskDelay(pdMS_TO_TICKS(10000));

@@ -76,8 +76,8 @@ void sdOpen(HALFILE *file, const char *file_name) {
 		} else {
 			printf("Open file failed.\r\n");
 		}
-		xSemaphoreGive(sfileAccessSemaphore);
 	}
+	xSemaphoreGive(sfileAccessSemaphore);
 }
 
 size_t sdWrite(HALFILE *file, const char *data) {
