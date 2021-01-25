@@ -15,17 +15,13 @@
  * Variables
  ******************************************************************************/
 
-static FATFS gfileSystem; /* File system object */
 static FATFS g_fileSystem; /* File system object */
 static uint32_t s_taskSleepTicks = portMAX_DELAY;
-static const uint8_t s_buffer1[] = { 'T', 'A', 'S', 'K', '1', '\r', '\n' };
-static const uint8_t s_buffer2[] = { 'T', 'A', 'S', 'K', '2', '\r', '\n' };
 /*! @brief SD card detect flag  */
 static volatile bool s_cardInserted = false;
 static volatile bool s_cardInsertStatus = false;
 /*! @brief Card semaphore  */
 static SemaphoreHandle_t sfileAccessSemaphore = NULL;
-static SemaphoreHandle_t s_CardDetectSemaphore = NULL;
 
 const TCHAR driverNumberBuffer[3U] = { SDDISK + '0', ':', '/' };
 
@@ -48,9 +44,10 @@ void sdInit(void) {
 	if (SD_HostInit(&g_sd) != kStatus_Success)
 		printf("SD Host init failed.\n");
 
-	SD_SetCardPower(&g_sd, false);
-	printf("Resetting chip...\n");
-	SD_SetCardPower(&g_sd, true);
+	/* Not nec */
+//	SD_SetCardPower(&g_sd, false);
+//	printf("Resetting chip...\n");
+//	SD_SetCardPower(&g_sd, true);
 
 	if (f_mount(&g_fileSystem, driverNumberBuffer, 0U)) {
 		printf("Mount volume failed.\r\n");
@@ -62,15 +59,6 @@ void sdInit(void) {
 		printf("Change drive failed.\r\n");
 	}
 #endif
-	printf("\r\nCreate directory......\r\n");
-	error = f_mkdir(_T("/xander"));
-	if (error) {
-		if (error == FR_EXIST) {
-			printf("Directory exists.\r\n");
-		} else {
-			printf("Make directory failed.\r\n");
-		}
-	}
 
 	xSemaphoreGive(sfileAccessSemaphore);
 }
@@ -96,7 +84,8 @@ size_t sdWrite(HALFILE *file, const char *data) {
 	FRESULT error;
 	UINT bytesWritten = 0U;
 	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
-		if (f_lseek(file, file->obj.objsize) != FR_OK) {
+		error = f_lseek(file, file->obj.objsize);
+		if (error != FR_OK) {
 			printf("lseek file failed.\r\n");
 			xSemaphoreGive(sfileAccessSemaphore);
 			return -1;
@@ -111,6 +100,21 @@ size_t sdWrite(HALFILE *file, const char *data) {
 	}
 	xSemaphoreGive(sfileAccessSemaphore);
 	return bytesWritten;
+}
+
+void sdMkDir(const char *dir_name){
+	FRESULT error;
+	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
+		error = f_mkdir(dir_name);
+		if (error) {
+			if (error == FR_EXIST) {
+				printf("Directory exists.\r\n");
+			} else {
+				printf("Make directory failed.\r\n");
+			}
+		}
+	}
+	xSemaphoreGive(sfileAccessSemaphore);
 }
 
 void sdClose(HALFILE *file) {

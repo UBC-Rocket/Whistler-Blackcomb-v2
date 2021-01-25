@@ -47,6 +47,13 @@ void sdOpen(HALFILE *file, const char *file_name);
 size_t sdWrite(HALFILE *file, const char *data);
 
 /**
+ * Makes a new directory
+ *
+ * @param dir_name the path of the new directory
+ */
+void sdMkDir(const char *dir_name);
+
+/**
  * Closes file
  *
  * @param file the file to close

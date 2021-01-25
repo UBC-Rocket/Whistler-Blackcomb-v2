@@ -47,7 +47,6 @@
 #define PI acos(-1)
 #define EVER ;;
 
-
 /* Task priorities. */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
@@ -95,8 +94,10 @@ int main(void) {
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(RADIO_UART_RX_TX_IRQn, 5);
 
+	BaseType_t error;
+
 	/* Copy the following to create a new task */
-	if (xTaskCreate( /* create task */
+	if (error = xTaskCreate( /* create task */
 	BlinkTask, /* pointer to the task */
 	"Blink Task", /* task name for kernel awareness debugging */
 	200 / sizeof(StackType_t), /* task stack size */
@@ -104,36 +105,40 @@ int main(void) {
 	tskIDLE_PRIORITY + 2, /* initial priority */
 	(TaskHandle_t*) NULL /* optional task handle_debug to create */
 	) != pdPASS) {
+		printf("Task init failed: %d\n", error);
 		for (;;)
 			; /* error! probably out of memory */
 	}
 
-	if (xTaskCreate(ReadImuTask, "IMU Task",
+	if (error = xTaskCreate(ReadImuTask, "IMU Task",
 	configMINIMAL_STACK_SIZE + 300,
 	NULL,
 	debug_uart_task_PRIORITY,
 	NULL) != pdPASS) {
+		printf("Task init failed: %d\n", error);
 		for (;;)
 			;
 	}
 
-//	if (xTaskCreate(RadioTask, "Radio Task",
-//	configMINIMAL_STACK_SIZE + 1000,
-//	NULL,
-//	radio_task_PRIORITY,
-//	NULL) != pdPASS) {
-//		for (;;)
-//			;
-//	}
+	if (error = xTaskCreate(RadioTask, "Radio Task",
+	configMINIMAL_STACK_SIZE + 1000,
+	NULL,
+	radio_task_PRIORITY,
+	NULL) != pdPASS) {
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
 
-	if (xTaskCreate(LogTask, "Log Task",
-		configMINIMAL_STACK_SIZE + 1000,
-		NULL,
-		log_task_PRIORITY,
-		NULL) != pdPASS) {
-			for (;;)
-				;
-		}
+	if (error = xTaskCreate(LogTask, "Log Task",
+	configMINIMAL_STACK_SIZE + 500,
+	NULL,
+	log_task_PRIORITY,
+	NULL) != pdPASS) {
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
 
 	vTaskStartScheduler();
 
@@ -282,7 +287,6 @@ static void ReadImuTask(void *pv) {
 //uint8_t radioPacket[] = { 0x7E, 0x00, 0x18, 0x90, 0x00, 0x13, 0xA2, 0x00, 0x41,
 //		0x67, 0x8F, 0xC0, 0xFF, 0xFE, 0xC2, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20,
 //		0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0xC7 };
-
 /* Right now just echoes anything sent to the radio */
 static void RadioTask(void *pv) {
 
@@ -298,7 +302,6 @@ static void RadioTask(void *pv) {
 	/* Add this for x86 testing */
 	// memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
 	// radio.serport.uart_handle.cur_buffer_size = sizeof(radioPacket);
-
 	while (1) {
 		int len = radioReceive(&radio, packet);
 
@@ -314,7 +317,8 @@ static void LogTask(void *pv) {
 	printf("starting...\n");
 	sdInit();
 	for (EVER) {
-		sdOpen(&file, _T("/dir_1/testfile.txt"));
+		sdMkDir("/testdir");
+		sdOpen(&file, _T("/testdir/testfile.txt"));
 		sdWrite(&file, "test data\n");
 		sdClose(&file);
 		vTaskDelay(pdMS_TO_TICKS(10000));
