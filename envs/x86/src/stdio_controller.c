@@ -31,7 +31,7 @@ enum sensors {
 
 #define PACKET_BUFFER_SIZE 8
 #define MAX_PACKET_IDS 0x74
-
+#define EVER ;;
 
 /*******************************************************************************
  * Variables
@@ -234,9 +234,9 @@ static void extractPacket() {
  */
 static void output(char c){
     printf("%c",c);
-    FILE *logfile = fopen("SIMtxlog.txt","a+"); //This file manipulation code is a little suspect
-    fprintf(logfile,"%c",c);
-    fclose(logfile);
+    //FILE *logfile = fopen("SIMtxlog.txt","a+"); //This file manipulation code is a little suspect
+    //fprintf(logfile,"%c",c);
+    //fclose(logfile);
 }
 
 
@@ -276,7 +276,7 @@ static void putPacket(const uint8_t id, const char *c, char const length){
     synOut((char)(length>>8));
     synOut((char)(length & 0xFF));
 
-    xSemaphoreTake(simOutSemaphore,portMAX_DELAY);
+    //xSemaphoreTake(simOutSemaphore,portMAX_DELAY);
 
     for (char const *end = c + length; c != end; c++){
         synOut(*c);
@@ -284,7 +284,7 @@ static void putPacket(const uint8_t id, const char *c, char const length){
 
     fflush(stdout);
 
-    xSemaphoreGive(simOutSemaphore);
+    //xSemaphoreGive(simOutSemaphore);
 }
 
 /*
@@ -316,16 +316,19 @@ static void inputLoop(void *pv){
     /*check for handshake acknowedgement*/
     char ack[4] = "ACK";
     char readChar;
+    //printf("before for loop\n");
     for (int i = 0; i < 3; i++) {
-        scanf("%c",&readChar);
-        //assert(ack[i] == readChar);
+        readChar=getCinForce();
+        //printf("read char is: %d\n",readChar);
+        assert(ack[i] == readChar);
     }
+    //printf("after for loop\n");
     putConfigPacket();
     
-    for(;;){
+    for(EVER){
 
         //constantly check for new packets
-        extractPacket();
+        //extractPacket();
         
         //console_print("stdio polling...\n");
         //vTaskDelay(pdMS_TO_TICKS(500));
@@ -339,7 +342,7 @@ static void inputLoop(void *pv){
 static void outputLoop(void *pv){
     printf("SYN"); /*this has to be the first thing to go out, I think*/
     fflush(stdout);
-    for(;;){
+    for(EVER){
         //check buffer
         //send what's in buffer
         
@@ -386,12 +389,12 @@ void stdioInit(){
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
 
     //todo: verify I am using these correctly. 
-    simInSemaphore = xSemaphoreCreateMutex();
-    assert(simInSemaphore != NULL); //basic error checking
+    //simInSemaphore = xSemaphoreCreateMutex();
+    //assert(simInSemaphore != NULL); //basic error checking
 
     
-    simOutSemaphore = xSemaphoreCreateMutex();
-    assert(simOutSemaphore !=NULL);
+    //simOutSemaphore = xSemaphoreCreateMutex();
+    //assert(simOutSemaphore !=NULL);
 
 
     if (xTaskCreate( 
@@ -417,17 +420,17 @@ void stdioInit(){
 }
 
 void stdioAssignUart(hal_uart_handle_t *handle){
-    if((void*)handle->base == (void*)IMU_UART){
-		uart_handles[0] = handle;
-        if (xTaskCreate( 
-			generateImuLoop, 
-			"imu generator controller",
-			200/sizeof(StackType_t),
-			(void*)NULL,
-			tskIDLE_PRIORITY+2,
-			(TaskHandle_t*)NULL
-			) != pdPASS) {
-    	for(;;);
-    }
-	}
+    // if((void*)handle->base == (void*)IMU_UART){
+	// 	uart_handles[0] = handle;
+    //     if (xTaskCreate( 
+	// 		generateImuLoop, 
+	// 		"imu generator controller",
+	// 		200/sizeof(StackType_t),
+	// 		(void*)NULL,
+	// 		tskIDLE_PRIORITY+2,
+	// 		(TaskHandle_t*)NULL
+	// 		) != pdPASS) {
+    // 	for(;;);
+    // }
+	// }
 }
