@@ -47,6 +47,7 @@
 #define PI acos(-1)
 #define EVER ;;
 
+
 /* Task priorities. */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
@@ -107,14 +108,14 @@ int main(void) {
 			; /* error! probably out of memory */
 	}
 
-//	if (xTaskCreate(ReadImuTask, "IMU Task",
-//	configMINIMAL_STACK_SIZE + 300,
-//	NULL,
-//	debug_uart_task_PRIORITY,
-//	NULL) != pdPASS) {
-//		for (;;)
-//			;
-//	}
+	if (xTaskCreate(ReadImuTask, "IMU Task",
+	configMINIMAL_STACK_SIZE + 300,
+	NULL,
+	debug_uart_task_PRIORITY,
+	NULL) != pdPASS) {
+		for (;;)
+			;
+	}
 
 //	if (xTaskCreate(RadioTask, "Radio Task",
 //	configMINIMAL_STACK_SIZE + 1000,
@@ -309,13 +310,13 @@ static void RadioTask(void *pv) {
 }
 
 static void LogTask(void *pv) {
-	HALFILE* file;
+	HALFILE file;
 	printf("starting...\n");
 	sdInit();
 	for (EVER) {
-		sdOpen(file, _T("testfile.txt"));
-		sdWrite(file, "test data\n");
-		sdClose(file);
+		sdOpen(&file, _T("/dir_1/testfile.txt"));
+		sdWrite(&file, "test data\n");
+		sdClose(&file);
 		vTaskDelay(pdMS_TO_TICKS(10000));
 	}
 }

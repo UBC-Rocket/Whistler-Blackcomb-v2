@@ -23,7 +23,7 @@ OSA_EVENT_HANDLE_DEFINE(s_event);
  ******************************************************************************/
 bool BOARD_SDCardGetDetectStatus(void)
 {
-    return GPIO_PinRead(BOARD_SDMMC_SD_CD_GPIO_BASE, BOARD_SDMMC_SD_CD_GPIO_PIN) == BOARD_SDMMC_SD_CD_INSERT_LEVEL;
+	return true;
 }
 
 void BOARD_SDMMC_SD_CD_PORT_IRQ_HANDLER(void)
@@ -43,25 +43,25 @@ void BOARD_SDCardDetectInit(sd_cd_t cd, void *userData)
 {
     /* install card detect callback */
     s_cd.cdDebounce_ms = BOARD_SDMMC_SD_CARD_DETECT_DEBOUNCE_DELAY_MS;
-    s_cd.type          = BOARD_SDMMC_SD_CD_TYPE;
+    s_cd.type          = kSD_DetectCardByHostDATA3;
     s_cd.cardDetected  = BOARD_SDCardGetDetectStatus;
     s_cd.callback      = cd;
     s_cd.userData      = userData;
     /* Card detection pin will generate interrupt on either eage */
-    PORT_SetPinInterruptConfig(BOARD_SDMMC_SD_CD_PORT_BASE, BOARD_SDMMC_SD_CD_GPIO_PIN,
-                               BOARD_SDMMC_SD_CD_INTTERUPT_TYPE);
-    /* set IRQ priority */
-    NVIC_SetPriority(BOARD_SDMMC_SD_CD_PORT_IRQ, BOARD_SDMMC_SD_CD_IRQ_PRIORITY);
-    /* Open card detection pin NVIC. */
-    EnableIRQ(BOARD_SDMMC_SD_CD_PORT_IRQ);
-
-    if (GPIO_PinRead(BOARD_SDMMC_SD_CD_GPIO_BASE, BOARD_SDMMC_SD_CD_GPIO_PIN) == BOARD_SDMMC_SD_CD_INSERT_LEVEL)
-    {
-        if (cd != NULL)
-        {
-            cd(true, userData);
-        }
-    }
+//    PORT_SetPinInterruptConfig(BOARD_SDMMC_SD_CD_PORT_BASE, BOARD_SDMMC_SD_CD_GPIO_PIN,
+//                               BOARD_SDMMC_SD_CD_INTTERUPT_TYPE);
+//    /* set IRQ priority */
+//    NVIC_SetPriority(BOARD_SDMMC_SD_CD_PORT_IRQ, BOARD_SDMMC_SD_CD_IRQ_PRIORITY);
+//    /* Open card detection pin NVIC. */
+//    EnableIRQ(BOARD_SDMMC_SD_CD_PORT_IRQ);
+//
+//    if (GPIO_PinRead(BOARD_SDMMC_SD_CD_GPIO_BASE, BOARD_SDMMC_SD_CD_GPIO_PIN) == BOARD_SDMMC_SD_CD_INSERT_LEVEL)
+//    {
+//        if (cd != NULL)
+//        {
+//            cd(true, userData);
+//        }
+//    }
 }
 
 void BOARD_SD_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, void *userData)
@@ -77,7 +77,7 @@ void BOARD_SD_Config(void *card, sd_cd_t cd, uint32_t hostIRQPriority, void *use
     ((sd_card_t *)card)->host->hostEvent = &s_event;
     ((sd_card_t *)card)->usrParam.cd     = &s_cd;
 
-//    BOARD_SDCardDetectInit(cd, userData);
+    BOARD_SDCardDetectInit(cd, userData);
 
     NVIC_SetPriority(BOARD_SDMMC_SD_HOST_IRQ, hostIRQPriority);
 }

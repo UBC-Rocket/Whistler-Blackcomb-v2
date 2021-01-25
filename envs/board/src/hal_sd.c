@@ -9,7 +9,6 @@
 #include "fsl_sd_disk.h"
 #include "fsl_sysmpu.h"
 
-
 #include "hal_sd.h"
 
 /*******************************************************************************
@@ -28,7 +27,7 @@ static volatile bool s_cardInsertStatus = false;
 static SemaphoreHandle_t sfileAccessSemaphore = NULL;
 static SemaphoreHandle_t s_CardDetectSemaphore = NULL;
 
-const TCHAR driverNumberBuffer[3U] = {SDDISK + '0', ':', '/'};
+const TCHAR driverNumberBuffer[3U] = { SDDISK + '0', ':', '/' };
 
 /*******************************************************************************
  * Declarations
@@ -38,83 +37,85 @@ const TCHAR driverNumberBuffer[3U] = {SDDISK + '0', ':', '/'};
  * Implementations
  ******************************************************************************/
 
-void sdInit(void){
-    FRESULT error;
+void sdInit(void) {
+	FRESULT error;
 
-    SYSMPU_Enable(SYSMPU, false);
+	SYSMPU_Enable(SYSMPU, false);
 
-    sfileAccessSemaphore = xSemaphoreCreateBinary();
-    BOARD_SD_Config(&g_sd, NULL, BOARD_SDMMC_SD_HOST_IRQ_PRIORITY, NULL);
+	sfileAccessSemaphore = xSemaphoreCreateBinary();
+	BOARD_SD_Config(&g_sd, NULL, BOARD_SDMMC_SD_HOST_IRQ_PRIORITY, NULL);
 
-    if (SD_HostInit(&g_sd) != kStatus_Success)
-    	printf("SD Host init failed.\n");
+	if (SD_HostInit(&g_sd) != kStatus_Success)
+		printf("SD Host init failed.\n");
 
 	SD_SetCardPower(&g_sd, false);
 	printf("Resetting chip...\n");
 	SD_SetCardPower(&g_sd, true);
 
-    if (f_mount(&g_fileSystem, driverNumberBuffer, 0U))
-    {
-        printf("Mount volume failed.\r\n");
-    }
+	if (f_mount(&g_fileSystem, driverNumberBuffer, 0U)) {
+		printf("Mount volume failed.\r\n");
+	}
 
 #if (FF_FS_RPATH >= 2U)
-    error = f_chdrive((char const *)&driverNumberBuffer[0U]);
-    if (error)
-    {
-        printf("Change drive failed.\r\n");
-    }
+	error = f_chdrive((char const*) &driverNumberBuffer[0U]);
+	if (error) {
+		printf("Change drive failed.\r\n");
+	}
 #endif
-    printf("\r\nCreate directory......\r\n");
-    error = f_mkdir(_T("/dir_1"));
-    if (error)
-    {
-        if (error == FR_EXIST)
-        {
-            printf("Directory exists.\r\n");
-        }
-        else
-        {
-            printf("Make directory failed.\r\n");
-        }
-    }
+	printf("\r\nCreate directory......\r\n");
+	error = f_mkdir(_T("/xander"));
+	if (error) {
+		if (error == FR_EXIST) {
+			printf("Directory exists.\r\n");
+		} else {
+			printf("Make directory failed.\r\n");
+		}
+	}
 
-    xSemaphoreGive(sfileAccessSemaphore);
+	xSemaphoreGive(sfileAccessSemaphore);
 }
 
 void sdOpen(HALFILE *file, const char *file_name) {
 	FRESULT error;
 	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
 		error = f_open(file, file_name, FA_WRITE);
-		if (error == FR_NO_FILE) {
-			if (f_open(file, file_name, (FA_WRITE | FA_CREATE_NEW))
-					!= FR_OK) {
+		if (error == FR_OK) {
+			printf("File opened");
+		} else if (error == FR_NO_FILE) {
+			if (f_open(file, file_name, (FA_WRITE | FA_CREATE_NEW)) != FR_OK) {
 				printf("Create file failed.\r\n");
-				return;
 			}
 		} else {
 			printf("Open file failed.\r\n");
-			return;
 		}
+		xSemaphoreGive(sfileAccessSemaphore);
 	}
 }
 
 size_t sdWrite(HALFILE *file, const char *data) {
 	FRESULT error;
-	UINT bytesWritten   = 0U;
-	if (f_lseek(file, file->obj.objsize) != FR_OK) {
-		printf("lseek file failed.\r\n");
-		return -1;
-	}
+	UINT bytesWritten = 0U;
+	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
+		if (f_lseek(file, file->obj.objsize) != FR_OK) {
+			printf("lseek file failed.\r\n");
+			xSemaphoreGive(sfileAccessSemaphore);
+			return -1;
+		}
 
-	error = f_write(file, data, strlen(data), &bytesWritten);
-	if ((error) || (bytesWritten != sizeof(s_buffer1))) {
-		printf("Write file failed.\r\n");
-		return -1;
+		error = f_write(file, data, strlen(data), &bytesWritten);
+		if ((error) || (bytesWritten != strlen(data))) {
+			printf("Write file failed.\r\n");
+			xSemaphoreGive(sfileAccessSemaphore);
+			return -1;
+		}
 	}
+	xSemaphoreGive(sfileAccessSemaphore);
 	return bytesWritten;
 }
 
-void sdClose(HALFILE *file){
-	f_close(file);
+void sdClose(HALFILE *file) {
+	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
+		f_close(file);
+		xSemaphoreGive(sfileAccessSemaphore);
+	}
 }
