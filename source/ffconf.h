@@ -10,14 +10,7 @@
 /*---------------------------------------------------------------------------/
 / MSDK adaptation configuration
 /---------------------------------------------------------------------------*/
-#define RAM_DISK_ENABLE
-/* Available options are:
-/      RAM_DISK_ENABLE
-/      USB_DISK_ENABLE
-/      SD_DISK_ENABLE
-/      MMC_DISK_ENABLE
-/      SDSPI_DISK_ENABLE
-/      NAND_DISK_ENABLE */
+#define SD_DISK_ENABLE
 
 /*---------------------------------------------------------------------------/
 / Function Configurations
@@ -178,7 +171,7 @@
 / Drive/Volume Configurations
 /---------------------------------------------------------------------------*/
 
-#define FF_VOLUMES		5
+#define FF_VOLUMES		3
 /* Number of volumes (logical drives) to be used. (1-10) */
 
 

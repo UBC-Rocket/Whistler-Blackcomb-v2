@@ -29,10 +29,11 @@
 #include "prediction.h"
 
 /* Includes specific to MCU or x86 */
-#include <hal_time.h>
+#include "hal_time.h"
 #include "hal.h"
 #include "hal_io.h"
 #include "hal_uart.h"
+#include "hal_sd.h"
 
 /* Radio Stuff */
 #include "xbee/wpan.h"
@@ -44,11 +45,13 @@
 /* Constants */
 /* TODO: figure out where this is defined properly */
 #define PI acos(-1)
+#define EVER ;;
 
 /* Task priorities. */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define radio_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define log_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
@@ -56,6 +59,7 @@
 static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
 static void RadioTask(void *pv);
+static void LogTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -103,23 +107,32 @@ int main(void) {
 			; /* error! probably out of memory */
 	}
 
-	if (xTaskCreate(ReadImuTask, "IMU Task",
-	configMINIMAL_STACK_SIZE + 300,
-	NULL,
-	debug_uart_task_PRIORITY,
-	NULL) != pdPASS) {
-		for (;;)
-			;
-	}
+//	if (xTaskCreate(ReadImuTask, "IMU Task",
+//	configMINIMAL_STACK_SIZE + 300,
+//	NULL,
+//	debug_uart_task_PRIORITY,
+//	NULL) != pdPASS) {
+//		for (;;)
+//			;
+//	}
 
-	if (xTaskCreate(RadioTask, "Radio Task",
-	configMINIMAL_STACK_SIZE + 1000,
-	NULL,
-	radio_task_PRIORITY,
-	NULL) != pdPASS) {
-		for (;;)
-			;
-	}
+//	if (xTaskCreate(RadioTask, "Radio Task",
+//	configMINIMAL_STACK_SIZE + 1000,
+//	NULL,
+//	radio_task_PRIORITY,
+//	NULL) != pdPASS) {
+//		for (;;)
+//			;
+//	}
+
+	if (xTaskCreate(LogTask, "Log Task",
+		configMINIMAL_STACK_SIZE + 1000,
+		NULL,
+		log_task_PRIORITY,
+		NULL) != pdPASS) {
+			for (;;)
+				;
+		}
 
 	vTaskStartScheduler();
 
@@ -292,5 +305,17 @@ static void RadioTask(void *pv) {
 			radioTxRequest(&radio, packet, len);
 		}
 		vTaskDelay(pdMS_TO_TICKS(1000));
+	}
+}
+
+static void LogTask(void *pv) {
+	HALFILE* file;
+	printf("starting...\n");
+	sdInit();
+	for (EVER) {
+		sdOpen(file, _T("testfile.txt"));
+		sdWrite(file, "test data\n");
+		sdClose(file);
+		vTaskDelay(pdMS_TO_TICKS(10000));
 	}
 }
