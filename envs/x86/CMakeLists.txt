@@ -5,7 +5,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_io.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_uart.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_time.c
-        ${CMAKE_CURRENT_LIST_DIR}/src/hal_sd.c
         ${CMAKE_CURRENT_LIST_DIR}/src/stdio_controller.c
         ${CMAKE_CURRENT_LIST_DIR}/src/console.c
 

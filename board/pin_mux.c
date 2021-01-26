@@ -53,14 +53,6 @@ BOARD_InitPins:
   - {pin_num: '109', peripheral: UART1, signal: TX, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, identifier: IMU_UART_TX}
   - {pin_num: '129', peripheral: UART2, signal: RX, pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, digital_filter: disable}
   - {pin_num: '130', peripheral: UART2, signal: TX, pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA}
-  - {pin_num: '4', peripheral: SDHC, signal: CMD, pin_signal: ADC1_SE7a/PTE3/SPI1_SIN/UART1_RTS_b/SDHC0_CMD/TRACE_D1/SPI1_SOUT, pull_select: up, pull_enable: enable}
-  - {pin_num: '2', peripheral: SDHC, signal: 'DATA, 0', pin_signal: ADC1_SE5a/PTE1/LLWU_P0/SPI1_SOUT/UART1_RX/SDHC0_D0/TRACE_D3/I2C1_SCL/SPI1_SIN, pull_select: up,
-    pull_enable: enable}
-  - {pin_num: '1', peripheral: SDHC, signal: 'DATA, 1', pin_signal: ADC1_SE4a/PTE0/SPI1_PCS1/UART1_TX/SDHC0_D1/TRACE_CLKOUT/I2C1_SDA/RTC_CLKOUT, pull_select: up,
-    pull_enable: enable}
-  - {pin_num: '8', peripheral: SDHC, signal: 'DATA, 2', pin_signal: PTE5/SPI1_PCS2/UART3_RX/SDHC0_D2/FTM3_CH0, pull_select: up, pull_enable: enable}
-  - {pin_num: '7', peripheral: SDHC, signal: 'DATA, 3', pin_signal: PTE4/LLWU_P2/SPI1_PCS0/UART3_TX/SDHC0_D3/TRACE_D0, pull_select: up, pull_enable: enable}
-  - {pin_num: '3', peripheral: SDHC, signal: DCLK, pin_signal: ADC1_SE6a/PTE2/LLWU_P1/SPI1_SCK/UART1_CTS_b/SDHC0_DCLK/TRACE_D2, pull_select: up, pull_enable: enable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -79,8 +71,6 @@ void BOARD_InitPins(void)
     CLOCK_EnableClock(kCLOCK_PortC);
     /* Port D Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortD);
-    /* Port E Clock Gate Control: Clock enabled */
-    CLOCK_EnableClock(kCLOCK_PortE);
 
     gpio_pin_config_t LED_BUILTIN_config = {
         .pinDirection = kGPIO_DigitalOutput,
@@ -117,72 +107,6 @@ void BOARD_InitPins(void)
 
     /* PORTD3 (pin 130) is configured as UART2_TX */
     PORT_SetPinMux(BOARD_INITPINS_RADIO_UART_TX_PORT, BOARD_INITPINS_RADIO_UART_TX_PIN, kPORT_MuxAlt3);
-
-    /* PORTE0 (pin 1) is configured as SDHC0_D1 */
-    PORT_SetPinMux(PORTE, 0U, kPORT_MuxAlt4);
-
-    PORTE->PCR[0] = ((PORTE->PCR[0] &
-                      /* Mask bits to zero which are setting */
-                      (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
-
-                     /* Pull Select: Internal pullup resistor is enabled on the corresponding pin, if the
-                      * corresponding PE field is set. */
-                     | (uint32_t)(kPORT_PullUp));
-
-    /* PORTE1 (pin 2) is configured as SDHC0_D0 */
-    PORT_SetPinMux(PORTE, 1U, kPORT_MuxAlt4);
-
-    PORTE->PCR[1] = ((PORTE->PCR[1] &
-                      /* Mask bits to zero which are setting */
-                      (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
-
-                     /* Pull Select: Internal pullup resistor is enabled on the corresponding pin, if the
-                      * corresponding PE field is set. */
-                     | (uint32_t)(kPORT_PullUp));
-
-    /* PORTE2 (pin 3) is configured as SDHC0_DCLK */
-    PORT_SetPinMux(PORTE, 2U, kPORT_MuxAlt4);
-
-    PORTE->PCR[2] = ((PORTE->PCR[2] &
-                      /* Mask bits to zero which are setting */
-                      (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
-
-                     /* Pull Select: Internal pullup resistor is enabled on the corresponding pin, if the
-                      * corresponding PE field is set. */
-                     | (uint32_t)(kPORT_PullUp));
-
-    /* PORTE3 (pin 4) is configured as SDHC0_CMD */
-    PORT_SetPinMux(PORTE, 3U, kPORT_MuxAlt4);
-
-    PORTE->PCR[3] = ((PORTE->PCR[3] &
-                      /* Mask bits to zero which are setting */
-                      (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
-
-                     /* Pull Select: Internal pullup resistor is enabled on the corresponding pin, if the
-                      * corresponding PE field is set. */
-                     | (uint32_t)(kPORT_PullUp));
-
-    /* PORTE4 (pin 7) is configured as SDHC0_D3 */
-    PORT_SetPinMux(PORTE, 4U, kPORT_MuxAlt4);
-
-    PORTE->PCR[4] = ((PORTE->PCR[4] &
-                      /* Mask bits to zero which are setting */
-                      (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
-
-                     /* Pull Select: Internal pullup resistor is enabled on the corresponding pin, if the
-                      * corresponding PE field is set. */
-                     | (uint32_t)(kPORT_PullUp));
-
-    /* PORTE5 (pin 8) is configured as SDHC0_D2 */
-    PORT_SetPinMux(PORTE, 5U, kPORT_MuxAlt4);
-
-    PORTE->PCR[5] = ((PORTE->PCR[5] &
-                      /* Mask bits to zero which are setting */
-                      (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_ISF_MASK)))
-
-                     /* Pull Select: Internal pullup resistor is enabled on the corresponding pin, if the
-                      * corresponding PE field is set. */
-                     | (uint32_t)(kPORT_PullUp));
 
     SIM->SOPT5 = ((SIM->SOPT5 &
                    /* Mask bits to zero which are setting */

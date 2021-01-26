@@ -19,13 +19,3 @@ target_link_libraries(IMU_test_app
 )
 
 add_test(IMU_test IMU_test_app)
-
-# add_executable(SD_test
-#     SD_test.c
-# )
-
-# target_link_libraries(SD_test
-#     Unity
-# )
-
-# add_test(SD_test SD_test)
