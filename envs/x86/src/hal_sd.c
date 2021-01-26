@@ -52,7 +52,7 @@ void sdMkDir(const char *dir_name){
 	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
         struct stat st = {0};
         if (stat(path, &st) == -1) {
-            int error = mkdir(path, 0700);
+            int error = mkdir(path, 0777);
 			if(error){
 				printf("Error making new directory\n");
 			}
