@@ -30,6 +30,7 @@ enum sensors {
 };
 
 #define PACKET_BUFFER_SIZE 8
+#define MESSAGE_BUFFER_SIZE 512
 #define MAX_PACKET_IDS 0x74
 #define EVER ;;
 
@@ -40,7 +41,7 @@ enum sensors {
 
 //packet's recieved buffer
 //are these amounts reasonable?
-uint8_t rxPacketBuffers[0x74][PACKET_BUFFER_SIZE][512] = {0};
+uint8_t rxPacketBuffers[0x74][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
 //[ID][Packet][Packet Contents]
 int rxPacketBuffersWriteIndex[MAX_PACKET_IDS] = {0};
 int rxPacketBuffersReadIndex[MAX_PACKET_IDS] = {0}; 
@@ -50,17 +51,13 @@ int rxPacketBuffersReadLowerLimit[MAX_PACKET_IDS] = {0}; //needs to be initializ
 
 //packet's recieved buffer
 //are these amounts reasonable?
-uint8_t txPacketBuffers[MAX_PACKET_IDS][PACKET_BUFFER_SIZE][512] = {0};
+uint8_t txPacketBuffers[MAX_PACKET_IDS][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
 //[ID][Packet][Packet Contents]
 int txPacketBuffersWriteIndex[MAX_PACKET_IDS] = {0};
 int txPacketBuffersReadIndex[MAX_PACKET_IDS] = {0}; 
 
-
-
-
 SemaphoreHandle_t simInSemaphore;
 SemaphoreHandle_t simOutSemaphore;
-
 
 /* TODO: update for all sensors */
 static hal_uart_handle_t *uart_handles[1];
@@ -78,8 +75,6 @@ static void putConfigPacket();
 static uint8_t getCinForce();
 static uint8_t getFilteredCin();
 static void extractPacket();
-
-
 static uint8_t readFromRxBuf(uint8_t data[],uint8_t id);
 static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
 
@@ -89,39 +84,35 @@ static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
  ******************************************************************************/
 
 
-/* Craptastic FIFO buffer Accidentaly Circular*/
-/* Good Lord, how ugly*/
+/**
+ * Reads the oldest unread entry in the SIM rx buffer for the specified ID.
+ * Once it has read all entries, will repeat sending the most recent
+ * @param data The array you want to fill with the contents of a SIM packet. Minimum size PACKET_BUFFER_SIZE
+ * @param id the SIM id of the buffer you want to read - e.g. radio or a specific sensor
+ * @return the length of the packet.
+ */
 
 static uint8_t readFromRxBuf(uint8_t data[],uint8_t id){
     if(rxPacketBuffersReadIndex[id]>=PACKET_BUFFER_SIZE){
         rxPacketBuffersReadIndex[id]=0;
-        
     }
 
-
     int readpoint = rxPacketBuffersReadIndex[id];
-    
 
-    data[0]=rxPacketBuffers[id][readpoint][0];
     for(int i=1;i<=rxPacketBuffers[id][readpoint][0];i++){
-        data[i]=rxPacketBuffers[id][readpoint][i];
+        data[i-1]=rxPacketBuffers[id][readpoint][i];
     }
 
     if(readpoint+1<rxPacketBuffersReadLowerLimit[id]+PACKET_BUFFER_SIZE){
         rxPacketBuffersReadIndex[id]++;
     }
     
-
-    //return the length (may be useful?)
     return data[0];
 }
-
-//RULES:
-//> Read Head Cannot get ahead of the write head
-//> Read Head cannot get more than 1 cycle behind the write head
-
+/**
+ * Internal function, used to write recieved packet to the approprite buffer
+ */ 
 static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length){
-    
     if(rxPacketBuffersWriteIndex[id]>=PACKET_BUFFER_SIZE){
         rxPacketBuffersWriteIndex[id]=0;
     }
@@ -129,46 +120,36 @@ static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length){
     int writepoint = rxPacketBuffersWriteIndex[id];
 
     rxPacketBuffers[id][writepoint][0]=length;
-    //printf("Placing '%d' in id %d, bufferloc %d, index %d\n",length,id,writepoint,0);
-
 
     for(int i=1;i<=length;i++){
         rxPacketBuffers[id][writepoint][i] = data[(i-1)];
-        //printf("Placing '%c' in id %d, bufferloc %d, index %d\n",data[i-1],id,writepoint,i);
     }
+
     rxPacketBuffersWriteIndex[id]++;
     rxPacketBuffersReadLowerLimit[id]++;
     if(rxPacketBuffersReadLowerLimit[id]>=PACKET_BUFFER_SIZE){
         rxPacketBuffersReadLowerLimit[id]=0;
     }
-    
 }
 
+//sets up the sim rx buffer
 static void initRxBuf(void){
     for(int i =0;i<MAX_PACKET_IDS;i++){
         rxPacketBuffersReadLowerLimit[i] = 0-PACKET_BUFFER_SIZE;
-    }
-    
+    }   
 }
 
 /*
- * Grabs a char from stdin. Performs some sort of error checking (??)
- * To Do: Understand what the commented-out section does (It's C++ from FLARE)
+ * Grabs a char from stdin. Does not grab empty chars. Blocking.
  */
 static uint8_t getCinForce() {
     uint8_t c;
     for(;;) {
-        if(scanf("%c",&c)!=1){
-            
+        if(scanf(" %c",&c)!=1){  
             continue;
         }
-        //if (std::cin.fail()) {        //I don't really understand at all what this does, need to ask.
-        //    std::cin.clear();         
-        //    continue;
-        //}
-        //output(c);
+
         return c;
-        
     }
 }
 
@@ -194,38 +175,33 @@ static void extractPacket() {
         uint16_t length;
 
         id = getFilteredCin();
-        //printf(" ID: %d\n",id);
         length = getFilteredCin();
         length <<= 8;
         length |= getFilteredCin();
-        //printf(" length: %d\n",length);
 
         uint8_t buf[512];
 
-        for (uint16_t i = 0; i <= length; i++) {
+        for (uint16_t i = 0; i <= length-1; i++) {
             buf[i]=getFilteredCin();
-            //printf("%d",buf[i]);
         }
 
         xSemaphoreTake(simInSemaphore,portMAX_DELAY);
         writeToRxBuf(buf,id,length);
         xSemaphoreGive(simInSemaphore);
 
-        FILE *logfile = fopen("SIMrxlog.txt","a+"); //This file manipulation code is a little suspect
-        char str[512] = {0};
+
+        //TODO: At some point in the future, it may be advisable to optimize this - seems a little clunky.
+        //on the other hand it will never run on the board so maybe it's fine
+        FILE *logfile = fopen("SIMrxlog.csv","a+");
+        char str[MESSAGE_BUFFER_SIZE] = {0};
         int i =0;
         for(; i<=length;i++){
             str[i]=buf[i];
         }
         str[++i]='\0';
-        fprintf(logfile,"%s",str);
-        fprintf(logfile,"\n");
-        //printf("%s",str);
+        fprintf(logfile,"%d,%d,%s\n",id,length,str);
         fclose(logfile);
-        
-    
     }
-
 
 /*
  * outputs a single char to standard out and logs it in SIMlog.txt
@@ -234,11 +210,10 @@ static void extractPacket() {
  */
 static void output(char c){
     printf("%c",c);
-    //FILE *logfile = fopen("SIMtxlog.txt","a+"); //This file manipulation code is a little suspect
-    //fprintf(logfile,"%c",c);
-    //fclose(logfile);
+    FILE *logfile = fopen("SIMtxlog.txt","a+"); //This file manipulation code is a little suspect
+    fprintf(logfile,"%c",c);
+    fclose(logfile);
 }
-
 
 /*
  * outputs a char to stdio in the SIM format, splitting it up into two chars
@@ -270,13 +245,12 @@ static void synOut(char c){
  * @param length length of the packet message  
  */
 static void putPacket(const uint8_t id, const char *c, char const length){
-    //TO DO: mutex stuff
     synOut(id);
 
     synOut((char)(length>>8));
     synOut((char)(length & 0xFF));
 
-    //xSemaphoreTake(simOutSemaphore,portMAX_DELAY);
+    xSemaphoreTake(simOutSemaphore,portMAX_DELAY);
 
     for (char const *end = c + length; c != end; c++){
         synOut(*c);
@@ -284,7 +258,7 @@ static void putPacket(const uint8_t id, const char *c, char const length){
 
     fflush(stdout);
 
-    //xSemaphoreGive(simOutSemaphore);
+    xSemaphoreGive(simOutSemaphore);
 }
 
 /*
@@ -304,8 +278,6 @@ static void putConfigPacket() {
 /*******************************************************************************
  * Loops for interacting with ground station interface
  ******************************************************************************/
-
-
 /*
  * The input loops handles verification of the handshake from the groundstation 
  * and sends the config packet. It then continously loops though extractPacket(),
@@ -316,22 +288,16 @@ static void inputLoop(void *pv){
     /*check for handshake acknowedgement*/
     char ack[4] = "ACK";
     char readChar;
-    //printf("before for loop\n");
     for (int i = 0; i < 3; i++) {
         readChar=getCinForce();
-        //printf("read char is: %d\n",readChar);
         assert(ack[i] == readChar);
     }
-    //printf("after for loop\n");
     putConfigPacket();
     
     for(EVER){
-
         //constantly check for new packets
-        //extractPacket();
-        
-        //console_print("stdio polling...\n");
-        //vTaskDelay(pdMS_TO_TICKS(500));
+        extractPacket();
+
     }
 }
 
@@ -383,19 +349,24 @@ static void generateImuLoop(void *pv){
 void stdioInit(){
     /* Thread safe output */
     console_init();
+    initRxBuf();
 
     /* For generation of normal threads if needed for testing */
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
 
+
+    //set up logging
+    FILE *logfile = fopen("SIMrxlog.csv","w");
+    fprintf(logfile,"id,length,message\n");
+    fclose(logfile);
+
     //todo: verify I am using these correctly. 
-    //simInSemaphore = xSemaphoreCreateMutex();
-    //assert(simInSemaphore != NULL); //basic error checking
+    simInSemaphore = xSemaphoreCreateMutex();
+    assert(simInSemaphore != NULL); //basic error checking
 
-    
-    //simOutSemaphore = xSemaphoreCreateMutex();
-    //assert(simOutSemaphore !=NULL);
-
+    simOutSemaphore = xSemaphoreCreateMutex();
+    assert(simOutSemaphore !=NULL);
 
     if (xTaskCreate( 
 	  		outputLoop, 
