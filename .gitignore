@@ -1,4 +1,5 @@
-data/logs/
+data/logs/*.txt
+data/logs/*.csv
 
 *.opendb
 *.DS_Store
