@@ -35,6 +35,17 @@ typedef enum state_t
 } state_t;
 
 /**
+ * Convenience array for easy debug naming
+ */
+static char* stateNames[] = {
+    "Error", 
+    "Fueling", 
+    "Ignition", 
+    "Ascent", 
+    "Recovery"
+};
+
+/**
  * Possible returns for the state transition functions
  */
 typedef enum stateRet_t
@@ -62,7 +73,6 @@ typedef struct stateInput_t
 } stateInput_t;
 
 
-
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
@@ -83,5 +93,6 @@ state_t getState(void);
  * @return the current state after input is taken into account
  */
 state_t setNextState(stateInput_t *input);
+
 
 #endif

@@ -35,6 +35,7 @@ struct stateTransition
 static struct stateTransition stateTransitions[] = {
     {stateFueling, stateRetPass, stateIgnition},
     {stateFueling, stateRetRepeat, stateFueling},
+    {stateIgnition, stateRetRepeat, stateIgnition}
     /* TODO: continue once we have actual states */
 };
 
@@ -108,7 +109,7 @@ static stateRet_t stateTransitionError(stateInput_t *input){
 }
 
 static stateRet_t stateTransitionFueling(stateInput_t *input){
-    return stateRetRepeat;
+    return stateRetPass;
 }
 
 static stateRet_t stateTransitionIgnition(stateInput_t *input){
