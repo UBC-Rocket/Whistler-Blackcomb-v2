@@ -1,0 +1,40 @@
+version: 2.1
+
+jobs:
+  test:
+    machine:
+      image: ubuntu-1604:202007-01
+    environment:
+      PATH: "/home/ubuntu/cmake-3.6.2-Linux-x86_64/bin:$PATH"
+    steps:
+      - checkout:
+          path: Whistler-Blackcomb
+      - run:
+          name: "Setup"
+          command: |
+            cmake --version
+            mkdir -p build
+            cd build
+            cmake ..
+      - run:
+          name: "Test"
+          command: |
+            cmake --build .
+            ctest -j14 -C Debug -T test --output-on-failure
+
+dependencies:
+      cache_directories:
+        - ~/cmake-3.6.2-Linux-x86_64
+      override:
+        - >
+          if [ ! -d ~/cmake-3.6.2-Linux-x86_64 ]; then
+            echo "No cache - building CMake"
+            cd ~ && wget --quiet https://cmake.org/files/v3.6/cmake-3.6.2-Linux-x86_64.tar.gz && tar -xvf cmake-3.6.2-Linux-x86_64.tar.gz
+          else
+            echo "Cached CMake found"
+          fi
+
+workflows:
+  main:
+    jobs:
+      - test
