@@ -4,8 +4,8 @@ jobs:
   test:
     machine:
       image: ubuntu-2004:202010-01
-    environment:
-      PATH: "/home/ubuntu/cmake-3.6.2-Linux-x86_64/bin:$PATH"
+    # environment:
+    #   PATH: "/home/ubuntu/cmake-3.6.2-Linux-x86_64/bin:$PATH"
     steps:
       - checkout:
           path: Whistler-Blackcomb
