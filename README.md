@@ -1,6 +1,6 @@
 # Whistler Blackcomb Flight Computer Firmware
 
-[![Build Status](https://travis-ci.com/UBC-Rocket/Whistler-Blackcomb-v2.svg?branch=master)](https://travis-ci.com/UBC-Rocket/Whistler-Blackcomb-v2)
+[![UBC-Rocket](https://circleci.com/gh/UBC-Rocket/Whistler-Blackcomb-v2.svg?style=shield)](https://app.circleci.com/pipelines/github/UBC-Rocket/Whistler-Blackcomb-v2?branch=master)
 ![Commit Activity](https://img.shields.io/github/commit-activity/m/ubc-rocket/whistler-blackcomb-v2)
 ![Code Size](https://img.shields.io/github/languages/code-size/ubc-rocket/whistler-blackcomb-v2)
 ![Pull Requests](https://img.shields.io/github/issues-pr/UBC-Rocket/Whistler-Blackcomb-v2)
@@ -36,6 +36,6 @@ All documentation are currently kept in the [doc/](doc/) directory.
 1. Uploading to Teensy [guide](doc/1-Teensy-Upload.md).
 2. freeRTOS installation and usage [guide](doc/2-RTOS-Basics.md).
 3. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md). 
-4. How Travis CI works and how to access ours in this [guide](doc/4-Travis-CI.md). 
+4. How continout integration works and how to access ours in this [guide](doc/4-Continuous-Integration.md). 
 5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md). 
 6. Radio system [guide](doc/4-Radio.h). 
