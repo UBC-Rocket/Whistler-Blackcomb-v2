@@ -12,6 +12,8 @@ jobs:
       - run:
           name: "Setup"
           command: |
+            git submodule init
+            git submodule update
             cmake --version
             mkdir -p build
             cd build
