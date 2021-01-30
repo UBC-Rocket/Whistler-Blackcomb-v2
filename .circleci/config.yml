@@ -16,23 +16,25 @@ jobs:
             mkdir -p build
             cd build
             cmake ..
+        working-directory: ./Whistler-Blackcomb
       - run:
           name: "Test"
           command: |
             cmake --build .
             ctest -j14 -C Debug -T test --output-on-failure
+        working-directory: ./Whistler-Blackcomb
 
-dependencies:
-      cache_directories:
-        - ~/cmake-3.6.2-Linux-x86_64
-      override:
-        - >
-          if [ ! -d ~/cmake-3.6.2-Linux-x86_64 ]; then
-            echo "No cache - building CMake"
-            cd ~ && wget --quiet https://cmake.org/files/v3.6/cmake-3.6.2-Linux-x86_64.tar.gz && tar -xvf cmake-3.6.2-Linux-x86_64.tar.gz
-          else
-            echo "Cached CMake found"
-          fi
+# dependencies:
+#       cache_directories:
+#         - ~/cmake-3.6.2-Linux-x86_64
+#       override:
+#         - >
+#           if [ ! -d ~/cmake-3.6.2-Linux-x86_64 ]; then
+#             echo "No cache - building CMake"
+#             cd ~ && wget --quiet https://cmake.org/files/v3.6/cmake-3.6.2-Linux-x86_64.tar.gz && tar -xvf cmake-3.6.2-Linux-x86_64.tar.gz
+#           else
+#             echo "Cached CMake found"
+#           fi
 
 workflows:
   main:
