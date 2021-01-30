@@ -14,7 +14,7 @@
  * A helper struct representing a single transition, going from srcState to
  * dstState when retCode is returned from a transition function.
  */
-static struct stateTransition
+struct stateTransition
 {
     state_t srcState;
     stateRet_t retCode;
@@ -47,11 +47,11 @@ static struct stateTransition stateTransitions[] = {
  * @param input the state input that will be used to compute the next state
  * @return the stateRet_t that represents the outcome of the state transition
  */
-static stateRet_t stateTransitionError(stateInput_t input);
-static stateRet_t stateTransitionFueling(stateInput_t input);
-static stateRet_t stateTransitionIgnition(stateInput_t input);
-static stateRet_t stateTransitionAscent(stateInput_t input);
-static stateRet_t stateTransitionRecovery(stateInput_t input);
+static stateRet_t stateTransitionError(stateInput_t *input);
+static stateRet_t stateTransitionFueling(stateInput_t *input);
+static stateRet_t stateTransitionIgnition(stateInput_t *input);
+static stateRet_t stateTransitionAscent(stateInput_t *input);
+static stateRet_t stateTransitionRecovery(stateInput_t *input);
 
 
 /**
@@ -69,11 +69,11 @@ static state_t stateLookup(state_t state, stateRet_t retCode);
  ******************************************************************************/
 
 /* The current state, possibly the most important variable in the project */
-static state_t curState;
+static state_t curState = stateFueling;
 /**
  * Array of state transition function pointers. 
  */
-stateRet_t (*stateFunctions[])(stateInput_t) = {
+stateRet_t (*stateFunctions[])(stateInput_t*) = {
     stateTransitionError,
     stateTransitionFueling,
     stateTransitionIgnition,
@@ -85,7 +85,7 @@ stateRet_t (*stateFunctions[])(stateInput_t) = {
  ******************************************************************************/
 
 static state_t stateLookup(state_t state, stateRet_t retCode){
-    for(int i = 0; i < sizeof(stateTransitions) / sizeof(stateTransitions[0]); ++i){
+    for(long unsigned int i = 0; i < sizeof(stateTransitions) / sizeof(stateTransitions[0]); ++i){
         if(stateTransitions[i].srcState == state && stateTransitions[i].retCode == retCode){
             return stateTransitions[i].dstState;
         }
@@ -98,11 +98,29 @@ state_t getState(void){
 }
 
 state_t setNextState(stateInput_t *input){
-    stateRetCode_t retCode = stateFunctions[curState](input);    
+    stateRet_t retCode = stateFunctions[curState](input);    
     curState = stateLookup(curState, retCode);
     return curState;
 }
 
+static stateRet_t stateTransitionError(stateInput_t *input){
+    return stateRetRepeat;
+}
 
+static stateRet_t stateTransitionFueling(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionIgnition(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionAscent(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionRecovery(stateInput_t *input){
+    return stateRetRepeat;
+}
 
 

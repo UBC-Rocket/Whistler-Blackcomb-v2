@@ -25,6 +25,7 @@
 #include "timers.h"
 
 /* Includes common between MCU and x86 */
+#include "state_machine.h"
 #include "IMU_interpret.h"
 #include "prediction.h"
 

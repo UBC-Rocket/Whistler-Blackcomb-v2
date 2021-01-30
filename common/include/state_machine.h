@@ -32,7 +32,7 @@ typedef enum state_t
     stateIgnition,
     stateAscent,
     stateRecovery
-};
+} state_t;
 
 /**
  * Possible returns for the state transition functions
@@ -42,7 +42,7 @@ typedef enum stateRet_t
     stateRetPass,
     stateRetRepeat,
     stateRetAbort
-};
+} stateRet_t;
 
 /**
  * A struct describing the input to the state transitions. 
@@ -59,7 +59,7 @@ typedef struct stateInput_t
     double vertVelocity;
     double vertPosition;
     /* TODO: Add actual data */
-};
+} stateInput_t;
 
 
 
