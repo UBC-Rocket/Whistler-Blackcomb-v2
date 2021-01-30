@@ -24,7 +24,7 @@ jobs:
           command: |
             cmake --build .
             ctest -j14 -C Debug -T test --output-on-failure
-          working_directory: "./Whistler-Blackcomb"
+          working_directory: "./Whistler-Blackcomb/build"
 
 # dependencies:
 #       cache_directories:
