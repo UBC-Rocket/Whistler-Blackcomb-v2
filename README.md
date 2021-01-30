@@ -1,6 +1,6 @@
 # Whistler Blackcomb Flight Computer Firmware
 
-[![UBC-Rocket](https://circleci.com/gh/UBC-Rocket/Whistler-Blackcomb-v2.svg?style=shield)](https://app.circleci.com/pipelines/github/UBC-Rocket/Whistler-Blackcomb-v2?branch=master)
+[![UBC-Rocket](https://circleci.com/gh/UBC-Rocket/Whistler-Blackcomb-v2.svg?style=shield)](https://app.circleci.com/pipelines/github/UBC-Rocket/Whistler-Blackcomb-v2)
 ![Commit Activity](https://img.shields.io/github/commit-activity/m/ubc-rocket/whistler-blackcomb-v2)
 ![Code Size](https://img.shields.io/github/languages/code-size/ubc-rocket/whistler-blackcomb-v2)
 ![Pull Requests](https://img.shields.io/github/issues-pr/UBC-Rocket/Whistler-Blackcomb-v2)

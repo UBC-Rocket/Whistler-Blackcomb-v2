@@ -1,0 +1,31 @@
+
+version: 2.1
+
+jobs:
+  test:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - checkout:
+          path: Whistler-Blackcomb
+      - run:
+          name: "Setup"
+          command: |
+            git submodule init
+            git submodule update
+            cmake --version
+            mkdir -p build
+            cd build
+            cmake ..
+          working_directory: "./Whistler-Blackcomb"
+      - run:
+          name: "Test"
+          command: |
+            cmake --build .
+            ctest -j14 -C Debug -T test --output-on-failure
+          working_directory: "./Whistler-Blackcomb/build"
+
+workflows:
+  main:
+    jobs:
+      - test
