@@ -16,13 +16,13 @@ jobs:
             mkdir -p build
             cd build
             cmake ..
-        working-directory: ./Whistler-Blackcomb
+          working_directory: "./Whistler-Blackcomb"
       - run:
           name: "Test"
           command: |
             cmake --build .
             ctest -j14 -C Debug -T test --output-on-failure
-        working-directory: ./Whistler-Blackcomb
+          working_directory: "./Whistler-Blackcomb"
 
 # dependencies:
 #       cache_directories:
