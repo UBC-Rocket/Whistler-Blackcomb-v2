@@ -18,63 +18,70 @@
  * Includes
  ******************************************************************************/
 
-
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-typedef enum state_t {
-    stateFueling, 
-    stateIgnition, 
-    stateAscent, 
+
+/**
+ * All possible states the rocket can be in. 
+ */
+typedef enum state_t
+{
+    stateError, 
+    stateFueling,
+    stateIgnition,
+    stateAscent,
     stateRecovery
 };
 
-typedef enum stateRet_t {
-    stateRetPass, 
-    stateRetRepeat, 
+/**
+ * Possible returns for the state transition functions
+ */
+typedef enum stateRet_t
+{
+    stateRetPass,
+    stateRetRepeat,
     stateRetAbort
 };
 
-typedef struct stateInput_t {
+/**
+ * A struct describing the input to the state transitions. 
+ * 
+ * Note that because we want an array of state transitions, the parameter type
+ * must be the same for all of them (we could do some hackery with void
+ * pointers, but this whole thing is supposed to make things simpler, not more
+ * complicated). For this reason, all possible inputs have to be encoded in this
+ * one struct. This means some inputs won't be used for some transitions, e.g.
+ * altitude for fueling. 
+ */
+typedef struct stateInput_t
+{
     double vertVelocity;
     double vertPosition;
     /* TODO: Add actual data */
 };
 
-struct transition {
-    state_t srcState;
-    stateRet_t retCode;
-    state_t dstState;
-};
 
-struct transition stateTransitions[] = {
-    {stateFueling, stateRetPass, stateIgnition}, 
-    {stateFueling, stateRetRepeat, stateFueling}, 
-    /* TODO: continue once we have actual states */
-};
-
-stateRet_t stateTransitionFueling(stateInput_t);
-stateRet_t stateTransitionIgnition(stateInput_t);
-stateRet_t stateTransitionAscent(stateInput_t);
-stateRet_t stateTransitionRecovery(stateInput_t);
-
-stateRet_t (* stateFunctions[])(stateInput_t) = {
-    stateTransitionFueling, 
-    stateTransitionIgnition, 
-    stateTransitionAscent, 
-    stateTransitionRecovery
-};
 
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
 
-/**
- * Locks the state machine for thread safety. This function should be called
- * before any operations on the state machine are comitted 
- */
-void stateLock();
 
-void stateUnlock();
+/**
+ * Gets the current state. 
+ * 
+ * @return the current state
+ */
+state_t getState(void);
+
+/**
+ * Calls the current transition function, and if necessary changes the state to
+ * the next one according to the inputted data. 
+ * 
+ * @param input the data to make state change decision based on
+ * @return the current state after input is taken into account
+ */
+state_t setNextState(stateInput_t *input);
 
 #endif
