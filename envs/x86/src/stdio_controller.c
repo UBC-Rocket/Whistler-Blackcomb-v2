@@ -46,12 +46,13 @@ enum sensors {
 
 //packet's recieved buffer
 //are these amounts reasonable?
-uint8_t packetBuffers[1][MAX_PACKET_IDS][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
+uint8_t packetBuffers[2][MAX_PACKET_IDS][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
 //[ID][Packet][Packet Contents]
-int packetBuffersWriteIndex[1][MAX_PACKET_IDS] = {0};
-int packetBuffersReadIndex[1][MAX_PACKET_IDS] = {0}; 
-int packetBuffersReadLowerLimit[1][MAX_PACKET_IDS] = {0}; //needs to be initialized in the init function
-int packetBuffersNewFlag[1][MAX_PACKET_IDS] = {0};
+int packetBuffersWriteIndex[2][MAX_PACKET_IDS] = {0};
+int packetBuffersReadIndex[2][MAX_PACKET_IDS] = {0}; 
+int packetBuffersReadLowerLimit[2][MAX_PACKET_IDS] = {0}; //needs to be initialized in the init function
+int packetBuffersNewFlag[2][MAX_PACKET_IDS] = {0};
+int handshakeRecieved =0;
 
 //the upper packet limit is the lower limit + the packet buffer size. It's the
 //range of allowable readable values
@@ -96,14 +97,11 @@ static void sendPackets(){
 
     //just thinking - should flag on any new data and should only unflag when the read head reaches the write head, (i.e all data read)
 
-    for(int id=0; id<=MAX_PACKET_IDS;id++){
-        //printf("TX buffer ID %d has value %d\n",id,packetBuffersNewFlag[TX][id]);
+    for(int id=0; id<MAX_PACKET_IDS;id++){
         if(packetBuffersNewFlag[TX][id]==FLAGGED){
-            
             char buf[512];
-            int length =readFromBuf(TX,buf,id);
-            //putPacket(id, buf, length);
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            char length =readFromBuf(TX,buf,id);
+            putPacket(id, buf, length);
         }
     }
 }
@@ -123,18 +121,17 @@ static uint8_t readFromBuf(int mode,uint8_t data[],uint8_t id){
     if(readpoint+1<packetBuffersReadLowerLimit[mode][id]+PACKET_BUFFER_SIZE){
         packetBuffersReadIndex[mode][id]++;
     } else {
-        //packetBuffersNewFlag[mode][id]=UNFLAGGED;
+        packetBuffersNewFlag[mode][id]=UNFLAGGED;
     }
     
-    return data[0];
+    return packetBuffers[mode][id][readpoint][0];
 }
 /**
  * Internal function, used to write recieved packet to the approprite buffer
  */ 
 static void writeToBuf(int mode,uint8_t data[],uint8_t id,uint16_t length){
     packetBuffersNewFlag[mode][id] = FLAGGED;
-    printf("flag for ID %d changed to 1",id);
-
+    
     if(packetBuffersWriteIndex[mode][id]>=PACKET_BUFFER_SIZE){
         packetBuffersWriteIndex[mode][id]=0;
     }
@@ -159,9 +156,6 @@ static void initBuf(int mode){
     for(int i =0;i<MAX_PACKET_IDS;i++){
         packetBuffersReadLowerLimit[mode][i] = 0-PACKET_BUFFER_SIZE;
     }
-    for(int i =0;i<MAX_PACKET_IDS;i++){
-        packetBuffersReadLowerLimit[mode][i] = 0-PACKET_BUFFER_SIZE;
-    }   
 }
 
 /*
@@ -309,7 +303,6 @@ static void putConfigPacket() {
  * reading SIM packets from stdio.
  */
 static void inputLoop(void *pv){
-    /*handshake*/
     /*check for handshake acknowedgement*/
     char ack[4] = "ACK";
     char readChar;
@@ -318,13 +311,12 @@ static void inputLoop(void *pv){
         assert(ack[i] == readChar);
     }
     putConfigPacket();
+    handshakeRecieved =1;
     
     for(EVER){
         //constantly check for new packets
         extractPacket();
-        char data[0] = {1};
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        //writeToBuf(TX,data,1,1);
+
 
     }
 }
@@ -336,6 +328,7 @@ static void inputLoop(void *pv){
 static void outputLoop(void *pv){
     printf("SYN"); /*this has to be the first thing to go out, I think*/
     fflush(stdout);
+    while(!handshakeRecieved){}
     for(EVER){
         //check buffer
         //send what's in buffer
@@ -384,9 +377,8 @@ void stdioInit(){
     /* Thread safe output */
     console_init();
     initBuf(RX);
-    for(int id=0; id<=MAX_PACKET_IDS;id++){
-        printf("TX buffer ID %d has value %d\n",id,packetBuffersNewFlag[TX][id]);
-    }
+    initBuf(TX);
+    
     /* For generation of normal threads if needed for testing */
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
