@@ -33,6 +33,11 @@ enum sensors {
 #define MESSAGE_BUFFER_SIZE 512
 #define MAX_PACKET_IDS 0x74
 #define EVER ;;
+#define RX 0
+#define TX 1
+
+#define FLAGGED 1
+#define UNFLAGGED 0
 
 /*******************************************************************************
  * Variables
@@ -41,20 +46,15 @@ enum sensors {
 
 //packet's recieved buffer
 //are these amounts reasonable?
-uint8_t rxPacketBuffers[0x74][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
+uint8_t packetBuffers[1][MAX_PACKET_IDS][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
 //[ID][Packet][Packet Contents]
-int rxPacketBuffersWriteIndex[MAX_PACKET_IDS] = {0};
-int rxPacketBuffersReadIndex[MAX_PACKET_IDS] = {0}; 
-int rxPacketBuffersReadLowerLimit[MAX_PACKET_IDS] = {0}; //needs to be initialized in the init function
+int packetBuffersWriteIndex[1][MAX_PACKET_IDS] = {0};
+int packetBuffersReadIndex[1][MAX_PACKET_IDS] = {0}; 
+int packetBuffersReadLowerLimit[1][MAX_PACKET_IDS] = {0}; //needs to be initialized in the init function
+int packetBuffersNewFlag[1][MAX_PACKET_IDS] = {0};
+
 //the upper packet limit is the lower limit + the packet buffer size. It's the
 //range of allowable readable values
-
-//packet's recieved buffer
-//are these amounts reasonable?
-uint8_t txPacketBuffers[MAX_PACKET_IDS][PACKET_BUFFER_SIZE][MESSAGE_BUFFER_SIZE] = {0};
-//[ID][Packet][Packet Contents]
-int txPacketBuffersWriteIndex[MAX_PACKET_IDS] = {0};
-int txPacketBuffersReadIndex[MAX_PACKET_IDS] = {0}; 
 
 SemaphoreHandle_t simInSemaphore;
 SemaphoreHandle_t simOutSemaphore;
@@ -75,8 +75,9 @@ static void putConfigPacket();
 static uint8_t getCinForce();
 static uint8_t getFilteredCin();
 static void extractPacket();
-static uint8_t readFromRxBuf(uint8_t data[],uint8_t id);
-static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
+static void sendPackets();
+static uint8_t readFromBuf(int mode, uint8_t data[],uint8_t id);
+static void writeToBuf(int mode, uint8_t data[],uint8_t id,uint16_t length);
 
 
 /*******************************************************************************
@@ -91,20 +92,38 @@ static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length);
  * @param id the SIM id of the buffer you want to read - e.g. radio or a specific sensor
  * @return the length of the packet.
  */
+static void sendPackets(){
 
-static uint8_t readFromRxBuf(uint8_t data[],uint8_t id){
-    if(rxPacketBuffersReadIndex[id]>=PACKET_BUFFER_SIZE){
-        rxPacketBuffersReadIndex[id]=0;
+    //just thinking - should flag on any new data and should only unflag when the read head reaches the write head, (i.e all data read)
+
+    for(int id=0; id<=MAX_PACKET_IDS;id++){
+        //printf("TX buffer ID %d has value %d\n",id,packetBuffersNewFlag[TX][id]);
+        if(packetBuffersNewFlag[TX][id]==FLAGGED){
+            
+            char buf[512];
+            int length =readFromBuf(TX,buf,id);
+            //putPacket(id, buf, length);
+            vTaskDelay(pdMS_TO_TICKS(1000));
+        }
+    }
+}
+
+
+static uint8_t readFromBuf(int mode,uint8_t data[],uint8_t id){
+    if(packetBuffersReadIndex[mode][id]>=PACKET_BUFFER_SIZE){
+        packetBuffersReadIndex[mode][id]=0;
     }
 
-    int readpoint = rxPacketBuffersReadIndex[id];
+    int readpoint = packetBuffersReadIndex[mode][id];
 
-    for(int i=1;i<=rxPacketBuffers[id][readpoint][0];i++){
-        data[i-1]=rxPacketBuffers[id][readpoint][i];
+    for(int i=1;i<=packetBuffers[mode][id][readpoint][0];i++){
+        data[i-1]=packetBuffers[mode][id][readpoint][i];
     }
 
-    if(readpoint+1<rxPacketBuffersReadLowerLimit[id]+PACKET_BUFFER_SIZE){
-        rxPacketBuffersReadIndex[id]++;
+    if(readpoint+1<packetBuffersReadLowerLimit[mode][id]+PACKET_BUFFER_SIZE){
+        packetBuffersReadIndex[mode][id]++;
+    } else {
+        //packetBuffersNewFlag[mode][id]=UNFLAGGED;
     }
     
     return data[0];
@@ -112,30 +131,36 @@ static uint8_t readFromRxBuf(uint8_t data[],uint8_t id){
 /**
  * Internal function, used to write recieved packet to the approprite buffer
  */ 
-static void writeToRxBuf(uint8_t data[],uint8_t id,uint16_t length){
-    if(rxPacketBuffersWriteIndex[id]>=PACKET_BUFFER_SIZE){
-        rxPacketBuffersWriteIndex[id]=0;
+static void writeToBuf(int mode,uint8_t data[],uint8_t id,uint16_t length){
+    packetBuffersNewFlag[mode][id] = FLAGGED;
+    printf("flag for ID %d changed to 1",id);
+
+    if(packetBuffersWriteIndex[mode][id]>=PACKET_BUFFER_SIZE){
+        packetBuffersWriteIndex[mode][id]=0;
     }
 
-    int writepoint = rxPacketBuffersWriteIndex[id];
+    int writepoint = packetBuffersWriteIndex[mode][id];
 
-    rxPacketBuffers[id][writepoint][0]=length;
+    packetBuffers[mode][id][writepoint][0]=length;
 
     for(int i=1;i<=length;i++){
-        rxPacketBuffers[id][writepoint][i] = data[(i-1)];
+        packetBuffers[mode][id][writepoint][i] = data[(i-1)];
     }
 
-    rxPacketBuffersWriteIndex[id]++;
-    rxPacketBuffersReadLowerLimit[id]++;
-    if(rxPacketBuffersReadLowerLimit[id]>=PACKET_BUFFER_SIZE){
-        rxPacketBuffersReadLowerLimit[id]=0;
+    packetBuffersWriteIndex[mode][id]++;
+    packetBuffersReadLowerLimit[mode][id]++;
+    if(packetBuffersReadLowerLimit[mode][id]>=PACKET_BUFFER_SIZE){
+        packetBuffersReadLowerLimit[mode][id]=0;
     }
 }
 
 //sets up the sim rx buffer
-static void initRxBuf(void){
+static void initBuf(int mode){
     for(int i =0;i<MAX_PACKET_IDS;i++){
-        rxPacketBuffersReadLowerLimit[i] = 0-PACKET_BUFFER_SIZE;
+        packetBuffersReadLowerLimit[mode][i] = 0-PACKET_BUFFER_SIZE;
+    }
+    for(int i =0;i<MAX_PACKET_IDS;i++){
+        packetBuffersReadLowerLimit[mode][i] = 0-PACKET_BUFFER_SIZE;
     }   
 }
 
@@ -186,7 +211,7 @@ static void extractPacket() {
         }
 
         xSemaphoreTake(simInSemaphore,portMAX_DELAY);
-        writeToRxBuf(buf,id,length);
+        writeToBuf(RX,buf,id,length);
         xSemaphoreGive(simInSemaphore);
 
 
@@ -297,6 +322,9 @@ static void inputLoop(void *pv){
     for(EVER){
         //constantly check for new packets
         extractPacket();
+        char data[0] = {1};
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        //writeToBuf(TX,data,1,1);
 
     }
 }
@@ -311,6 +339,12 @@ static void outputLoop(void *pv){
     for(EVER){
         //check buffer
         //send what's in buffer
+        sendPackets();
+
+
+
+        
+
         
     }
     
@@ -349,8 +383,10 @@ static void generateImuLoop(void *pv){
 void stdioInit(){
     /* Thread safe output */
     console_init();
-    initRxBuf();
-
+    initBuf(RX);
+    for(int id=0; id<=MAX_PACKET_IDS;id++){
+        printf("TX buffer ID %d has value %d\n",id,packetBuffersNewFlag[TX][id]);
+    }
     /* For generation of normal threads if needed for testing */
     // pthread_t ioThread;
     // pthread_create( &ioThread, NULL, inputLoop, NULL);
