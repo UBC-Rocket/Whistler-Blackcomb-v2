@@ -46,23 +46,13 @@
 /* Constants */
 /* TODO: figure out where this is defined properly */
 #define PI acos(-1)
-<<<<<<< HEAD
-#define EVER \
-	;        \
-	;
-=======
 #define EVER ;;
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 
 /* Task priorities. */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define radio_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define log_task_PRIORITY (configMAX_PRIORITIES - 1)
-<<<<<<< HEAD
-#define state_machine_task_PRIORITY (configMAX_PRIORITIES - 1)
-=======
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 
 /*******************************************************************************
  * Prototypes
@@ -71,10 +61,6 @@ static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
 static void RadioTask(void *pv);
 static void LogTask(void *pv);
-<<<<<<< HEAD
-static void StateMachineTask(void *pv);
-=======
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 
 /*******************************************************************************
  * UART Variables
@@ -113,17 +99,6 @@ int main(void)
 	BaseType_t error;
 
 	/* Copy the following to create a new task */
-<<<<<<< HEAD
-	if (error = xTaskCreate(						   /* create task */
-							BlinkTask,				   /* pointer to the task */
-							"Blink Task",			   /* task name for kernel awareness debugging */
-							200 / sizeof(StackType_t), /* task stack size */
-							(void *)NULL,			   /* optional task startup argument */
-							tskIDLE_PRIORITY + 2,	   /* initial priority */
-							(TaskHandle_t *)NULL	   /* optional task handle_debug to create */
-							) != pdPASS)
-	{
-=======
 	if (error = xTaskCreate( /* create task */
 	BlinkTask, /* pointer to the task */
 	"Blink Task", /* task name for kernel awareness debugging */
@@ -132,72 +107,36 @@ int main(void)
 	tskIDLE_PRIORITY + 2, /* initial priority */
 	(TaskHandle_t*) NULL /* optional task handle_debug to create */
 	) != pdPASS) {
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 		printf("Task init failed: %d\n", error);
 		for (;;)
 			; /* error! probably out of memory */
 	}
 
 	if (error = xTaskCreate(ReadImuTask, "IMU Task",
-<<<<<<< HEAD
-							configMINIMAL_STACK_SIZE + 300,
-							NULL,
-							debug_uart_task_PRIORITY,
-							NULL) != pdPASS)
-	{
-=======
 	configMINIMAL_STACK_SIZE + 300,
 	NULL,
 	debug_uart_task_PRIORITY,
 	NULL) != pdPASS) {
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 		printf("Task init failed: %d\n", error);
 		for (;;)
 			;
 	}
 
 	if (error = xTaskCreate(RadioTask, "Radio Task",
-<<<<<<< HEAD
-							configMINIMAL_STACK_SIZE + 1000,
-							NULL,
-							radio_task_PRIORITY,
-							NULL) != pdPASS)
-	{
-=======
 	configMINIMAL_STACK_SIZE + 1000,
 	NULL,
 	radio_task_PRIORITY,
 	NULL) != pdPASS) {
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 		printf("Task init failed: %d\n", error);
 		for (;;)
 			;
 	}
 
 	if (error = xTaskCreate(LogTask, "Log Task",
-<<<<<<< HEAD
-							configMINIMAL_STACK_SIZE + 500,
-							NULL,
-							log_task_PRIORITY,
-							NULL) != pdPASS)
-	{
-		printf("Task init failed: %d\n", error);
-		for (;;)
-			;
-	}
-
-	if (error = xTaskCreate(StateMachineTask, "State Machine Task",
-							configMINIMAL_STACK_SIZE + 500,
-							NULL,
-							state_machine_task_PRIORITY,
-							NULL) != pdPASS)
-	{
-=======
 	configMINIMAL_STACK_SIZE + 500,
 	NULL,
 	log_task_PRIORITY,
 	NULL) != pdPASS) {
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 		printf("Task init failed: %d\n", error);
 		for (;;)
 			;
@@ -375,12 +314,7 @@ static void RadioTask(void *pv)
 	/* Add this for x86 testing */
 	// memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
 	// radio.serport.uart_handle.cur_buffer_size = sizeof(radioPacket);
-<<<<<<< HEAD
-	while (1)
-	{
-=======
 	while (1) {
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 		int len = radioReceive(&radio, packet);
 
 		if (len > 0)
@@ -391,21 +325,11 @@ static void RadioTask(void *pv)
 	}
 }
 
-<<<<<<< HEAD
-static void LogTask(void *pv)
-{
-	HALFILE file;
-	printf("starting...\n");
-	sdInit();
-	for (EVER)
-	{
-=======
 static void LogTask(void *pv) {
 	HALFILE file;
-	printf("starting...\n");
+	//printf("starting...\n"); //no using stdio, interferes with sim protocal
 	sdInit();
 	for (EVER) {
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 		sdMkDir("/testdir");
 		sdOpen(&file, "/testdir/testfile.txt");
 		sdWrite(&file, "test data\n");
@@ -413,16 +337,3 @@ static void LogTask(void *pv) {
 		vTaskDelay(pdMS_TO_TICKS(10000));
 	}
 }
-<<<<<<< HEAD
-
-static void StateMachineTask(void *pv){
-	
-	stateInput_t input;
-	for (EVER) {
-		printf("%s\n", stateNames[getState()]);
-		setNextState(&input);
-		vTaskDelay(pdMS_TO_TICKS(1000));
-	}
-}
-=======
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
