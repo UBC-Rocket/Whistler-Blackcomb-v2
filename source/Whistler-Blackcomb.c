@@ -25,6 +25,7 @@
 #include "timers.h"
 
 /* Includes common between MCU and x86 */
+#include "state_machine.h"
 #include "IMU_interpret.h"
 #include "prediction.h"
 
@@ -44,11 +45,16 @@
 /* Constants */
 /* TODO: figure out where this is defined properly */
 #define PI acos(-1)
+#define EVER \
+	;        \
+	;
 
 /* Task priorities. */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define radio_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define log_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define state_machine_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
@@ -56,6 +62,8 @@
 static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
 static void RadioTask(void *pv);
+static void LogTask(void *pv);
+static void StateMachineTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -74,15 +82,16 @@ hal_uart_handle_t hal_uart_imu;
  * Positioning Variables
  ******************************************************************************/
 
-double position[] = { 0, 0, 0 };
-double velocity[] = { 0, 0, 0 };
-double accel[] = { 0, 0, 0 };
+double position[] = {0, 0, 0};
+double velocity[] = {0, 0, 0};
+double accel[] = {0, 0, 0};
 IMU_1 IMU;
 
 /*******************************************************************************
  * Main
  ******************************************************************************/
-int main(void) {
+int main(void)
+{
 	initHal();
 	initTimers();
 
@@ -91,32 +100,60 @@ int main(void) {
 	halNvicSetPriority(RADIO_UART_RX_TX_IRQn, 5);
 
 	/* Copy the following to create a new task */
-	if (xTaskCreate( /* create task */
-	BlinkTask, /* pointer to the task */
-	"Blink Task", /* task name for kernel awareness debugging */
-	200 / sizeof(StackType_t), /* task stack size */
-	(void*) NULL, /* optional task startup argument */
-	tskIDLE_PRIORITY + 2, /* initial priority */
-	(TaskHandle_t*) NULL /* optional task handle_debug to create */
-	) != pdPASS) {
+	if (error = xTaskCreate(						   /* create task */
+							BlinkTask,				   /* pointer to the task */
+							"Blink Task",			   /* task name for kernel awareness debugging */
+							200 / sizeof(StackType_t), /* task stack size */
+							(void *)NULL,			   /* optional task startup argument */
+							tskIDLE_PRIORITY + 2,	   /* initial priority */
+							(TaskHandle_t *)NULL	   /* optional task handle_debug to create */
+							) != pdPASS)
+	{
+		printf("Task init failed: %d\n", error);
 		for (;;)
 			; /* error! probably out of memory */
 	}
 
-	if (xTaskCreate(ReadImuTask, "IMU Task",
-	configMINIMAL_STACK_SIZE + 300,
-	NULL,
-	debug_uart_task_PRIORITY,
-	NULL) != pdPASS) {
+	if (error = xTaskCreate(ReadImuTask, "IMU Task",
+							configMINIMAL_STACK_SIZE + 300,
+							NULL,
+							debug_uart_task_PRIORITY,
+							NULL) != pdPASS)
+	{
+		printf("Task init failed: %d\n", error);
 		for (;;)
 			;
 	}
 
-	if (xTaskCreate(RadioTask, "Radio Task",
-	configMINIMAL_STACK_SIZE + 1000,
-	NULL,
-	radio_task_PRIORITY,
-	NULL) != pdPASS) {
+	if (error = xTaskCreate(RadioTask, "Radio Task",
+							configMINIMAL_STACK_SIZE + 1000,
+							NULL,
+							radio_task_PRIORITY,
+							NULL) != pdPASS)
+	{
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
+
+	if (error = xTaskCreate(LogTask, "Log Task",
+							configMINIMAL_STACK_SIZE + 500,
+							NULL,
+							log_task_PRIORITY,
+							NULL) != pdPASS)
+	{
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
+
+	if (error = xTaskCreate(StateMachineTask, "State Machine Task",
+							configMINIMAL_STACK_SIZE + 500,
+							NULL,
+							state_machine_task_PRIORITY,
+							NULL) != pdPASS)
+	{
+		printf("Task init failed: %d\n", error);
 		for (;;)
 			;
 	}
@@ -134,8 +171,10 @@ int main(void) {
 /*!
  * @brief Simple blink Task as sanity check for program working
  */
-static void BlinkTask(void *pv) {
-	while (1) {
+static void BlinkTask(void *pv)
+{
+	while (1)
+	{
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 		vTaskDelay(pdMS_TO_TICKS(1000));
@@ -147,7 +186,8 @@ static void BlinkTask(void *pv) {
  * Note: this whole function is a mess for now before we start actually
  * implementing library code. 
  */
-static void ReadImuTask(void *pv) {
+static void ReadImuTask(void *pv)
+{
 	configImu(&IMU);
 
 	int uart_error;
@@ -161,11 +201,11 @@ static void ReadImuTask(void *pv) {
 	// quaternion acceleration;
 
 	// double * gravityAccel = (double*) pvPortMalloc(3 * sizeof(double));
-	double *vecOrientation = (double*) pvPortMalloc(3 * sizeof(double));
+	double *vecOrientation = (double *)pvPortMalloc(3 * sizeof(double));
 
 	// Dummy covariance matrices for now since these are yet to be determined
-//	double stateCovariance[][2][2] = {{{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}};
-//	double processCovariance[2][2] = {{0, 0}, {0, 0}};
+	//	double stateCovariance[][2][2] = {{{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}, {{0, 0}, {0, 0}}};
+	//	double processCovariance[2][2] = {{0, 0}, {0, 0}};
 
 	// double * stateCovariance = (double*) pvPortMalloc(3 * 2 * 2 * sizeof(double));
 	// double * processCovariance = (double*) pvPortMalloc(2 * 2 * sizeof(double));
@@ -180,42 +220,48 @@ static void ReadImuTask(void *pv) {
 	unsigned long imu_last_time = 0;
 
 	/* Initialize UART interfaces. */
-	if (kStatus_Success != uartInit(&hal_uart_debug)) {
+	if (kStatus_Success != uartInit(&hal_uart_debug))
+	{
 		vTaskSuspend(NULL);
 	}
 
-	if (kStatus_Success != uartInit(&hal_uart_imu)) {
+	if (kStatus_Success != uartInit(&hal_uart_imu))
+	{
 		vTaskSuspend(NULL);
 	}
 
 	/* Send introduction message. */
-	if (kStatus_Success
-			!= uartSend(&hal_uart_debug, (uint8_t*) debug_intro_message,
-					strlen(debug_intro_message))) {
+	if (kStatus_Success != uartSend(&hal_uart_debug, (uint8_t *)debug_intro_message,
+									strlen(debug_intro_message)))
+	{
 		vTaskSuspend(NULL);
 	}
 
 	/* Receive input from imu and parse it. */
-	do {
+	do
+	{
 		uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);
-		if (uart_error == kStatus_UART_RxHardwareOverrun) {
+		if (uart_error == kStatus_UART_RxHardwareOverrun)
+		{
 			/* Notify about hardware buffer overrun */
-			if (kStatus_Success
-					!= uartSend(&hal_uart_debug,
-							(uint8_t*) send_hardware_overrun,
-							strlen(send_hardware_overrun))) {
+			if (kStatus_Success != uartSend(&hal_uart_debug,
+											(uint8_t *)send_hardware_overrun,
+											strlen(send_hardware_overrun)))
+			{
 				vTaskSuspend(NULL);
 			}
 		}
-		if (uart_error == kStatus_UART_RxRingBufferOverrun) {
+		if (uart_error == kStatus_UART_RxRingBufferOverrun)
+		{
 			/* Notify about ring buffer overrun */
-			if (kStatus_Success
-					!= uartSend(&hal_uart_debug, (uint8_t*) send_ring_overrun,
-							strlen(send_ring_overrun))) {
+			if (kStatus_Success != uartSend(&hal_uart_debug, (uint8_t *)send_ring_overrun,
+											strlen(send_ring_overrun)))
+			{
 				vTaskSuspend(NULL);
 			}
 		}
-		if (n > 0 && IMU.datagram[0] == 0x93) {
+		if (n > 0 && IMU.datagram[0] == 0x93)
+		{
 			// Parse Datagram
 			parse_error = interpretImuData(&IMU);
 
@@ -224,7 +270,8 @@ static void ReadImuTask(void *pv) {
 				len = sprintf(toPrint, "ID_MISMATCH\n");
 			else if (parse_error == DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK)
 				len = sprintf(toPrint, "STATUS_BYTE_FAIL\n");
-			else if (parse_error == DATAGRAM_PARSE_SUCCESS) {
+			else if (parse_error == DATAGRAM_PARSE_SUCCESS)
+			{
 
 				double gx = IMU.rate[0] * PI / 180;
 				double gy = IMU.rate[1] * PI / 180;
@@ -234,8 +281,8 @@ static void ReadImuTask(void *pv) {
 
 				// Get calculated orientation quaternion
 				orientation = getOrientation(
-						(cur_time - imu_last_time) / 1000000.0, orientation, gx,
-						gy, gz);
+					(cur_time - imu_last_time) / 1000000.0, orientation, gx,
+					gy, gz);
 
 				quaternion o;
 				o.re = 0;
@@ -245,16 +292,15 @@ static void ReadImuTask(void *pv) {
 
 				o = qMult(orientation, qMult(o, qConjugate(orientation)));
 
-				// len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
-				// 		(int) (o.i * 100), (int) (o.j * 100), (int) (o.k * 100),
-				// 		(int) (100 * sqrt(o.i * o.i + o.j * o.j + o.k * o.k)));
+				len = sprintf(toPrint, "x: %3d, y: %3d, z: %3d, r: %3d\n",
+							  (int)(o.i * 100), (int)(o.j * 100), (int)(o.k * 100),
+							  (int)(100 * sqrt(o.i * o.i + o.j * o.j + o.k * o.k)));
 				// len = sprintf(toPrint, "t = %d", cur_time - imu_last_time);
 
 				imu_last_time = cur_time;
 			}
 
-			uartSend(&hal_uart_debug, (uint8_t*) toPrint, len);
-
+			uartSend(&hal_uart_debug, (uint8_t *)toPrint, len);
 		}
 	} while (kStatus_Success == uart_error);
 
@@ -270,12 +316,13 @@ static void ReadImuTask(void *pv) {
 //		0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0xC7 };
 
 /* Right now just echoes anything sent to the radio */
-static void RadioTask(void *pv) {
+static void RadioTask(void *pv)
+{
 
 	xbee_dev_t radio;
 	xbee_serial_t serial;
 
-	uint8_t *packet = (uint8_t*) pvPortMalloc(256 * sizeof(uint8_t));
+	uint8_t *packet = (uint8_t *)pvPortMalloc(256 * sizeof(uint8_t));
 
 	serial.baudrate = 9600;
 	uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
@@ -284,13 +331,39 @@ static void RadioTask(void *pv) {
 	/* Add this for x86 testing */
 	// memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
 	// radio.serport.uart_handle.cur_buffer_size = sizeof(radioPacket);
-
-	while (1) {
+	while (1)
+	{
 		int len = radioReceive(&radio, packet);
 
-		if (len > 0) {
+		if (len > 0)
+		{
 			radioTxRequest(&radio, packet, len);
 		}
+		vTaskDelay(pdMS_TO_TICKS(1000));
+	}
+}
+
+static void LogTask(void *pv)
+{
+	HALFILE file;
+	printf("starting...\n");
+	sdInit();
+	for (EVER)
+	{
+		sdMkDir("/testdir");
+		sdOpen(&file, "/testdir/testfile.txt");
+		sdWrite(&file, "test data\n");
+		sdClose(&file);
+		vTaskDelay(pdMS_TO_TICKS(10000));
+	}
+}
+
+static void StateMachineTask(void *pv){
+	
+	stateInput_t input;
+	for (EVER) {
+		printf("%s\n", stateNames[getState()]);
+		setNextState(&input);
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
