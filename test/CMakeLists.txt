@@ -20,12 +20,25 @@ target_link_libraries(IMU_test_app
 
 add_test(IMU_test IMU_test_app)
 
-# add_executable(SD_test
-#     SD_test.c
-# )
+add_executable(state_machine_test_app
+     test_state_machine.c
+)
 
-# target_link_libraries(SD_test
-#     Unity
-# )
+target_link_libraries(state_machine_test_app
+     Unity
+     state_machine
+ )
 
-# add_test(SD_test SD_test)
+ add_test(state_machine_test state_machine_test_app)
+
+
+ add_executable(prediction_test_app
+     test_prediction.c
+)
+
+target_link_libraries(prediction_test_app
+     Unity
+     prediction
+ )
+
+ add_test(prediction_test prediction_test_app)
