@@ -27,11 +27,19 @@
  */
 typedef enum state_t
 {
-    stateError, 
+    stateError,
+    stateStartup, 
     stateFueling,
+    stateStandby,
     stateIgnition,
-    stateAscent,
-    stateRecovery
+    statePoweredAscent,
+    stateUnpoweredFlight,
+    stateBallutes,
+    stateMainParachutes,
+    stateLanded,
+
+    stateGroundAbort,
+    stateFlightAbort
 } state_t;
 
 /**
@@ -39,10 +47,17 @@ typedef enum state_t
  */
 static char* stateNames[] = {
     "Error", 
-    "Fueling", 
+    "Startup",
+    "Fueling",
+    "Standby", 
     "Ignition", 
-    "Ascent", 
-    "Recovery"
+    "Powered Ascent",
+    "Unpowered Flight",
+    "Ballutes",
+    "Main Parachutes",
+    "Landed", 
+    "Ground Abort",
+    "Flight Abort"
 };
 
 /**
@@ -52,6 +67,7 @@ typedef enum stateRet_t
 {
     stateRetPass,
     stateRetRepeat,
+    stateRetRevert,
     stateRetAbort
 } stateRet_t;
 
@@ -69,6 +85,7 @@ typedef struct stateInput_t
 {
     double vertVelocity;
     double vertPosition;
+
     /* TODO: Add actual data */
 } stateInput_t;
 

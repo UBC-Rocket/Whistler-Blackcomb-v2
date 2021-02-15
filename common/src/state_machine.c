@@ -33,10 +33,41 @@ struct stateTransition
  * that we don't have to worry about it
  */
 static struct stateTransition stateTransitions[] = {
-    {stateFueling, stateRetPass, stateIgnition},
-    {stateFueling, stateRetRepeat, stateFueling},
-    {stateIgnition, stateRetRepeat, stateIgnition}
-    /* TODO: continue once we have actual states */
+    {stateStartup,          stateRetRepeat, stateStartup    },
+    {stateStartup,          stateRetPass,   stateFueling    },
+
+    {stateFueling,          stateRetRepeat, stateFueling    },
+    {stateFueling,          stateRetPass,   stateStandby    },
+
+    {stateStandby,          stateRetRepeat, stateStandby    },
+    {stateStandby,          stateRetPass,   stateIgnition   },
+    {stateStandby,          stateRetRevert, stateFueling,   },
+    {stateStandby,          stateRetAbort,  stateGroundAbort},
+
+    {stateGroundAbort,      stateRetRepeat, stateGroundAbort},
+    {stateGroundAbort,      stateRetPass,   stateFueling    },
+
+    {stateIgnition,         stateRetRepeat, stateIgnition       },
+    {stateIgnition,         stateRetPass,   statePoweredAscent  },
+    {stateIgnition,         stateRetAbort,  stateGroundAbort},
+    
+    {statePoweredAscent,    stateRetRepeat, statePoweredAscent},
+    {statePoweredAscent,    stateRetPass,   stateUnpoweredFlight},
+    {statePoweredAscent,    stateRetAbort,  stateFlightAbort},
+
+    {stateUnpoweredFlight,  stateRetRepeat, stateUnpoweredFlight},
+    {stateUnpoweredFlight,  stateRetPass,   stateBallutes},
+
+    {stateBallutes,         stateRetRepeat, stateBallutes},
+    {stateBallutes,         stateRetPass,   stateMainParachutes},
+
+    {stateMainParachutes,   stateRetRepeat, stateMainParachutes},
+    {stateMainParachutes,   stateRetPass,   stateLanded},
+
+    {stateFlightAbort,      stateRetRepeat, stateFlightAbort},
+    {stateFlightAbort,      stateRetPass,   stateUnpoweredFlight},
+
+    {stateLanded,           stateRetRepeat, stateLanded}
 };
 
 /**
@@ -49,10 +80,18 @@ static struct stateTransition stateTransitions[] = {
  * @return the stateRet_t that represents the outcome of the state transition
  */
 static stateRet_t stateTransitionError(stateInput_t *input);
+static stateRet_t stateTransitionStartup(stateInput_t *input);
 static stateRet_t stateTransitionFueling(stateInput_t *input);
+static stateRet_t stateTransitionStandby(stateInput_t *input);
 static stateRet_t stateTransitionIgnition(stateInput_t *input);
-static stateRet_t stateTransitionAscent(stateInput_t *input);
-static stateRet_t stateTransitionRecovery(stateInput_t *input);
+static stateRet_t stateTransitionPoweredAscent(stateInput_t *input);
+static stateRet_t stateTransitionUnpoweredFlight(stateInput_t *input);
+static stateRet_t stateTransitionBallutes(stateInput_t *input);
+static stateRet_t stateTransitionMainParachutes(stateInput_t *input);
+static stateRet_t stateTransitionLanded(stateInput_t *input);
+
+static stateRet_t stateTransitionGroundAbort(stateInput_t *input);
+static stateRet_t stateTransitionFlightAbort(stateInput_t *input);
 
 
 /**
@@ -76,10 +115,17 @@ static state_t curState = stateFueling;
  */
 stateRet_t (*stateFunctions[])(stateInput_t*) = {
     stateTransitionError,
+    stateTransitionStartup,
     stateTransitionFueling,
+    stateTransitionStandby,
     stateTransitionIgnition,
-    stateTransitionAscent,
-    stateTransitionRecovery};
+    stateTransitionPoweredAscent,
+    stateTransitionUnpoweredFlight,
+    stateTransitionBallutes,
+    stateTransitionMainParachutes,
+    stateTransitionLanded,
+    stateTransitionGroundAbort,
+    stateTransitionFlightAbort};
 
 /*******************************************************************************
  * Implementations
@@ -108,7 +154,15 @@ static stateRet_t stateTransitionError(stateInput_t *input){
     return stateRetRepeat;
 }
 
+static stateRet_t stateTransitionStartup(stateInput_t *input){
+    return stateRetPass;
+}
+
 static stateRet_t stateTransitionFueling(stateInput_t *input){
+    return stateRetPass;
+}
+
+static stateRet_t stateTransitionStandby(stateInput_t *input){
     return stateRetPass;
 }
 
@@ -116,12 +170,31 @@ static stateRet_t stateTransitionIgnition(stateInput_t *input){
     return stateRetRepeat;
 }
 
-static stateRet_t stateTransitionAscent(stateInput_t *input){
+static stateRet_t stateTransitionPoweredAscent(stateInput_t *input){
     return stateRetRepeat;
 }
 
-static stateRet_t stateTransitionRecovery(stateInput_t *input){
+static stateRet_t stateTransitionUnpoweredFlight(stateInput_t *input){
     return stateRetRepeat;
 }
 
+static stateRet_t stateTransitionBallutes(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionMainParachutes(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionLanded(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionGroundAbort(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionFlightAbort(stateInput_t *input){
+    return stateRetRepeat;
+}
 
