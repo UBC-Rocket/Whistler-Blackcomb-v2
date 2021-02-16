@@ -33,41 +33,42 @@ struct stateTransition
  * that we don't have to worry about it
  */
 static struct stateTransition stateTransitions[] = {
-    {stateStartup,          stateRetRepeat, stateStartup    },
-    {stateStartup,          stateRetPass,   stateFueling    },
+/*   Source State           Return Code     Desination State    */
+    {stateStartup,          stateRetRepeat, stateStartup        },
+    {stateStartup,          stateRetPass,   stateFueling        },
 
-    {stateFueling,          stateRetRepeat, stateFueling    },
-    {stateFueling,          stateRetPass,   stateStandby    },
+    {stateFueling,          stateRetRepeat, stateFueling        },
+    {stateFueling,          stateRetPass,   stateStandby        },
 
-    {stateStandby,          stateRetRepeat, stateStandby    },
-    {stateStandby,          stateRetPass,   stateIgnition   },
-    {stateStandby,          stateRetRevert, stateFueling,   },
-    {stateStandby,          stateRetAbort,  stateGroundAbort},
+    {stateStandby,          stateRetRepeat, stateStandby        },
+    {stateStandby,          stateRetPass,   stateIgnition       },
+    {stateStandby,          stateRetRevert, stateFueling,       },
+    {stateStandby,          stateRetAbort,  stateGroundAbort    },
 
-    {stateGroundAbort,      stateRetRepeat, stateGroundAbort},
-    {stateGroundAbort,      stateRetPass,   stateFueling    },
+    {stateGroundAbort,      stateRetRepeat, stateGroundAbort    },
+    {stateGroundAbort,      stateRetPass,   stateFueling        },
 
     {stateIgnition,         stateRetRepeat, stateIgnition       },
     {stateIgnition,         stateRetPass,   statePoweredAscent  },
-    {stateIgnition,         stateRetAbort,  stateGroundAbort},
+    {stateIgnition,         stateRetAbort,  stateGroundAbort    },
     
-    {statePoweredAscent,    stateRetRepeat, statePoweredAscent},
+    {statePoweredAscent,    stateRetRepeat, statePoweredAscent  },
     {statePoweredAscent,    stateRetPass,   stateUnpoweredFlight},
-    {statePoweredAscent,    stateRetAbort,  stateFlightAbort},
+    {statePoweredAscent,    stateRetAbort,  stateFlightAbort    },
 
     {stateUnpoweredFlight,  stateRetRepeat, stateUnpoweredFlight},
-    {stateUnpoweredFlight,  stateRetPass,   stateBallutes},
+    {stateUnpoweredFlight,  stateRetPass,   stateBallutes       },
 
-    {stateBallutes,         stateRetRepeat, stateBallutes},
-    {stateBallutes,         stateRetPass,   stateMainParachutes},
+    {stateBallutes,         stateRetRepeat, stateBallutes       },
+    {stateBallutes,         stateRetPass,   stateMainParachutes },
 
-    {stateMainParachutes,   stateRetRepeat, stateMainParachutes},
-    {stateMainParachutes,   stateRetPass,   stateLanded},
+    {stateMainParachutes,   stateRetRepeat, stateMainParachutes },
+    {stateMainParachutes,   stateRetPass,   stateLanded         },
 
-    {stateFlightAbort,      stateRetRepeat, stateFlightAbort},
+    {stateFlightAbort,      stateRetRepeat, stateFlightAbort    },
     {stateFlightAbort,      stateRetPass,   stateUnpoweredFlight},
 
-    {stateLanded,           stateRetRepeat, stateLanded}
+    {stateLanded,           stateRetRepeat, stateLanded         }
 };
 
 /**
@@ -124,6 +125,7 @@ stateRet_t (*stateFunctions[])(stateInput_t*) = {
     stateTransitionBallutes,
     stateTransitionMainParachutes,
     stateTransitionLanded,
+    
     stateTransitionGroundAbort,
     stateTransitionFlightAbort};
 

@@ -67,7 +67,7 @@ typedef enum stateRet_t
 {
     stateRetPass,
     stateRetRepeat,
-    stateRetRevert,
+    stateRetRevert, //only used by standby
     stateRetAbort
 } stateRet_t;
 
@@ -85,6 +85,19 @@ typedef struct stateInput_t
 {
     double vertVelocity;
     double vertPosition;
+
+
+    /* HMI Triggers (examples) */
+
+    char HMI_triggerGroundAbort; //holy snake-camel, Batman!
+    char HMI_triggerStandby;
+    char HMI_triggerFueling;
+    
+
+    /* GSE Triggers (comes via GSE from GSE HMI) */
+
+    char GSE_triggerIgnition;
+
 
     /* TODO: Add actual data */
 } stateInput_t;
