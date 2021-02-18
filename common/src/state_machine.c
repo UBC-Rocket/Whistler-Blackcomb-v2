@@ -39,6 +39,7 @@ static struct stateTransition stateTransitions[] = {
 
     {stateFueling,          stateRetRepeat, stateFueling        },
     {stateFueling,          stateRetPass,   stateStandby        },
+    {stateFueling,          stateRetAbort,  stateGroundAbort    },
 
     {stateStandby,          stateRetRepeat, stateStandby        },
     {stateStandby,          stateRetPass,   stateIgnition       },
@@ -157,19 +158,52 @@ static stateRet_t stateTransitionError(stateInput_t *input){
 }
 
 static stateRet_t stateTransitionStartup(stateInput_t *input){
-    return stateRetPass;
+    if(input->HMI_triggerFueling){
+        return stateRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
+    
 }
 
 static stateRet_t stateTransitionFueling(stateInput_t *input){
-    return stateRetPass;
+    if(input->HMI_triggerGroundAbort){
+        return stateRetAbort;
+    } 
+    else if(input->HMI_triggerStandby){
+        return stateRetPass;
+    } 
+    else{
+        return stateRetRepeat;
+    }
 }
 
 static stateRet_t stateTransitionStandby(stateInput_t *input){
-    return stateRetPass;
+    if(input->HMI_triggerGroundAbort){
+        return stateRetAbort;
+    }
+    else if(input->HMI_triggerFueling){
+        return stateRetRevert;
+    }
+    else if(input->GSE_triggerLaunch)){
+        return stateRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
 }
 
 static stateRet_t stateTransitionIgnition(stateInput_t *input){
-    return stateRetRepeat;
+    if(input->HMI_triggerGroundAbort){
+        return stateRetAbort;
+    }
+    else if(1/*this will eventuall be "all good"*/){
+        return stareRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
 }
 
 static stateRet_t stateTransitionPoweredAscent(stateInput_t *input){
@@ -193,7 +227,12 @@ static stateRet_t stateTransitionLanded(stateInput_t *input){
 }
 
 static stateRet_t stateTransitionGroundAbort(stateInput_t *input){
-    return stateRetRepeat;
+    if(input->HMI_triggerFueling){
+        return stateRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
 }
 
 static stateRet_t stateTransitionFlightAbort(stateInput_t *input){
