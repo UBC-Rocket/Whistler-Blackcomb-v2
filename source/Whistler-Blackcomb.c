@@ -351,11 +351,12 @@ static void LogTask(void *pv) {
 static void StateTask(void *pv) {
 	//update the stateinput 
 	
-	stateInput_t stateInput;
+	stateInput_t stateInput = {0};
 	for(EVER){
 		stateInput.HMI_triggerGroundAbort = 1;
-		//set all the state inputs...
+		/*TODO: set all the state inputs...*/
 		setNextState(&stateInput);
+		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 	
 

@@ -13,7 +13,7 @@ void defaultStateTest(void){
 
 /*test that it changes state on HMI triggers*/
 void basicStateChangeTest(void){
-    stateInput_t testStateInput;
+    stateInput_t testStateInput ={0};
     testStateInput.HMI_triggerFueling = 1; //bad magic number bad
     state_t state = setNextState(&testStateInput);
     TEST_ASSERT_EQUAL(state,stateFueling);
