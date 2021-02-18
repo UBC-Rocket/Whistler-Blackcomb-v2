@@ -17,5 +17,13 @@ add_library(IMU_interpret STATIC
     src/IMU_interpret.c
 )
 
+add_library(state_machine STATIC src/state_machine.c)
+add_library(prediction STATIC src/prediction.c)
+
+
+
 add_subdirectory(include)
 add_subdirectory(src)
+
+
+

@@ -56,7 +56,11 @@ In VSCode, change the kit to GCC x.x.x.
 You should now be able to build a `.exe`!
 
 # Compliling for Linux and Windows from the Same Directory
-If you are building for Linux and Windows from the same place, you'll need to delete the `CMakeCache.txt` file when you switch between the two. 
+If you are building for Linux and Windows from the same place, you'll need to delete the `build/CMakeCache.txt` file when you switch between the two. 
 
 # Issues
 If this isn't working, contact Xander or Eric on slack. Hopefully they can figure out where Eric messed up this documentation!
+
+### Known Issues:
+
+- VSCode might not properly execute tests if compiling in this mode. The tests should still all compile fine, and you can run them individually, but you just can't use the handy `run CTest Tests` button.
