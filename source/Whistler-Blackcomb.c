@@ -62,6 +62,7 @@ static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
 static void RadioTask(void *pv);
 static void LogTask(void *pv);
+static void StateTask(void *pv);
 
 /*******************************************************************************
  * UART Variables

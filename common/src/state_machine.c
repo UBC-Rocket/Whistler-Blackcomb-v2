@@ -111,7 +111,7 @@ static state_t stateLookup(state_t state, stateRet_t retCode);
  ******************************************************************************/
 
 /* The current state, possibly the most important variable in the project */
-static state_t curState = stateFueling;
+static state_t curState = stateStartup;
 /**
  * Array of state transition function pointers. 
  */
@@ -186,7 +186,7 @@ static stateRet_t stateTransitionStandby(stateInput_t *input){
     else if(input->HMI_triggerFueling){
         return stateRetRevert;
     }
-    else if(input->GSE_triggerLaunch)){
+    else if(input->GSE_triggerIgnition){
         return stateRetPass;
     }
     else{
@@ -199,7 +199,7 @@ static stateRet_t stateTransitionIgnition(stateInput_t *input){
         return stateRetAbort;
     }
     else if(1/*this will eventuall be "all good"*/){
-        return stareRetPass;
+        return stateRetPass;
     }
     else{
         return stateRetRepeat;
