@@ -351,8 +351,8 @@ static void LogTask(void *pv) {
 static void StateTask(void *pv) {
 	//update the stateinput 
 	
-	stateInput_t stateInput = {0};
 	for(EVER){
+		stateInput_t stateInput = {0}; // is this a terrible idea?
 		stateInput.HMI_triggerGroundAbort = 1;
 		/*TODO: set all the state inputs...*/
 		setNextState(&stateInput);

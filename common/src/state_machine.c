@@ -198,9 +198,9 @@ static stateRet_t stateTransitionIgnition(stateInput_t *input){
     if(input->HMI_triggerGroundAbort){
         return stateRetAbort;
     }
-    else if(1/*this will eventuall be "all good"*/){
-        return stateRetPass;
-    }
+    //else if(1/*this will eventuall be "all good"*/){
+    //    return stateRetPass;
+    //}
     else{
         return stateRetRepeat;
     }
