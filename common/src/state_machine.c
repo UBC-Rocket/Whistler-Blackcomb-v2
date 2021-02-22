@@ -5,6 +5,11 @@
 
 #include <state_machine.h>
 
+/*******************************************************************************
+ * Definitions
+ ******************************************************************************/
+
+#define CLEAR 0
 
 /*******************************************************************************
  * Declarations
@@ -159,6 +164,7 @@ static stateRet_t stateTransitionError(stateInput_t *input){
 
 static stateRet_t stateTransitionStartup(stateInput_t *input){
     if(input->HMI_triggerFueling){
+        input->HMI_triggerFueling = CLEAR;
         return stateRetPass;
     }
     else{
@@ -169,9 +175,11 @@ static stateRet_t stateTransitionStartup(stateInput_t *input){
 
 static stateRet_t stateTransitionFueling(stateInput_t *input){
     if(input->HMI_triggerGroundAbort){
+        input->HMI_triggerGroundAbort = CLEAR;
         return stateRetAbort;
     } 
     else if(input->HMI_triggerStandby){
+        input->HMI_triggerStandby = CLEAR;
         return stateRetPass;
     } 
     else{
@@ -181,12 +189,15 @@ static stateRet_t stateTransitionFueling(stateInput_t *input){
 
 static stateRet_t stateTransitionStandby(stateInput_t *input){
     if(input->HMI_triggerGroundAbort){
+        input->HMI_triggerGroundAbort = CLEAR;
         return stateRetAbort;
     }
     else if(input->HMI_triggerFueling){
+        input->HMI_triggerFueling = CLEAR;
         return stateRetRevert;
     }
     else if(input->GSE_triggerIgnition){
+        input->GSE_triggerIgnition = CLEAR;
         return stateRetPass;
     }
     else{
@@ -196,6 +207,7 @@ static stateRet_t stateTransitionStandby(stateInput_t *input){
 
 static stateRet_t stateTransitionIgnition(stateInput_t *input){
     if(input->HMI_triggerGroundAbort){
+        input->HMI_triggerGroundAbort=CLEAR;
         return stateRetAbort;
     }
     //else if(1/*this will eventuall be "all good"*/){

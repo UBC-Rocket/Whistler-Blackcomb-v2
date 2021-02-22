@@ -87,6 +87,12 @@ double accel[] = {0, 0, 0};
 IMU_1 IMU;
 
 /*******************************************************************************
+ * State Transition Variables
+ ******************************************************************************/
+
+stateInput_t stateTransitonInput = {0};
+
+/*******************************************************************************
  * Main
  ******************************************************************************/
 int main(void)
@@ -348,14 +354,10 @@ static void LogTask(void *pv) {
 	}
 }
 
-static void StateTask(void *pv) {
-	//update the stateinput 
-	
+static void StateTask(void *pv) {	
 	for(EVER){
-		stateInput_t stateInput = {0}; // is this a terrible idea?
-		stateInput.HMI_triggerGroundAbort = 1;
 		/*TODO: set all the state inputs...*/
-		setNextState(&stateInput);
+		setNextState(&stateTransitonInput);
 		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 	
