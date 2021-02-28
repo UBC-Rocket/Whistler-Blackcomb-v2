@@ -158,6 +158,11 @@ state_t setNextState(stateInput_t *input){
     return curState;
 }
 
+state_t testSetState(state_t state){
+    curState=state;
+    return curState;
+}
+
 static stateRet_t stateTransitionError(stateInput_t *input){
     return stateRetRepeat;
 }

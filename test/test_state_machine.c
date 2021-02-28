@@ -9,12 +9,15 @@ void baseTest(void){
     TEST_ASSERT_EQUAL_HEX8(2,2);
 }
 
-/*test that it starts in the right state*/
-void defaultStateTest(void){
+/*test that it starts in the right state - should be the fist test called!*/
+void defaultStateTest(void){    
     state_t state = getState();
     TEST_ASSERT_EQUAL(state,stateStartup);
 }
 void statesResetTest(void){
+    //reset states to stateStartup
+    testSetState(stateStartup);
+
     stateInput_t input = {0};
     state_t state;
 
@@ -41,8 +44,12 @@ void statesResetTest(void){
 }
 
 
+
 /*test that it changes state on HMI triggers*/
 void examplePathTest(void){ //how to name these tests?
+    //reset states to stateStartup
+    testSetState(stateStartup);
+
     stateInput_t testStateInput ={0};
     int testInputsExpectedOutputs[22][5]={
     /*  groundAbort Standby Fueling Ignition    Expected*/
@@ -79,12 +86,6 @@ void examplePathTest(void){ //how to name these tests?
         testStateInput.HMI_triggerFueling = testInputsExpectedOutputs[i][2];
         testStateInput.GSE_triggerIgnition = testInputsExpectedOutputs[i][3];
         state_t state = setNextState(&testStateInput);
-        char expectedState[32];
-        strcpy(expectedState,stateNames[testInputsExpectedOutputs[i][4]]);
-        char actualState[32];
-        strcpy(actualState, stateNames[state]);
-        printf("%d: expected %s got %s\n",i,expectedState,actualState);
-
         TEST_ASSERT_EQUAL(testInputsExpectedOutputs[i][4],state);
     }
 

@@ -125,4 +125,14 @@ state_t getState(void);
 state_t setNextState(stateInput_t *input);
 
 
+/**
+ * FOR TESTING PURPOSES ONLY!
+ * Sets the state machine state to any state you choose
+ * 
+ * @param state the state to move to
+ * @return the state you have moved to
+ */
+state_t testSetState(state_t state);
+
+
 #endif
