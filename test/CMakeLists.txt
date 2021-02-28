@@ -39,6 +39,7 @@ target_link_libraries(state_machine_test_app
 target_link_libraries(prediction_test_app
      Unity
      prediction
+     m
  )
 
  add_test(prediction_test prediction_test_app)

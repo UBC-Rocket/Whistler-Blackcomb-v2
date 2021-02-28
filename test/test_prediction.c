@@ -4,16 +4,18 @@
 void baseTest(void){
     TEST_ASSERT_EQUAL_HEX8(2,2);
 }
-void scalarMultTest(void){
-    void ScalarMultTest(void){
-    int matrix1[3] = {1,1,1};
-    int scalar = 2;
-    int expectedResult[3] = {2,2,2};
-    int result;
+void matMultTest(void){
+    double matrix1[2][2] = {{1,2},{3,4}};
+    double matrix2[2][2] = {{5,6},{7,8}};
+    double expectedResult[2][2] = {{19,22},{43,50}};
+    double result[2][2];
+    
+    matMult(matrix1,matrix2,result);
 
-    scalMult(matrix1,scalar,result);
-
-    TEST_ASSERT_EQUAL(result,expectedResult);
+    for(int i=0;i<2;i++){
+        for(int ii=0;ii<2;ii++){
+            TEST_ASSERT_EQUAL(result[i][ii],expectedResult[i][ii]);
+        }
     }
 }
 
@@ -22,6 +24,6 @@ void tearDown(void){}
 int main (void){
     UNITY_BEGIN();
     RUN_TEST(baseTest);
-    RUN_TEST(scalarMultTest);
+    RUN_TEST(matMultTest);
     return UNITY_END();
 }
