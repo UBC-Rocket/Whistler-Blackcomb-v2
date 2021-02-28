@@ -23,12 +23,10 @@ void statesResetTest(void){
 
     //this should move it out of startup to fueling
     state = setNextState(&input);
-    printf("%s\n",stateNames[state]); //for testing the testing
 
     input.HMI_triggerFueling = TRUE;
     state = setNextState(&input);
     TEST_ASSERT_EQUAL(input.HMI_triggerFueling,FALSE); //is it reset?
-    printf("%s\n",stateNames[state]); //for testing the testing
 
     input.HMI_triggerStandby = TRUE;
     setNextState(&input);
@@ -42,8 +40,6 @@ void statesResetTest(void){
     setNextState(&input);
     TEST_ASSERT_EQUAL(input.HMI_triggerGroundAbort,FALSE); //is it reset?
 }
-
-
 
 /*test that it changes state on HMI triggers*/
 void examplePathTest(void){ //how to name these tests?
@@ -75,7 +71,6 @@ void examplePathTest(void){ //how to name these tests?
         {FALSE,     FALSE,  FALSE,  TRUE,       stateIgnition   }, //Move to Ignition
         {FALSE,     FALSE,  FALSE,  FALSE,      stateIgnition   }, //Stay in Ignition
         {TRUE,      FALSE,  FALSE,  FALSE,      stateGroundAbort}  //Move to Ground Abort
-
     };
 
     for(int i=0;i<22;i++){
@@ -88,10 +83,6 @@ void examplePathTest(void){ //how to name these tests?
         state_t state = setNextState(&testStateInput);
         TEST_ASSERT_EQUAL(testInputsExpectedOutputs[i][4],state);
     }
-
-
-
-
 }
 
 void setUp(void){}
