@@ -53,6 +53,7 @@
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define radio_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define log_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define state_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
@@ -61,6 +62,7 @@ static void ReadImuTask(void *pvParameters);
 static void BlinkTask(void *pv);
 static void RadioTask(void *pv);
 static void LogTask(void *pv);
+static void StateTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -83,6 +85,12 @@ double position[] = {0, 0, 0};
 double velocity[] = {0, 0, 0};
 double accel[] = {0, 0, 0};
 IMU_1 IMU;
+
+/*******************************************************************************
+ * State Transition Variables
+ ******************************************************************************/
+
+stateInput_t stateTransitonInput = {0};
 
 /*******************************************************************************
  * Main
@@ -136,6 +144,15 @@ int main(void)
 	configMINIMAL_STACK_SIZE + 500,
 	NULL,
 	log_task_PRIORITY,
+	NULL) != pdPASS) {
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
+	if (error = xTaskCreate(StateTask, "State Task",
+	configMINIMAL_STACK_SIZE + 500,
+	NULL,
+	state_task_PRIORITY,
 	NULL) != pdPASS) {
 		printf("Task init failed: %d\n", error);
 		for (;;)
@@ -327,7 +344,6 @@ static void RadioTask(void *pv)
 
 static void LogTask(void *pv) {
 	HALFILE file;
-	//printf("starting...\n"); //no using stdio, interferes with sim protocal
 	sdInit();
 	for (EVER) {
 		sdMkDir("/testdir");
@@ -336,4 +352,14 @@ static void LogTask(void *pv) {
 		sdClose(&file);
 		vTaskDelay(pdMS_TO_TICKS(10000));
 	}
+}
+
+static void StateTask(void *pv) {	
+	for(EVER){
+		/*TODO: set all the state inputs...*/
+		setNextState(&stateTransitonInput);
+		vTaskDelay(pdMS_TO_TICKS(10));
+	}
+	
+
 }
