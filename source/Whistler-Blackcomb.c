@@ -190,6 +190,7 @@ static void BlinkTask(void *pv)
 static void ReadImuTask(void *pv)
 {
 	configImu(&IMU);
+	crc32_initTable();
 
 	int uart_error;
 	size_t n = 0;
@@ -271,6 +272,8 @@ static void ReadImuTask(void *pv)
 				len = sprintf(toPrint, "ID_MISMATCH\n");
 			else if (parse_error == DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK)
 				len = sprintf(toPrint, "STATUS_BYTE_FAIL\n");
+			else if (parse_error == DATAGRAM_INCORRECT_CRC)
+				len = sprintf(toPrint, "CRC CHECK FAILED\n");
 			else if (parse_error == DATAGRAM_PARSE_SUCCESS)
 			{
 
