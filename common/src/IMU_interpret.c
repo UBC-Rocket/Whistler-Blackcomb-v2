@@ -18,7 +18,7 @@ int get_ID(IMU_1 *imu);
 
 int get_dummyBytes(IMU_1 *imu);
 
-uint32_t crc32_lookup[256];
+uint crc32_lookup[256];
 
 /*******************************************************************************
  * Implementations

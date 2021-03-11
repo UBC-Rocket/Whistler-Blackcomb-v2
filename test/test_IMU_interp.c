@@ -12,6 +12,8 @@ int crc32_test_datagram_from_path(char[], int);
  * Tests
  ******************************************************************************/
 
+//Note: Correct CRC32 values are from https://crccalc.com/
+
 void statusbyte_test(void){
     IMU_1 IMU;
     configImu(&IMU);
