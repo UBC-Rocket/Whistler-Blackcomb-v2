@@ -5,6 +5,11 @@
 
 #include <state_machine.h>
 
+/*******************************************************************************
+ * Definitions
+ ******************************************************************************/
+
+#define CLEAR 0
 
 /*******************************************************************************
  * Declarations
@@ -33,10 +38,43 @@ struct stateTransition
  * that we don't have to worry about it
  */
 static struct stateTransition stateTransitions[] = {
-    {stateFueling, stateRetPass, stateIgnition},
-    {stateFueling, stateRetRepeat, stateFueling},
-    {stateIgnition, stateRetRepeat, stateIgnition}
-    /* TODO: continue once we have actual states */
+/*   Source State           Return Code     Desination State    */
+    {stateStartup,          stateRetRepeat, stateStartup        },
+    {stateStartup,          stateRetPass,   stateFueling        },
+
+    {stateFueling,          stateRetRepeat, stateFueling        },
+    {stateFueling,          stateRetPass,   stateStandby        },
+    {stateFueling,          stateRetAbort,  stateGroundAbort    },
+
+    {stateStandby,          stateRetRepeat, stateStandby        },
+    {stateStandby,          stateRetPass,   stateIgnition       },
+    {stateStandby,          stateRetRevert, stateFueling,       },
+    {stateStandby,          stateRetAbort,  stateGroundAbort    },
+
+    {stateGroundAbort,      stateRetRepeat, stateGroundAbort    },
+    {stateGroundAbort,      stateRetPass,   stateFueling        },
+
+    {stateIgnition,         stateRetRepeat, stateIgnition       },
+    {stateIgnition,         stateRetPass,   statePoweredAscent  },
+    {stateIgnition,         stateRetAbort,  stateGroundAbort    },
+    
+    {statePoweredAscent,    stateRetRepeat, statePoweredAscent  },
+    {statePoweredAscent,    stateRetPass,   stateUnpoweredFlight},
+    {statePoweredAscent,    stateRetAbort,  stateFlightAbort    },
+
+    {stateUnpoweredFlight,  stateRetRepeat, stateUnpoweredFlight},
+    {stateUnpoweredFlight,  stateRetPass,   stateBallutes       },
+
+    {stateBallutes,         stateRetRepeat, stateBallutes       },
+    {stateBallutes,         stateRetPass,   stateMainParachutes },
+
+    {stateMainParachutes,   stateRetRepeat, stateMainParachutes },
+    {stateMainParachutes,   stateRetPass,   stateLanded         },
+
+    {stateFlightAbort,      stateRetRepeat, stateFlightAbort    },
+    {stateFlightAbort,      stateRetPass,   stateUnpoweredFlight},
+
+    {stateLanded,           stateRetRepeat, stateLanded         }
 };
 
 /**
@@ -49,10 +87,18 @@ static struct stateTransition stateTransitions[] = {
  * @return the stateRet_t that represents the outcome of the state transition
  */
 static stateRet_t stateTransitionError(stateInput_t *input);
+static stateRet_t stateTransitionStartup(stateInput_t *input);
 static stateRet_t stateTransitionFueling(stateInput_t *input);
+static stateRet_t stateTransitionStandby(stateInput_t *input);
 static stateRet_t stateTransitionIgnition(stateInput_t *input);
-static stateRet_t stateTransitionAscent(stateInput_t *input);
-static stateRet_t stateTransitionRecovery(stateInput_t *input);
+static stateRet_t stateTransitionPoweredAscent(stateInput_t *input);
+static stateRet_t stateTransitionUnpoweredFlight(stateInput_t *input);
+static stateRet_t stateTransitionBallutes(stateInput_t *input);
+static stateRet_t stateTransitionMainParachutes(stateInput_t *input);
+static stateRet_t stateTransitionLanded(stateInput_t *input);
+
+static stateRet_t stateTransitionGroundAbort(stateInput_t *input);
+static stateRet_t stateTransitionFlightAbort(stateInput_t *input);
 
 
 /**
@@ -70,16 +116,24 @@ static state_t stateLookup(state_t state, stateRet_t retCode);
  ******************************************************************************/
 
 /* The current state, possibly the most important variable in the project */
-static state_t curState = stateFueling;
+static state_t curState = stateStartup;
 /**
  * Array of state transition function pointers. 
  */
 stateRet_t (*stateFunctions[])(stateInput_t*) = {
     stateTransitionError,
+    stateTransitionStartup,
     stateTransitionFueling,
+    stateTransitionStandby,
     stateTransitionIgnition,
-    stateTransitionAscent,
-    stateTransitionRecovery};
+    stateTransitionPoweredAscent,
+    stateTransitionUnpoweredFlight,
+    stateTransitionBallutes,
+    stateTransitionMainParachutes,
+    stateTransitionLanded,
+    
+    stateTransitionGroundAbort,
+    stateTransitionFlightAbort};
 
 /*******************************************************************************
  * Implementations
@@ -104,24 +158,101 @@ state_t setNextState(stateInput_t *input){
     return curState;
 }
 
+state_t testSetState(state_t state){
+    curState=state;
+    return curState;
+}
+
 static stateRet_t stateTransitionError(stateInput_t *input){
     return stateRetRepeat;
 }
 
+static stateRet_t stateTransitionStartup(stateInput_t *input){
+    if(input->HMI_triggerFueling){
+        input->HMI_triggerFueling = CLEAR;
+        return stateRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
+    
+}
+
 static stateRet_t stateTransitionFueling(stateInput_t *input){
-    return stateRetPass;
+    if(input->HMI_triggerGroundAbort){
+        input->HMI_triggerGroundAbort = CLEAR;
+        return stateRetAbort;
+    } 
+    else if(input->HMI_triggerStandby){
+        input->HMI_triggerStandby = CLEAR;
+        return stateRetPass;
+    } 
+    else{
+        return stateRetRepeat;
+    }
+}
+
+static stateRet_t stateTransitionStandby(stateInput_t *input){
+    if(input->HMI_triggerGroundAbort){
+        input->HMI_triggerGroundAbort = CLEAR;
+        return stateRetAbort;
+    }
+    else if(input->HMI_triggerFueling){
+        input->HMI_triggerFueling = CLEAR;
+        return stateRetRevert;
+    }
+    else if(input->GSE_triggerIgnition){
+        input->GSE_triggerIgnition = CLEAR;
+        return stateRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
 }
 
 static stateRet_t stateTransitionIgnition(stateInput_t *input){
+    if(input->HMI_triggerGroundAbort){
+        input->HMI_triggerGroundAbort=CLEAR;
+        return stateRetAbort;
+    }
+    //else if(1/*this will eventuall be "all good"*/){
+    //    return stateRetPass;
+    //}
+    else{
+        return stateRetRepeat;
+    }
+}
+
+static stateRet_t stateTransitionPoweredAscent(stateInput_t *input){
     return stateRetRepeat;
 }
 
-static stateRet_t stateTransitionAscent(stateInput_t *input){
+static stateRet_t stateTransitionUnpoweredFlight(stateInput_t *input){
     return stateRetRepeat;
 }
 
-static stateRet_t stateTransitionRecovery(stateInput_t *input){
+static stateRet_t stateTransitionBallutes(stateInput_t *input){
     return stateRetRepeat;
 }
 
+static stateRet_t stateTransitionMainParachutes(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionLanded(stateInput_t *input){
+    return stateRetRepeat;
+}
+
+static stateRet_t stateTransitionGroundAbort(stateInput_t *input){
+    if(input->HMI_triggerFueling){
+        return stateRetPass;
+    }
+    else{
+        return stateRetRepeat;
+    }
+}
+
+static stateRet_t stateTransitionFlightAbort(stateInput_t *input){
+    return stateRetRepeat;
+}
 

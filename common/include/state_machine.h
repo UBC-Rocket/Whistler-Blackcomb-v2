@@ -27,11 +27,19 @@
  */
 typedef enum state_t
 {
-    stateError, 
+    stateError,
+    stateStartup, 
     stateFueling,
+    stateStandby,
     stateIgnition,
-    stateAscent,
-    stateRecovery
+    statePoweredAscent,
+    stateUnpoweredFlight,
+    stateBallutes,
+    stateMainParachutes,
+    stateLanded,
+
+    stateGroundAbort,
+    stateFlightAbort
 } state_t;
 
 /**
@@ -39,10 +47,17 @@ typedef enum state_t
  */
 static char* stateNames[] = {
     "Error", 
-    "Fueling", 
+    "Startup",
+    "Fueling",
+    "Standby", 
     "Ignition", 
-    "Ascent", 
-    "Recovery"
+    "Powered Ascent",
+    "Unpowered Flight",
+    "Ballutes",
+    "Main Parachutes",
+    "Landed", 
+    "Ground Abort",
+    "Flight Abort"
 };
 
 /**
@@ -52,6 +67,7 @@ typedef enum stateRet_t
 {
     stateRetPass,
     stateRetRepeat,
+    stateRetRevert, //only used by standby
     stateRetAbort
 } stateRet_t;
 
@@ -69,6 +85,20 @@ typedef struct stateInput_t
 {
     double vertVelocity;
     double vertPosition;
+
+
+    /* HMI Triggers (examples) */
+
+    char HMI_triggerGroundAbort; //holy snake-camel, Batman!
+    char HMI_triggerStandby;
+    char HMI_triggerFueling;
+    
+
+    /* GSE Triggers (comes via GSE from GSE HMI) */
+
+    char GSE_triggerIgnition;
+
+
     /* TODO: Add actual data */
 } stateInput_t;
 
@@ -93,6 +123,16 @@ state_t getState(void);
  * @return the current state after input is taken into account
  */
 state_t setNextState(stateInput_t *input);
+
+
+/**
+ * FOR TESTING PURPOSES ONLY!
+ * Sets the state machine state to any state you choose
+ * 
+ * @param state the state to move to
+ * @return the state you have moved to
+ */
+state_t testSetState(state_t state);
 
 
 #endif

@@ -16,6 +16,10 @@ int to_2C(int value);
 
 int get_ID(IMU_1 *imu);
 
+int get_dummyBytes(IMU_1 *imu);
+
+uint crc32_lookup[256];
+
 /*******************************************************************************
  * Implementations
  ******************************************************************************/
@@ -28,6 +32,7 @@ void configImu(IMU_1 *imu){
 	imu->interpTemp 	= 0;
 	imu->interpAux 		= 0;
 	imu->datagramID		=get_ID(imu);
+	imu->dummyBytes     =get_dummyBytes(imu);
 	//these guys don't do anything right now.
 	imu->sampleRate 	= 125;
 	imu->bitRate 		= 374400;
@@ -112,7 +117,29 @@ int get_ID(IMU_1 *imu) {
 	}
 }
 
+int get_dummyBytes(IMU_1 *imu) {
+	//copy of the table in the STIM300 datasheet, table 6-21, pg. 36
+	//kind of a gross way to implement this might clean it up later
 
+	if(imu->datagramID == 0xB1 || imu->datagramID == 0xB3 || imu->datagramID == 0xB5 || imu->datagramID == 0xB7 
+	|| imu->datagramID == 0xD1 || imu->datagramID == 0xD2 || imu->datagramID == 0x91 || imu->datagramID == 0x92 
+	|| imu->datagramID == 0x99 || imu->datagramID == 0x9A) {
+		return 0;
+	} 
+	else if(imu->datagramID == 0xA7 || imu->datagramID == 0xAF) {
+		return 1;
+	}
+	else if(imu->datagramID == 0xBC || imu->datagramID == 0xBD || imu->datagramID == 0x90 || imu->datagramID == 0x93
+	|| imu->datagramID == 0xA5 || imu->datagramID == 0xA6 || imu->datagramID == 0x98 || imu->datagramID == 0x9B ||
+	imu->datagramID == 0xAD || imu->datagramID == 0xAE) {
+		return 2;
+	}
+	else if(imu->datagramID == 0xBE || imu->datagramID == 0xBF || imu->datagramID == 0x94 || imu->datagramID == 0x9C) {
+		return 3;
+	}
+
+	return 0;
+}
 
 int interpretImuData(IMU_1 *imu) {
 	//IMPORTANT: This is not well made, so you better make sure that the length of the arrays you pass are right...
@@ -122,6 +149,9 @@ int interpretImuData(IMU_1 *imu) {
 
 	//we'll use this to see if any of the status bytes are in non-OK states
 	int statusFlag = 0;
+
+	//we'll use this to for storing the result of our crc test
+	int crcFlag = 0;
 
 	//quick check to make sure the identifier from the packet = identifier it expects.
 	if (imu->datagram[datagramCount] != imu->datagramID) {
@@ -243,15 +273,58 @@ int interpretImuData(IMU_1 *imu) {
 	datagramCount += 2;
 
 	//evaluate crc
-	datagramCount += 3;
+	unsigned int msgCrc = (imu->datagram[datagramCount] << 24) + (imu->datagram[datagramCount + 1] << 16) +  
+		(imu->datagram[datagramCount + 2] << 8) + imu->datagram[datagramCount + 3];
+
+	unsigned int expectedCrc = crc32(imu->datagram, datagramCount, imu->dummyBytes); 
+
+	//if the 2 crcs dont' match, there's been an error so trigger the flag
+	if(msgCrc != expectedCrc) {
+		crcFlag = 1;
+	}
+
+	datagramCount += 4;
 
 	//evaluate if any of the status bytes triggered the flag
 	if (statusFlag) {
 		//one or more of the status bytes had some kin
 		return DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK;
+	} else if(crcFlag) {
+		//incorrect crc has been calculated
+		return DATAGRAM_INCORRECT_CRC;
 	} else {
 		//if it made it to this point, as far as the program knows the packet was successfully interpereated with no status byte issues
 		return DATAGRAM_PARSE_SUCCESS;
 	}
+}
 
+void crc32_initTable(void) {
+    for(int input = 0; input < 256; input++) {
+        uint crc = (uint)(input << 24);
+
+        for(int bit = 0; bit < 8; bit++) {
+            if (crc & (1 << 31)) { 
+                crc <<= 1;
+                crc ^= POLYNOMIAL;
+            }
+            else {
+                crc <<= 1;
+            }
+        }
+
+        crc32_lookup[input] = crc;
+    }
+}
+
+uint crc32(byte message[], int msgLength, int dummyBytes) {
+    uint crc = SEED;
+
+    for(int i = 0; i < msgLength + dummyBytes; i++) {
+        byte curByte = (i < msgLength) ? message[i] : DUMMYBYTE; //anything after the length of our message is a dummy byte
+
+        byte pos = (byte)((crc ^ (curByte << 24)) >> 24); 
+        crc = (crc << 8) ^ (uint)crc32_lookup[pos];
+    }
+
+    return crc;
 }

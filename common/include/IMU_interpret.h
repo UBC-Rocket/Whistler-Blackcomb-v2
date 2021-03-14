@@ -5,6 +5,14 @@
 #define DATAGRAM_PARSE_SUCCESS						0
 #define DATAGRAM_PARSE_ID_MISMATCH					1
 #define DATAGRAM_PARSE_ANY_STATUS_BYTE_NOT_OK		2
+#define DATAGRAM_INCORRECT_CRC						3
+
+//CRC32 calculation constants
+#define POLYNOMIAL 0x04C11DB7
+#define SEED 0xFFFFFFFF
+#define DUMMYBYTE 0x00
+typedef unsigned char byte;
+typedef unsigned int uint;
 
 /**
  * This struct holds all the data for the IMU, including configuartion, inputs,
@@ -123,6 +131,11 @@ typedef struct IMU {
 	 * IMU latency
 	 */
 	int latency;
+
+	/**
+	 * The number of dummy bytes to append to the end of the datagram when calculating CRC.
+	*/
+	int dummyBytes;
 } IMU_1;
 
 /**
@@ -142,8 +155,29 @@ void configImu(IMU_1 *imu);
  * 0, 1, and 2 hold x, y, and z values, respectively. temp[] 0-2 holds gyro temps 
  * x,y,z; 3-5 holds accelerometer temps x,y,z; and 6-8 holds inclinometer temps 
  * x,y,z. aux holds the auxillary output, and latency holds the latency.
-
  */
 int interpretImuData(IMU_1 *imu);
+
+/**
+ * The 32-bit Cyclic Redundancy Checksum (CRC32) is calculated byte-by-byte which means we can precompute solutions 
+ * in a 256-length lookup table (which is what we do here).
+ * 
+ * The CRC checksum is calculated crc = message % polynomial. Message and polynomial (binary numbers) are 
+ * interpeted as polynomials (ex. 0b1101 -> x^3 + x^2 + 1) and "polynomial division" is peformed. 
+ * (with some rule changes) This is intuitively pretty confusing, but at least the implementation isn't that complicated.
+ * The remainder is our checksum. For more info about implementation, this article is probably the best: 
+ * http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
+ */
+void crc32_initTable(void);
+
+/*
+ * Calculate CRC32 checkum by accessing our lookup table.
+ * @param message The message we calculate the checksum for
+ * @param msgLength The length of our message in bytes
+ * @param dummyBytes As per the datasheet, the CRC32 algorithm requires a message that is an a multiple of  32 bits (4 bytes).
+ * Some datagrams don't match this requirement, so for an easy fix 1-3 dummy bytes (content = 0x00) are appended to the end of 
+ * the message. See datasheet pg. 35 for more info.
+*/
+uint crc32(byte[], int, int);
 
 #endif
