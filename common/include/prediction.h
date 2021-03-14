@@ -11,6 +11,8 @@
  ******************************************************************************/
 
 #define MATRIX_SIZE 2
+#define PI acos(-1)
+
 
 // Quaternion struct definition
 typedef struct quaternions {

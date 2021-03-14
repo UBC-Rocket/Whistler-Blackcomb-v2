@@ -346,9 +346,116 @@ void qConjugateTest(void){
     compareQ(resultQ2,expectedResultQ2);
 }
 
+void basicGetOrientationTest(void){
+    /*some things we'll need for all the tests*/
+    quaternion initalOrientation;
+    quaternion finalOrientation;
+    quaternion expectedOrientation;
+    double testGx;
+    double testGy;
+    double testGz;
 
+    //testing w/ nice, pleasant right angles
 
+    /*Test1: rotate 90 degrees around x axis*/
+    initalOrientation = qUnit();
 
+    testGx=PI/2;
+    testGy=0;
+    testGz=0;
+
+    expectedOrientation.re=0.707107;
+    expectedOrientation.i=0.707107;
+    expectedOrientation.j=0;
+    expectedOrientation.k=0;
+
+    finalOrientation=getOrientation(1,initalOrientation,testGx,testGy,testGz);
+
+    compareQ(finalOrientation,expectedOrientation);
+
+    /*Test2: rotate 90 degrees around y axis*/
+    initalOrientation = qUnit();
+    testGx=0;
+    testGy=PI/2;
+    testGz=0;
+
+    expectedOrientation.re=0.707107;
+    expectedOrientation.i=0;
+    expectedOrientation.j=0.707107;
+    expectedOrientation.k=0;
+
+    finalOrientation=getOrientation(1,initalOrientation,testGx,testGy,testGz);
+
+    compareQ(finalOrientation,expectedOrientation);
+
+    /*Test3: rotate 90 degrees around z axis*/
+    initalOrientation = qUnit();
+    testGx=0;
+    testGy=0;
+    testGz=PI/2;
+
+    expectedOrientation.re=0.707107;
+    expectedOrientation.i=0;
+    expectedOrientation.j=0;
+    expectedOrientation.k=0.707107;
+
+    finalOrientation=getOrientation(1,initalOrientation,testGx,testGy,testGz);
+
+    compareQ(finalOrientation,expectedOrientation);
+}
+
+    void getOrientationTest(void){
+    /*some things we'll need for all the tests*/
+    quaternion initalOrientation;
+    quaternion finalOrientation;
+    quaternion expectedOrientation;
+    double testGx;
+    double testGy;
+    double testGz;
+
+    /*Test 1*/
+    testGx=0;
+    testGy=0;
+    testGz=0;
+
+    initalOrientation = qUnit();
+    expectedOrientation  = qUnit();
+
+    finalOrientation = getOrientation(1,initalOrientation,testGx,testGy,testGz);
+
+    compareQ(finalOrientation,expectedOrientation);
+
+    /*Test 2*/
+    testGx=1;
+    testGy=2;
+    testGz=3;
+
+    initalOrientation = qUnit();
+    expectedOrientation.re=-0.295551127493;
+    expectedOrientation.i=0.255321860045;
+    expectedOrientation.j=0.510643720091;
+    expectedOrientation.k=0.765965580136;
+
+    finalOrientation = getOrientation(1,initalOrientation,testGx,testGy,testGz);
+
+    compareQ(finalOrientation,expectedOrientation);
+
+    /*Test 3 (this one multiplies by the result of test 2*/
+    testGx=0;
+    testGy=-2;
+    testGz=2;
+
+    initalOrientation = finalOrientation;
+
+    expectedOrientation.re=-0.22442;
+    expectedOrientation.i=-0.85184;
+    expectedOrientation.j=0.464392;
+    expectedOrientation.k=0.0913491;
+
+    finalOrientation = getOrientation(1,initalOrientation,testGx,testGy,testGz);
+
+    compareQ(finalOrientation,expectedOrientation);
+    }
 
 /*helper array of all the tests, for simplifying main() and just to try it out*/
 void (*predictionTests[])(void)={
@@ -364,6 +471,8 @@ void (*predictionTests[])(void)={
     qSumTest,
     qNormTest,
     qConjugateTest,
+    basicGetOrientationTest,
+    getOrientationTest,
 };
 
 void setUp(void){}
