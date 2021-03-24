@@ -4,8 +4,8 @@
 void compareSquareMatrix(double testArray[MATRIX_SIZE][MATRIX_SIZE], 
     double expectedArray[MATRIX_SIZE][MATRIX_SIZE]){
      for(int i=0;i<MATRIX_SIZE;i++){
-        for(int ii=0;ii<MATRIX_SIZE;ii++){
-            TEST_ASSERT_EQUAL_FLOAT(expectedArray[i][ii],testArray[i][ii]);
+        for(int j=0;j<MATRIX_SIZE;j++){
+            TEST_ASSERT_EQUAL_FLOAT(expectedArray[i][j],testArray[i][j]);
         }
     }
 }
@@ -24,7 +24,7 @@ void matMultTest(void){
     //for this one, I tried more tests. Hopefully all testing different cases here.
 
     int numMats = 4;
-    double testMats[4][MATRIX_SIZE][MATRIX_SIZE] = {
+    double testMats[][MATRIX_SIZE][MATRIX_SIZE] = {
         {{1,2},{3,4}},
         {{-5,-6},{-7,-8}},
         {{0,0},{0,0}},
@@ -42,8 +42,8 @@ void matMultTest(void){
     
     int resultIndex=0;
     for(int i=0;i<numMats;i++){
-        for(int ii=i+1;ii<numMats;ii++){
-            matMult(testMats[i],testMats[ii],result);
+        for(int j=i+1;j<numMats;j++){
+            matMult(testMats[i],testMats[j],result);
             compareSquareMatrix(result,expectedResults[resultIndex]);
             resultIndex++;
         }
