@@ -100,8 +100,7 @@ int crc32_test_datagrams_from_path(char path[], int crcStart, int dummyBytes){
     }
 
     // printf("ERRORS: %d, TESTS: %d\n", errorsFound, numDatagrams);
-    //since this should theoretically find errors sometimes, I'm giving the test a 5% MOE 
-    return (double)errorsFound / numDatagrams < 0.05; 
+    return !errorsFound;
 }
 
 //We can use this function as a template to write other interpretImuData test cases. 
