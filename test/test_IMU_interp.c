@@ -6,7 +6,7 @@
  * Declarations
  ******************************************************************************/
 
-int crc32_test_datagram_from_path(char[], int);
+int crc32_test_datagrams_from_path(char[], int, int);
 
 /*******************************************************************************
  * Tests
@@ -40,37 +40,67 @@ void crc32_test2(void){
 
 void crc32_test_datagram1(void) {
     //The first datagram copied from imu_uart_data_2.txt
-    //For identifier 0x93 (which this message is), there are 34 bytes preceding the CRC, so the CRC starts here at byte # 34
-    int result = crc32_test_datagram_from_path("../../data/imu/imu_datagram_test1.txt", 34); 
+    int result = crc32_test_datagrams_from_path("../../data/imu/imu_datagram_test1.txt", 34, 2);
     TEST_ASSERT_EQUAL_INT(1, result);
 }
 
-void crc32_test_datagram2(void) {
-     //The first datagram copied from imu_uart_data_3.txt
-    //For identifier 0x93 (which this message is), there are 34 bytes preceding the CRC, so the CRC starts here at byte # 34
-    int result = crc32_test_datagram_from_path("../../data/imu/imu_datagram_test2.txt", 34);
+void crc32_test_uart2(void) {
+    int result = crc32_test_datagrams_from_path("../../data/imu/imu_uart_data_2.txt", 34, 2); 
     TEST_ASSERT_EQUAL_INT(1, result);
 }
 
-int crc32_test_datagram_from_path(char path[], int crcStart){
+void crc32_test_uart3(void) {
+    int result = crc32_test_datagrams_from_path("../../data/imu/imu_uart_data_3.txt", 34, 2); 
+    TEST_ASSERT_EQUAL_INT(1, result);
+}
+
+void crc32_test_error(void) {
+    int result = crc32_test_datagrams_from_path("../../data/imu/imu_datagram_error.txt", 34, 2); 
+    TEST_ASSERT_EQUAL_INT(0, result); //i've edited this text file so the the result should be false
+}
+
+//For identifier 0x93 (which all the messages we have so far are), there are 34 bytes preceding the CRC, so the CRC starts at byte # 34,
+// and we need 2 dummy bytes (for message of length 40, so divisible by 4 bytes or 32 bits)
+int crc32_test_datagrams_from_path(char path[], int crcStart, int dummyBytes){
     crc32_initTable();
     byte datagram[64];
     FILE *f = fopen(path, "r");
+    
+    int reachedEOF = 0; //flag checking if we've reached the end of file
+    int errorsFound = 0; //counter holding number of errors detected by crc check
+    int numDatagrams = 0; //counter holding number of datagrams we've run the crc check on
+    int datagramLength = crcStart + 4 + 2; //length is the (# of bytes preceding crc) + (4 bytes for crc) + (2 bytes for <CR> and <LF>)
 
-    //parse datagram
-    for(int i = 0; i < 64; i++) {
-        int curByte = 0;
-        fscanf(f, "%d ", &curByte);
-        datagram[i] = curByte;
+    while(!reachedEOF) {
+        //parse datagram
+        for(int i = 0; i < datagramLength; i++) {
+            int curByte = 0;
+
+            if(fscanf(f, "%d ", &curByte) == EOF) {
+                reachedEOF = 1;
+                break;
+            }
+
+            datagram[i] = curByte;
+        }
+
+        if(!reachedEOF) {
+            uint msgCrc = (datagram[crcStart] << 24) + (datagram[crcStart + 1] << 16) +  
+            (datagram[crcStart + 2] << 8) + datagram[crcStart + 3];
+
+            //For identifier 0x93 we add 2 dummy bytes to get a multiple of 4 bytes or 32 bits
+            uint expectedCrc = crc32(datagram, crcStart, 2);
+            // printf("Message CRC: %x, Expected CRC: %x\n", msgCrc, expectedCrc);
+
+            numDatagrams++;
+            if(msgCrc != expectedCrc) {
+                errorsFound++;
+            }
+        }
     }
 
-    uint msgCrc = (datagram[crcStart] << 24) + (datagram[crcStart + 1] << 16) +  
-		(datagram[crcStart + 2] << 8) + datagram[crcStart + 3];
-
-    //For identifier 0x93 we add 2 dummy bytes to get a multiple of 4 bytes or 32 bits
-    uint expectedCrc = crc32(datagram, crcStart, 2);
-
-    return msgCrc == expectedCrc ? 1 : 0;
+    // printf("ERRORS: %d, TESTS: %d\n", errorsFound, numDatagrams);
+    return !errorsFound;
 }
 
 //We can use this function as a template to write other interpretImuData test cases. 
@@ -112,7 +142,9 @@ int main (void){
     RUN_TEST(crc32_test1);
     RUN_TEST(crc32_test2);
     RUN_TEST(crc32_test_datagram1);
-    RUN_TEST(crc32_test_datagram2);
+    RUN_TEST(crc32_test_uart2);
+    RUN_TEST(crc32_test_uart3);
+    RUN_TEST(crc32_test_error);
 
     return UNITY_END();
 }
