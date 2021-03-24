@@ -3,7 +3,7 @@
  * Includes
  ******************************************************************************/
 
-#include "prediction.h"
+#include <prediction.h>
 #include <math.h>
 
 /*******************************************************************************
@@ -74,17 +74,29 @@ quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
 	return qNorm(qSum(qPrev, qMult(omega, qPrev)));
 }
 
-// Gets orientation of quaternion the "proper" way
-// This is the best explanation I could find of how it works: 
-// https://math.stackexchange.com/questions/39553/how-do-i-apply-an-angular-velocity-vector3-to-a-unit-quaternion-orientation
+/**
+ * produces a quaternion representing orientation based on a previous orientation
+ * and a 3d angular velocity vector
+ * 
+ * based on https://math.stackexchange.com/questions/39553/how-do-i-apply-an-angular-velocity-vector3-to-a-unit-quaternion-orientation
+ *
+ * @param deltaT time interval
+ * @param qPrev quaternion representing the previous orientation
+ * @param gx x component of angular velocity (rads/sec)
+ * @param gy y component of angular velocity (rads/sec)
+ * @param gz z component of angular velocity (rads/sec)
+ * @return new quaternion representing orientation 
+ */
 quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
 		double gz) {
 	quaternion q;
 	double norm = deltaT * sqrt(gx * gx + gy * gy + gz * gz);
 	q.re = cos(norm / 2);
 	double sinNorm = sin(norm / 2); // Variable to avoid repeated sin computation
-	// Check to make sure we don't get a divide by 0 error. Note that in the case that norm is 0 we want the vector component
-	// of q to be zeros because this represents no rotation (i.e. multiplication by unity)
+	/* Check to make sure we don't get a divide by 0 error. 
+	   Note that in the case that norm is 0 we want the vector component
+	   of q to be zeros because this represents no rotation (i.e. multiplication
+	   by unity)*/
 	if (sinNorm != 0) {
 		q.i = deltaT * gx / norm * sinNorm;
 		q.j = deltaT * gy / norm * sinNorm;

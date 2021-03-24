@@ -11,6 +11,8 @@
  ******************************************************************************/
 
 #define MATRIX_SIZE 2
+#define PI acos(-1)
+
 
 // Quaternion struct definition
 typedef struct quaternions {
@@ -37,6 +39,19 @@ quaternion qConjugate(quaternion q);
 quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
 		double gy, double gz);
 
+/**
+ * produces a quaternion representing orientation based on a previous orientation
+ * and a 3d angular velocity vector
+ * 
+ * based on https://math.stackexchange.com/questions/39553/how-do-i-apply-an-angular-velocity-vector3-to-a-unit-quaternion-orientation
+ *
+ * @param deltaT time interval
+ * @param qPrev quaternion representing the previous orientation
+ * @param gx x component of angular velocity (rads/sec)
+ * @param gy y component of angular velocity (rads/sec)
+ * @param gz z component of angular velocity (rads/sec)
+ * @return new quaternion representing orientation 
+ */
 quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
 		double gz);
 
