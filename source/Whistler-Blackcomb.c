@@ -35,6 +35,7 @@
 #include "hal_io.h"
 #include "hal_uart.h"
 #include "hal_sd.h"
+#include "hal_can.h"
 
 /* Radio Stuff */
 #include "xbee/wpan.h"
@@ -48,12 +49,13 @@
 #define PI acos(-1)
 #define EVER ;;
 
-/* Task priorities. */
+/* Task priorities. Will update once more finalized */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define radio_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define log_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define state_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define can_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
@@ -63,6 +65,7 @@ static void BlinkTask(void *pv);
 static void RadioTask(void *pv);
 static void LogTask(void *pv);
 static void StateTask(void *pv);
+static void CanTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -153,6 +156,15 @@ int main(void)
 	configMINIMAL_STACK_SIZE + 500,
 	NULL,
 	state_task_PRIORITY,
+	NULL) != pdPASS) {
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
+	if (error = xTaskCreate(CanTask, "Can Task",
+	configMINIMAL_STACK_SIZE + 500,
+	NULL,
+	can_task_PRIORITY,
 	NULL) != pdPASS) {
 		printf("Task init failed: %d\n", error);
 		for (;;)
@@ -365,4 +377,14 @@ static void StateTask(void *pv) {
 	}
 	
 
+}
+
+uint8_t message[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77};
+static void CanTask(void *pv) {
+	hal_can_handle_t can_handle;
+	canInit(&can_handle, CAN1);
+	canSend(&can_handle, 0x123, message, 8);
+	for(EVER){
+		vTaskDelay(pdMS_TO_TICKS(100));
+	}
 }

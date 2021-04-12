@@ -61,6 +61,11 @@
                         <data>true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="Peripheral" resourceId="CAN1" description="Peripheral CAN1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="SWComponent" resourceId="platform.drivers.common" description="Pins initialization requires the COMMON Driver in the project." problem_level="2" source="Pins:BOARD_InitPins">
                      <feature name="enabled" evaluation="equal" configuration="core0">
                         <data>true</data>
@@ -145,6 +150,8 @@
                         <pin_feature name="pull_enable" value="enable"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="CAN1" signal="TX" pin_num="45" pin_signal="ADC0_SE17/PTE24/CAN1_TX/UART4_TX/I2C0_SCL/EWM_OUT_b"/>
+                  <pin peripheral="CAN1" signal="RX" pin_num="46" pin_signal="ADC0_SE18/PTE25/LLWU_P21/CAN1_RX/UART4_RX/I2C0_SDA/EWM_IN"/>
                </pins>
             </function>
          </functions_list>
@@ -229,6 +236,16 @@
       </dcdx>
       <periphs name="Peripherals" version="8.0" enabled="true" update_project_code="true">
          <dependencies>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.flexcan" description="FLEXCAN Driver not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
+               <feature name="enabled" evaluation="equal">
+                  <data type="Boolean">true</data>
+               </feature>
+            </dependency>
+            <dependency resourceType="SWComponent" resourceId="platform.drivers.flexcan" description="Unsupported version of the FLEXCAN Driver in the toolchain/IDE project. Required: ${required_value}, actual: ${actual_value}. Project might not compile correctly." problem_level="1" source="Peripherals">
+               <feature name="version" evaluation="equivalent">
+                  <data type="Version">2.5.0</data>
+               </feature>
+            </dependency>
             <dependency resourceType="SWComponent" resourceId="platform.drivers.uart" description="UART Driver not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
                <feature name="enabled" evaluation="equal">
                   <data type="Boolean">true</data>
@@ -252,6 +269,26 @@
                <description></description>
                <options/>
                <dependencies>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="CAN1.can_rxd" description="Signal RX of the peripheral CAN1 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="CAN1.can_txd" description="Signal TX of the peripheral CAN1 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="ClockOutput" resourceId="Bus_clock" description="Bus clock is inactive." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="ClockOutput" resourceId="Bus_clock" description="Bus clock is inactive." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="ClockOutput" resourceId="System_clock" description="System clock is inactive." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
                      <feature name="frequency" evaluation="greaterThan">
                         <data type="Frequency" unit="Hz">0</data>
@@ -299,6 +336,111 @@
                   </dependency>
                </dependencies>
                <instances>
+                  <instance name="CAN1" uuid="3e416742-7305-4c59-a6cb-56dee695c367" type="flexcan" type_id="flexcan_477f6be3462ee2961b67c0825ef495e2" mode="interrupts" peripheral="CAN1" enabled="true" comment="" custom_name_enabled="false">
+                     <config_set name="interruptsCfg">
+                        <setting name="messageBufferIrqs" value="0"/>
+                        <set name="interruptsEnable">
+                           <selected/>
+                        </set>
+                        <setting name="enable_ored_mb_irq" value="false"/>
+                        <struct name="interrupt_ored_mb">
+                           <setting name="IRQn" value="CAN1_ORed_Message_buffer_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <setting name="enable_busoff_irq" value="false"/>
+                        <struct name="interrupt_busoff">
+                           <setting name="IRQn" value="CAN1_Bus_Off_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <setting name="enable_error_irq" value="false"/>
+                        <struct name="interrupt_error">
+                           <setting name="IRQn" value="CAN1_Error_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <setting name="enable_tx_irq" value="false"/>
+                        <struct name="interrupt_tx">
+                           <setting name="IRQn" value="CAN1_Tx_Warning_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <setting name="enable_rx_irq" value="false"/>
+                        <struct name="interrupt_rx">
+                           <setting name="IRQn" value="CAN1_Rx_Warning_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                        <setting name="enable_wakeup_irq" value="false"/>
+                        <struct name="interrupt_wakeup">
+                           <setting name="IRQn" value="CAN1_Wake_Up_IRQn"/>
+                           <setting name="enable_interrrupt" value="enabled"/>
+                           <setting name="enable_priority" value="false"/>
+                           <setting name="priority" value="0"/>
+                           <setting name="enable_custom_name" value="false"/>
+                        </struct>
+                     </config_set>
+                     <config_set name="fsl_flexcan">
+                        <struct name="can_config">
+                           <setting name="clockSource" value="kFLEXCAN_ClkSrcPeri"/>
+                           <setting name="clockSourceFreq" value="BOARD_BootClockRUN"/>
+                           <setting name="wakeupSrc" value="kFLEXCAN_WakeupSrcUnfiltered"/>
+                           <setting name="baudRate" value="1000000"/>
+                           <setting name="maxMbNum" value="16"/>
+                           <setting name="enableLoopBack" value="false"/>
+                           <setting name="enableTimerSync" value="true"/>
+                           <setting name="enableSelfWakeup" value="false"/>
+                           <setting name="enableIndividMask" value="false"/>
+                           <setting name="disableSelfReception" value="false"/>
+                           <setting name="enableListenOnlyMode" value="false"/>
+                           <struct name="timingConfig">
+                              <setting name="propSeg" value="2"/>
+                              <setting name="phaseSeg1" value="4"/>
+                              <setting name="phaseSeg2" value="3"/>
+                              <setting name="rJumpwidth" value="2"/>
+                              <struct name="bitTime"/>
+                           </struct>
+                        </struct>
+                        <setting name="enableRxFIFO" value="false"/>
+                        <struct name="rxFIFO">
+                           <setting name="idFilterTable" value=""/>
+                           <setting name="idFilterNum" value="num0"/>
+                           <setting name="idFilterType" value="kFLEXCAN_RxFifoFilterTypeA"/>
+                           <setting name="priority" value="kFLEXCAN_RxFifoPrioLow"/>
+                        </struct>
+                        <array name="channels">
+                           <struct name="0">
+                              <setting name="mbID" value="0"/>
+                              <setting name="mbType" value="mbRx"/>
+                              <struct name="rxMb">
+                                 <setting name="id" value="0"/>
+                                 <setting name="format" value="kFLEXCAN_FrameFormatStandard"/>
+                                 <setting name="type" value="kFLEXCAN_FrameTypeData"/>
+                              </struct>
+                           </struct>
+                           <struct name="1">
+                              <setting name="mbID" value="1"/>
+                              <setting name="mbType" value="mbTx"/>
+                              <struct name="rxMb">
+                                 <setting name="id" value="0"/>
+                                 <setting name="format" value="kFLEXCAN_FrameFormatStandard"/>
+                                 <setting name="type" value="kFLEXCAN_FrameTypeData"/>
+                              </struct>
+                           </struct>
+                        </array>
+                     </config_set>
+                  </instance>
                   <instance name="UART0" uuid="c7baad50-e524-45f8-b52a-6ae56163adae" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART0" enabled="true" comment="" custom_name_enabled="false">
                      <config_set name="uartConfig_t" quick_selection="QuickSelection1">
                         <struct name="uartConfig">
