@@ -20,6 +20,7 @@ pin_labels:
 - {pin_num: '109', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, label: IMU_UART_RX, identifier: IMU_UART_RX;IMU_UART_TX}
 - {pin_num: '129', pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, label: RADIO_UART_RX, identifier: RADIO_UART_RX}
 - {pin_num: '130', pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA, label: RADIO_UART_TX, identifier: RADIO_UART_TX}
+- {pin_num: '47', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, label: CAN1_STBN, identifier: CAN1_STBN}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -63,6 +64,7 @@ BOARD_InitPins:
   - {pin_num: '3', peripheral: SDHC, signal: DCLK, pin_signal: ADC1_SE6a/PTE2/LLWU_P1/SPI1_SCK/UART1_CTS_b/SDHC0_DCLK/TRACE_D2, pull_select: up, pull_enable: enable}
   - {pin_num: '45', peripheral: CAN1, signal: TX, pin_signal: ADC0_SE17/PTE24/CAN1_TX/UART4_TX/I2C0_SCL/EWM_OUT_b}
   - {pin_num: '46', peripheral: CAN1, signal: RX, pin_signal: ADC0_SE18/PTE25/LLWU_P21/CAN1_RX/UART4_RX/I2C0_SDA/EWM_IN}
+  - {pin_num: '47', peripheral: GPIOE, signal: 'GPIO, 26', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, direction: OUTPUT, gpio_init_state: 'true'}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -90,6 +92,13 @@ void BOARD_InitPins(void)
     };
     /* Initialize GPIO functionality on pin PTC5 (pin 110)  */
     GPIO_PinInit(BOARD_INITPINS_LED_BUILTIN_GPIO, BOARD_INITPINS_LED_BUILTIN_PIN, &LED_BUILTIN_config);
+
+    gpio_pin_config_t CAN1_STBN_config = {
+        .pinDirection = kGPIO_DigitalOutput,
+        .outputLogic = 1U
+    };
+    /* Initialize GPIO functionality on pin PTE26 (pin 47)  */
+    GPIO_PinInit(BOARD_INITPINS_CAN1_STBN_GPIO, BOARD_INITPINS_CAN1_STBN_PIN, &CAN1_STBN_config);
 
     /* PORTB16 (pin 95) is configured as UART0_RX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_TX_PORT, BOARD_INITPINS_DEBUG_UART_TX_PIN, kPORT_MuxAlt3);
@@ -158,6 +167,9 @@ void BOARD_InitPins(void)
 
     /* PORTE25 (pin 46) is configured as CAN1_RX */
     PORT_SetPinMux(PORTE, 25U, kPORT_MuxAlt2);
+
+    /* PORTE26 (pin 47) is configured as PTE26 */
+    PORT_SetPinMux(BOARD_INITPINS_CAN1_STBN_PORT, BOARD_INITPINS_CAN1_STBN_PIN, kPORT_MuxAsGpio);
 
     /* PORTE3 (pin 4) is configured as SDHC0_CMD */
     PORT_SetPinMux(PORTE, 3U, kPORT_MuxAlt4);

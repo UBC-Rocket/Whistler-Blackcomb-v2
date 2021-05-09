@@ -10,9 +10,8 @@
  * Included files
  **********************************************************************************************************************/
 #include "fsl_common.h"
-#include "fsl_flexcan.h"
-#include "fsl_clock.h"
 #include "fsl_uart.h"
+#include "fsl_clock.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -22,10 +21,6 @@ extern "C" {
  * Definitions
  **********************************************************************************************************************/
 /* Definitions for BOARD_InitPeripherals functional group */
-/* Definition of peripheral ID */
-#define CAN1_PERIPHERAL CAN1
-/* Definition of the clock source frequency */
-#define CAN1_CLOCK_SOURCE 48000000UL
 /* Definition of peripheral ID */
 #define UART0_PERIPHERAL UART0
 /* Definition of the clock source frequency */
@@ -42,10 +37,6 @@ extern "C" {
 /***********************************************************************************************************************
  * Global variables
  **********************************************************************************************************************/
-extern const flexcan_config_t CAN1_config;
-/* Message buffer 0 configuration structure */
-extern const flexcan_rx_mb_config_t CAN1_rx_mb_config_0;
-extern flexcan_rx_fifo_config_t CAN1_rx_fifo_config;
 extern const uart_config_t UART0_config;
 extern const uart_config_t UART1_config;
 extern const uart_config_t UART2_config;
