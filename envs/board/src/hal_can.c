@@ -9,10 +9,12 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-uint32_t rxFifoFilter[] = { FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 0, 0),
-		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 1, 0),
+uint32_t rxFifoFilter[4] = {
+		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 0, 0),
+//		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 1, 0),
 		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x123, 0, 0),
-		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x124, 1, 0) };
+//		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x123, 1, 0)
+};
 
 /*******************************************************************************
  * Implementations
@@ -36,6 +38,8 @@ static void flexcan_callback(CAN_Type *base, flexcan_handle_t *handle,
 //                txComplete = true;
 //            }
             break;
+        case kStatus_FLEXCAN_ErrorStatus:
+        	break;
 	default:
 		break;
 	}
@@ -46,16 +50,10 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	FLEXCAN_GetDefaultConfig(&handle->config);
 	/* Change configuration settings here before init */
 	handle->config.clkSrc = CAN_CLK_SOURCE;
+	handle->config.disableSelfReception = true;
 	FLEXCAN_Init(handle->base, &handle->config, CAN_CLK_FREQ);
 
-	/* Sets up TX buffer. 8 offset because of FIFO buffer */
-	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
-			true);
-
-	FLEXCAN_TransferCreateHandle(handle->base, &(handle->transfer_handle),
-			flexcan_callback, NULL);
-
-//	/* Sets up receive FIFO, got from here: http://eet.etec.wwu.edu/KurtTaylor/project/docs/Bibleography/MCU/ConnSoftDocs/Kinetis%20SDK%20v2.0.0%20API%20Reference%20Manual/group__flexcan__driver.html */
+	/* Sets up receive FIFO, got from here: http://eet.etec.wwu.edu/KurtTaylor/project/docs/Bibleography/MCU/ConnSoftDocs/Kinetis%20SDK%20v2.0.0%20API%20Reference%20Manual/group__flexcan__driver.html */
 	handle->fifo_config.idFilterTable = rxFifoFilter;
 	handle->fifo_config.idFilterType = kFLEXCAN_RxFifoFilterTypeA;
 	handle->fifo_config.idFilterNum = sizeof(rxFifoFilter)
@@ -63,13 +61,21 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	handle->fifo_config.priority = kFLEXCAN_RxFifoPrioHigh;
 	FLEXCAN_SetRxFifoConfig(handle->base, &handle->fifo_config, true);
 
+	/* Sets up TX buffer. 8 offset because of FIFO buffer */
+	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
+			true);
 
+
+	FLEXCAN_TransferCreateHandle(handle->base, &(handle->transfer_handle),
+			flexcan_callback, NULL);
 
 }
 
-static flexcan_fifo_transfer_t rxFrame;
+static flexcan_fifo_transfer_t fifo_transfer;
 int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
-	FLEXCAN_TransferReceiveFifoNonBlocking(handle->base, &(handle->transfer_handle), &rxFrame);
+	fifo_transfer.frame = rxFrame;
+	if(FLEXCAN_TransferReceiveFifoNonBlocking(handle->base, &(handle->transfer_handle), &fifo_transfer)!=kStatus_Success)
+		printf("CAN Receive Failed!\n");
 }
 
 static flexcan_frame_t txFrame;

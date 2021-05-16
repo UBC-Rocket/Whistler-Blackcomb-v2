@@ -380,10 +380,12 @@ static void StateTask(void *pv) {
 }
 
 uint8_t message[] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88};
+flexcan_frame_t rxFrame;
 static void CanTask(void *pv) {
 	hal_can_handle_t can_handle;
 	canInit(&can_handle, CAN1);
-	canSend(&can_handle, 0x123, message, 8);
+//	canSend(&can_handle, 0x123, message, 8);
+	canReceive(&can_handle, &rxFrame);
 	for(EVER){
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
