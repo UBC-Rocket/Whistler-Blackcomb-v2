@@ -21,24 +21,23 @@ uint32_t rxFifoFilter[] = {
  * Implementations
  ******************************************************************************/
 
+/**
+ * Callback function for status change, documentation for most parameters in
+ * fsl_flexcan.h
+ *
+ * userData is the hal_can_handle_t for can instance calling this function
+ */
 static void flexcan_callback(CAN_Type *base, flexcan_handle_t *handle,
 		status_t status, uint32_t result, void *userData) {
 	hal_can_handle_t* hal_handle = (hal_can_handle_t*)userData;
+	/* Note: it's important to use FromISR versions of semaphore taking, since
+	 * normal versions won't work inside a interrupt */
 	switch (status) {
-	/* Process FlexCAN Rx event. */
         case kStatus_FLEXCAN_RxIdle:
-//            if (RX_MESSAGE_BUFFER_NUM == result)
-//            {
-//                rxComplete = true;
-//            }
             break;
 
-        /* Process FlexCAN Tx event. */
         case kStatus_FLEXCAN_TxIdle:
-//            if (TX_MESSAGE_BUFFER_NUM == result)
-//            {
-//                txComplete = true;
-//            }
+        	xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
             break;
         case kStatus_FLEXCAN_RxFifoIdle:
         	xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
@@ -67,13 +66,14 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	FLEXCAN_SetRxFifoConfig(handle->base, &handle->fifo_config, true);
 
 	/* Sets up TX buffer. 8 offset because of FIFO buffer */
-//	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
-//			true);
+	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
+			true);
 
 
 	FLEXCAN_TransferCreateHandle(handle->base, &(handle->transfer_handle),
 			flexcan_callback, handle);
 
+	/* Semaphores are used to make functions blocking */
 	handle->rxSem = xSemaphoreCreateBinary();
 	handle->txSem = xSemaphoreCreateBinary();
 	xSemaphoreGive(handle->rxSem);
@@ -92,28 +92,35 @@ int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 	xSemaphoreGive(handle->rxSem);
 }
 
-static flexcan_frame_t txFrame;
-int canSend(hal_can_handle_t *handle, uint32_t id, const uint8_t *buffer,
+int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 		uint32_t length) {
-	/* Doesn't just accept this directly because macros are unavailable in
-	 * x86 */
-	txFrame.format = (uint8_t) kFLEXCAN_FrameFormatStandard;
-	txFrame.type = (uint8_t) kFLEXCAN_FrameTypeData;
-	txFrame.id = FLEXCAN_ID_STD(id);
-	txFrame.length = (uint8_t) length;
-	txFrame.dataWord0 =
-			CAN_WORD0_DATA_BYTE_0(
-					buffer[0]) | CAN_WORD0_DATA_BYTE_1(buffer[1]) | CAN_WORD0_DATA_BYTE_2(buffer[2]) |
-					CAN_WORD0_DATA_BYTE_3(buffer[3]);
-	txFrame.dataWord1 =
-			CAN_WORD1_DATA_BYTE_4(
-					buffer[4]) | CAN_WORD1_DATA_BYTE_5(buffer[5]) | CAN_WORD1_DATA_BYTE_6(buffer[6]) |
-					CAN_WORD1_DATA_BYTE_7(buffer[7]);
+	if(xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE){
+		/* Doesn't just accept this directly because macros are unavailable in
+		 * x86
+		 * Instead sets up transmit packet in this function*/
+		flexcan_frame_t txFrame;
+		txFrame.format = (uint8_t) kFLEXCAN_FrameFormatStandard;
+		txFrame.type = (uint8_t) kFLEXCAN_FrameTypeData;
+		txFrame.id = FLEXCAN_ID_STD(id);
+		txFrame.length = (uint8_t) length;
+		uint8_t *buffer = packet.c;
+		txFrame.dataWord0 =
+				CAN_WORD0_DATA_BYTE_0(
+						buffer[0]) | CAN_WORD0_DATA_BYTE_1(buffer[1]) | CAN_WORD0_DATA_BYTE_2(buffer[2]) |
+						CAN_WORD0_DATA_BYTE_3(buffer[3]);
+		txFrame.dataWord1 =
+				CAN_WORD1_DATA_BYTE_4(
+						buffer[4]) | CAN_WORD1_DATA_BYTE_5(buffer[5]) | CAN_WORD1_DATA_BYTE_6(buffer[6]) |
+						CAN_WORD1_DATA_BYTE_7(buffer[7]);
 
-	handle->txXfer.mbIdx = (uint8_t) (8+FLEXCAN_GetInstance(handle->base));
-	handle->txXfer.frame = &txFrame;
+		handle->txXfer.mbIdx = (uint8_t) (8+FLEXCAN_GetInstance(handle->base));
+		handle->txXfer.frame = &txFrame;
 
-	if(FLEXCAN_TransferSendNonBlocking(handle->base,
-			&(handle->transfer_handle), &(handle->txXfer))!=kStatus_Success)
-		printf("CAN Send Failed!\n");
+		if(FLEXCAN_TransferSendNonBlocking(handle->base,
+				&(handle->transfer_handle), &(handle->txXfer))!=kStatus_Success)
+			printf("CAN Send Failed!\n");
+	}
+	/* Wait until message sent before returning */
+	xSemaphoreTake(handle->rxSem, portMAX_DELAY);
+	xSemaphoreGive(handle->rxSem);
 }

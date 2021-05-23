@@ -364,10 +364,10 @@ static void LogTask(void *pv) {
 	HALFILE file;
 	sdInit();
 	for (EVER) {
-		sdMkDir("/testdir");
-		sdOpen(&file, "/testdir/testfile.txt");
-		sdWrite(&file, "test data\n");
-		sdClose(&file);
+//		sdMkDir("/testdir");
+//		sdOpen(&file, "/testdir/testfile.txt");
+//		sdWrite(&file, "test data\n");
+//		sdClose(&file);
 		vTaskDelay(pdMS_TO_TICKS(10000));
 	}
 }
@@ -382,7 +382,7 @@ static void StateTask(void *pv) {
 
 }
 
-uint8_t message[] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8};
+hal_can_packet_t message = { 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8 };
 flexcan_frame_t rxFrame;
 static void CanTask(void *pv) {
 	hal_can_handle_t can_handle;
@@ -392,6 +392,7 @@ static void CanTask(void *pv) {
 		canReceive(&can_handle, &rxFrame);
 		printf("0x%x\n", rxFrame.dataWord0);
 		printf("0x%x\n", rxFrame.dataWord1);
+//		canSend(&can_handle, 0x123, message, 8);
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

@@ -17,6 +17,15 @@
  * Definitions
  ******************************************************************************/
 
+/*
+ * Helper union to keep track of CAN frame packets in different data types
+ */
+typedef union _hal_can_packet_t {
+	uint8_t c[8];
+	uint32_t i[2];
+	float f[2];
+} hal_can_packet_t;
+
 #ifdef COMPILE_BOARD
 
 typedef struct _hal_can_handle_t {
@@ -106,7 +115,7 @@ int canReceive(hal_can_handle_t *handle, flexcan_frame_t* rxFrame);
  * @param length length of buffer, must be 8 or less
  * @return ?
  */
-int canSend(hal_can_handle_t *handle, uint32_t id, const uint8_t* buffer, uint32_t length);
+int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet, uint32_t length);
 
 
 #endif
