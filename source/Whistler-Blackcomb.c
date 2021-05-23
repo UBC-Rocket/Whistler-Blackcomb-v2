@@ -106,6 +106,9 @@ int main(void)
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(RADIO_UART_RX_TX_IRQn, 5);
+	/* Have to set these or else semaphore functions in interrupts won't work */
+	halNvicSetPriority(CAN0_ORed_Message_buffer_IRQn, 5);
+	halNvicSetPriority(CAN1_ORed_Message_buffer_IRQn, 5);
 
 	BaseType_t error;
 
@@ -385,8 +388,10 @@ static void CanTask(void *pv) {
 	hal_can_handle_t can_handle;
 	canInit(&can_handle, CAN1);
 	canSend(&can_handle, 0x123, message, 8);
-	canReceive(&can_handle, &rxFrame);
 	for(EVER){
+		canReceive(&can_handle, &rxFrame);
+		printf("0x%x\n", rxFrame.dataWord0);
+		printf("0x%x\n", rxFrame.dataWord1);
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }

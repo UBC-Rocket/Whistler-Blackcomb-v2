@@ -23,6 +23,7 @@ uint32_t rxFifoFilter[] = {
 
 static void flexcan_callback(CAN_Type *base, flexcan_handle_t *handle,
 		status_t status, uint32_t result, void *userData) {
+	hal_can_handle_t* hal_handle = (hal_can_handle_t*)userData;
 	switch (status) {
 	/* Process FlexCAN Rx event. */
         case kStatus_FLEXCAN_RxIdle:
@@ -39,6 +40,9 @@ static void flexcan_callback(CAN_Type *base, flexcan_handle_t *handle,
 //                txComplete = true;
 //            }
             break;
+        case kStatus_FLEXCAN_RxFifoIdle:
+        	xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
+        	break;
         case kStatus_FLEXCAN_ErrorStatus:
         	break;
 	default:
@@ -68,15 +72,24 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 
 
 	FLEXCAN_TransferCreateHandle(handle->base, &(handle->transfer_handle),
-			flexcan_callback, NULL);
+			flexcan_callback, handle);
 
+	handle->rxSem = xSemaphoreCreateBinary();
+	handle->txSem = xSemaphoreCreateBinary();
+	xSemaphoreGive(handle->rxSem);
+	xSemaphoreGive(handle->txSem);
 }
 
-static flexcan_fifo_transfer_t fifo_transfer;
 int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
-	fifo_transfer.frame = rxFrame;
-	if(FLEXCAN_TransferReceiveFifoNonBlocking(handle->base, &(handle->transfer_handle), &fifo_transfer)!=kStatus_Success)
-		printf("CAN Receive Failed!\n");
+	if(xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE){
+		handle->fifo_transfer.frame = rxFrame;
+		if(FLEXCAN_TransferReceiveFifoNonBlocking(handle->base, &(handle->transfer_handle), &(handle->fifo_transfer))!=kStatus_Success)
+			printf("CAN Receive Failed!\n");
+	}
+	if(xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE){
+		rxFrame = handle->fifo_transfer.frame;
+	}
+	xSemaphoreGive(handle->rxSem);
 }
 
 static flexcan_frame_t txFrame;

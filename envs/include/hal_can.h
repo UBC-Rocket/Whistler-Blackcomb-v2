@@ -4,9 +4,10 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-
 #ifdef COMPILE_BOARD
 #include "fsl_flexcan.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 #elif defined(COMPILE_x86)
 #include "MK66F18.h"
@@ -23,7 +24,10 @@ typedef struct _hal_can_handle_t {
 	flexcan_config_t config;
 	flexcan_rx_fifo_config_t fifo_config;
 	flexcan_handle_t transfer_handle;
+	flexcan_fifo_transfer_t fifo_transfer;
 	flexcan_mb_transfer_t txXfer;
+	SemaphoreHandle_t rxSem;
+	SemaphoreHandle_t txSem;
 } hal_can_handle_t;
 
 #elif defined(COMPILE_x86)
