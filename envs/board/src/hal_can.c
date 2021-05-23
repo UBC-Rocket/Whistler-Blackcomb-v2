@@ -5,12 +5,13 @@
 #include "hal_can.h"
 #include "fsl_flexcan.h"
 #include "board.h"
+#include "stdio.h"
 
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-uint32_t rxFifoFilter[4] = {
-		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 0, 0),
+uint32_t rxFifoFilter[] = {
+//		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 0, 0),
 //		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 1, 0),
 		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x123, 0, 0),
 //		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x123, 1, 0)
@@ -53,7 +54,7 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	handle->config.disableSelfReception = true;
 	FLEXCAN_Init(handle->base, &handle->config, CAN_CLK_FREQ);
 
-	/* Sets up receive FIFO, got from here: http://eet.etec.wwu.edu/KurtTaylor/project/docs/Bibleography/MCU/ConnSoftDocs/Kinetis%20SDK%20v2.0.0%20API%20Reference%20Manual/group__flexcan__driver.html */
+	/* Sets up receive FIFO, got from here: https://community.nxp.com/t5/Kinetis-Microcontrollers/FlexCAN-Fifo-SDK-2-0-example/m-p/718276 */
 	handle->fifo_config.idFilterTable = rxFifoFilter;
 	handle->fifo_config.idFilterType = kFLEXCAN_RxFifoFilterTypeA;
 	handle->fifo_config.idFilterNum = sizeof(rxFifoFilter)
@@ -62,8 +63,8 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	FLEXCAN_SetRxFifoConfig(handle->base, &handle->fifo_config, true);
 
 	/* Sets up TX buffer. 8 offset because of FIFO buffer */
-	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
-			true);
+//	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
+//			true);
 
 
 	FLEXCAN_TransferCreateHandle(handle->base, &(handle->transfer_handle),
