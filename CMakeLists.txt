@@ -14,6 +14,8 @@ enable_testing()
 
 add_executable(whistler-blackcomb source/Whistler-Blackcomb.c)
 
+add_library(freertos)
+
 add_subdirectory(envs/x86)
 add_subdirectory(common)
 add_subdirectory(external)
@@ -33,6 +35,17 @@ target_include_directories(whistler-blackcomb PUBLIC
     envs/x86/freertos/portable
     source
 )
+
+target_include_directories(freertos PUBLIC
+    
+    envs/include
+    envs/x86/include
+    envs/x86/freertos/include
+    envs/x86/freertos/portable/utils
+    envs/x86/freertos/portable
+    source
+)
+
 
 target_link_libraries(whistler-blackcomb m)
 
