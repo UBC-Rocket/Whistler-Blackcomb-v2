@@ -155,32 +155,6 @@ void bufferWraparoundTest_RTOS(void){
     vTaskStartScheduler();
 }
 
-
-// //this isn't going to be an actual test... Just needed a place to scratch some
-// //stuff out, and this was already setup.
-// void test_Test(void){
-//     cbufHandle_t radioBufRX;
-//     radioBufRX=cbufInit(8);
-
-//         uint8_t length=6;
-//         uint8_t maxMessage[256] = {1,2,3,4,5,6,7};
-//         uint8_t *briefMessage = pvPortMalloc(length*sizeof(uint8_t));
-//         for(int i=0;i<length+1;i++){
-//             briefMessage[i]=maxMessage[i];
-//         }
-//         cbufPut(radioBufRX,length,briefMessage);
-//         vPortFree(briefMessage);
-//     uint8_t outmessage[256];
-//     cbufGet(radioBufRX,outmessage);
-
-//     for(int i=0;i<length+1;i++){
-//         printf("%d\n",outmessage[i]);
-//     }
-
-// }
-
-
-
 void setUp(void){}
 void tearDown(void){}
 int main (void){
@@ -189,6 +163,5 @@ int main (void){
     RUN_TEST(initBufTest_RTOS);
     RUN_TEST(placeAndRecieveTest_RTOS);
     RUN_TEST(bufferWraparoundTest_RTOS);
-   // RUN_TEST(test_Test);
     return UNITY_END();
 }

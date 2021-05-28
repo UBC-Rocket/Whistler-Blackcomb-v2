@@ -10,11 +10,6 @@
 #include <stdbool.h>
 #include "FreeRTOS.h"
 #include "semphr.h" 
-
-
-
-
-
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -52,12 +47,6 @@ void cbufFree(cbufHandle_t cbuf);
  */
 void cbufReset(cbufHandle_t cbuf);
 
-/**
- * ForcePut always places data in buffer, overwriting old data
- * @param cbuf handle of buffer to write too
- * @param data data added to buffer (uint8_t)
- */
-void cbufForcePut(cbufHandle_t cbuf, uint8_t length, uint8_t *data);
 
 /**
  * Put places new data into buffer into the buffer if there is space. It will

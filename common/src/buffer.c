@@ -2,11 +2,10 @@
 
 
 
-//circular buffer with waste slot
 
-//"hidden" definiton of the circular buffer structure
 
- 
+
+//"hidden" definiton of the circular buffer structure 
 struct cbuf_t
 {
     uint8_t **buffer;
@@ -89,8 +88,6 @@ size_t cbufGetCapacity(cbufHandle_t cbuf)
     
 }
 
-
-//should be a lock here I think 
 size_t cbufGetSize(cbufHandle_t cbuf)
 {
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
@@ -154,40 +151,9 @@ static void retreat_pointer(cbufHandle_t cbuf)
 
 }
 
-// void cbufForcePut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
-// {
-//     assert(cbuf && cbuf->buffer);
-
-//     cbuf->buffer[cbuf->head] = length;
-//     advance_pointer(cbuf);
-
-//     for(int index=0;index<length;index++){
-//         cbuf->buffer[cbuf->head] = data[index];
-//         advance_pointer(cbuf);
-//     }    
-// }
-
-// int cbufGentlePut(cbufHandle_t cbuf, uint8_t data)
-// {
-//     int r = -1;
-
-//     assert(cbuf && cbuf->buffer);
-
-//     if (!cbufCheckFull(cbuf))
-//     {
-//         cbuf->buffer[cbuf->head] = data;
-//         advance_pointer(cbuf);
-//         r = 0;
-//     }
-
-//     return r;
-// }
-
 int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 {
-    SemaphoreHandle_t testSemaphore = xSemaphoreCreateMutex();
-    xSemaphoreGive(testSemaphore);
-    xSemaphoreTake(testSemaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
     assert(cbuf && cbuf->buffer);
     uint8_t * message = pvPortMalloc((length+1)*sizeof(uint8_t));
@@ -200,7 +166,7 @@ int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
     
     advance_pointer(cbuf);
     
-    xSemaphoreGive(testSemaphore);
+    xSemaphoreGive(cbuf->semaphore);
 
     return 0;
 
@@ -211,7 +177,7 @@ int cbufGet(cbufHandle_t cbuf, uint8_t *data)
 {
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
-    //assert(cbuf && data && cbuf->buffer);
+    assert(cbuf && data && cbuf->buffer);
 
     uint8_t length = 0;
 
