@@ -24,8 +24,22 @@ add_library(buffer STATIC src/buffer.c)
 
 target_link_libraries(buffer freertos)
 
+add_library(radio STATIC src/radio.c)
+
+target_link_libraries(radio hal)
+
+
+add_library(radio_protocol STATIC src/radio_protocol.c)
+
+target_link_libraries(radio_protocol buffer)
+target_link_libraries(radio_protocol radio)
 add_subdirectory(include)
 add_subdirectory(src)
+add_subdirectory(xbee)
+add_definitions( -DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\" )
+add_definitions( -DCOMPILE_x86 )
+
+
 #add_subdirectory(../envs/x86/freertos freertos)
 #add_subdirectory(../source freertosconfig)
 

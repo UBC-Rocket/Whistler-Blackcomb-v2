@@ -16,6 +16,8 @@ add_executable(whistler-blackcomb source/Whistler-Blackcomb.c)
 
 add_library(freertos)
 
+add_library(hal)
+
 add_subdirectory(envs/x86)
 add_subdirectory(common)
 add_subdirectory(external)
@@ -44,6 +46,15 @@ target_include_directories(freertos PUBLIC
     envs/x86/freertos/portable/utils
     envs/x86/freertos/portable
     source
+)
+
+target_link_libraries(hal freertos)
+target_include_directories(hal PUBLIC
+  device
+  CMSIS
+  board
+  envs/include
+  envs/
 )
 
 

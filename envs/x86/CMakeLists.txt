@@ -37,3 +37,16 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/freertos/portable/MemMang/heap_3.c
 )
 
+
+
+target_sources( 
+    hal
+    PRIVATE
+
+        ${CMAKE_CURRENT_LIST_DIR}/src/hal_io.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/hal_sd.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/hal_time.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/hal_uart.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/hal.c
+
+)
