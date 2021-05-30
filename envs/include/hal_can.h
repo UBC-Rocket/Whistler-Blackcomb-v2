@@ -4,10 +4,12 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-#ifdef COMPILE_BOARD
-#include "fsl_flexcan.h"
+
 #include "FreeRTOS.h"
 #include "semphr.h"
+
+#ifdef COMPILE_BOARD
+#include "fsl_flexcan.h"
 
 #elif defined(COMPILE_x86)
 #include "MK66F18.h"
@@ -52,6 +54,12 @@ typedef struct _hal_can_handle_t {
 } hal_can_handle_t;
 
 #elif defined(COMPILE_x86)
+
+typedef struct _hal_can_handle_t {
+	CAN_Type *base;
+	SemaphoreHandle_t rxSem;
+	SemaphoreHandle_t txSem;
+} hal_can_handle_t;
 
 
 /* FlexCAN message frame structure. This is copy pasted from fsl_flexcan.h,
@@ -105,7 +113,6 @@ typedef struct _flexcan_frame
  * whether it "can" as in able to be initialized, but whatever)
  * @param handle the handle of the can bus instance
  * @param base the base of the CAN controller
- * @return ?
  */
 void canInit(hal_can_handle_t *handle, CAN_Type *base);
 
@@ -114,7 +121,6 @@ void canInit(hal_can_handle_t *handle, CAN_Type *base);
  * already messages will return immediately
  * @param handle the handle of the can bus instance
  * @param rxFrame the frame of the received message
- * @return ?
  */
 void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame);
 
@@ -125,7 +131,6 @@ void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame);
  * @param buffer array of 8 bytes for message to send. If length < 8 rest of
  * buffer can be anything
  * @param length length of buffer, must be 8 or less
- * @return ?
  */
 void canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 		uint32_t length);
