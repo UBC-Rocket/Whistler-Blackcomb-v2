@@ -64,17 +64,24 @@ bool cbufCheckFull(cbufHandle_t cbuf)
 {
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
     assert(cbuf);
+
+    bool returnVal=cbuf->full;
     xSemaphoreGive(cbuf->semaphore);
-    return cbuf->full;
+
+
+    return returnVal;
 }
 
 bool cbufCheckEmpty(cbufHandle_t cbuf)
 {
     assert(cbuf);
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
-    return (!cbuf->full && (cbuf->head == cbuf->tail));
+
+    bool returnVal=(!cbuf->full && (cbuf->head == cbuf->tail));
+
     xSemaphoreGive(cbuf->semaphore);
-}
+
+    return returnVal;
 
 size_t cbufGetCapacity(cbufHandle_t cbuf)
 {
