@@ -3,9 +3,6 @@
 
 #define CONFIG_PACKET_LENGTH 43
 
-//static SemaphoreHandle_t sRadioBufRXCritSemaphore = NULL;
-
-
 //loops
 
 static void inputLoop(void *pv)
@@ -18,7 +15,6 @@ static void inputLoop(void *pv)
     uint8_t messageReadHead;
 
     uint8_t message;
-
 
     for (;;)
     {
@@ -83,9 +79,9 @@ static void outputLoop(void *pv)
 
 void GSRadioInit(void)
 {
-    radioBufTX = cbufInit(2048); //this would fit 8 full packets (but they might not be full!)
-    radioBufRXCrit = cbufInit(256);
-    radioBufRXLow = cbufInit(256);
+    // radioBufTX = cbufInit(2048); //this would fit 8 full packets (but they might not be full!)
+    // radioBufRXCrit = cbufInit(256);
+    // radioBufRXLow = cbufInit(256);
 
     //init the two tasks
 
@@ -125,15 +121,10 @@ void GSRadioInit(void)
 }
 
 
-
-//command response helper functions
-
-void radioSendPing(void){
+void radioPrepPing(void){
     uint8_t *message=pvPortMalloc(sizeof(uint8_t)*8);//TODO: adjust length
     uint8_t ID=0x00;
     //need to flesh out specs
-
-
 }
 
 void radioPrepConfig(void){
@@ -153,17 +144,151 @@ void radioPrepConfig(void){
     cbufPut(radioBufTX,CONFIG_PACKET_LENGTH,message);
 }
 
-//declarations for all the single component radio return preps
 
-static void radioPrepNothing(void);
 
-static void radioPrepAcc(void);
 
-//implementations
-static void radioPrepNothing(void){
-    return;
-}
+static void radioPrepGPS(void);
 
-static void radioPrepAccX(void){
+static void radioPrepState(void);
 
+static void radioPrepOrientation(void);
+
+static void radioPrepAccel(void);
+
+//HP Tank PT
+static void radioPrepPT_HP_T_001(void); 
+
+//HP Tank Out Valve TC
+static void radioPrepTC_HP_OUT_001(void); 
+
+//HP Press Valve
+static void radioPrepV_HP_P_001(void); 
+
+//Fuel Press Valve
+static void radioPrepV_F_PR_001(void); 
+
+//Fuel Vent Valve
+static void radioPrepV_F_V_001(void); 
+
+//Fuel Tank PT
+static void radioPrepPT_F_T_001(void); 
+
+//Fuel Fill Valve
+static void radioPrepV_F_F_001(void); 
+
+//Fuel Injector PT
+static void radioPrepPT_F_INJ_001(void); 
+
+//Main Fuel Valve
+static void radioPrepV_F_MFV_001(void); 
+
+//LOX Press Valve
+static void radioPrepV_L_PR_001(void);
+
+//LOX Tank PT
+static void radioPrepPT_L_T_001(void);
+
+//LOX Vent Valve
+static void radioPrepV_L_V_001(void);
+
+//LOX Fill TC
+static void radioPrepTC_L_F_001(void);
+
+//LOX Fill Valve
+static void radioPrepV_L_F_001(void);
+
+//LOX Injector PT
+static void radioPrepPT_L_INJ_001(void);
+
+//Main Oxidizer Valve
+static void radioPrepV_L_MOV_001(void);
+
+//LOX Bleed Valve
+static void radioPrepV_L_BLD_001(void);
+
+//LOX Bleed TC
+static void radioPrepTC_L_BLD_001(void);
+
+//Data Dump
+static void radioPrepDataDump(void);
+
+
+void dealWithLowMessages(void){
+    uint8_t message = 0;
+    for(;;){
+        if(!cbufGet(radioBufRXLow,&message)){
+            switch(message){
+                case 0x04:
+                    radioPrepGps();
+                    break;
+                case 0x05:
+                    radioPrepState();
+                    break;
+                case 0x06:
+                    radioPrepOrientation();
+                    break;
+                case 0x07:
+                    radioPrepAcc();
+                    break;
+                case 0x1E:
+                    radioPrepPT_HP_T_001();
+                    break;
+                case 0x1F:
+                    radioPrepTC_HP_OUT_001();
+                    break;
+                case 0x20:
+                    radioPrepV_HP_P_001();
+                    break;
+                case 0x21:
+                    radioPrepV_F_PR_001();
+                    break;
+                case 0x22:
+                    radioPrepPT_F_T_001();
+                    break;
+                case 0x23:
+                    radioPrepPT_F_INJ_001();
+                    break;
+                case 0x24:
+                    radioPrepV_F_F_001();
+                    break;
+                case 0x25:
+                    radioPrepPT_F_INJ_001();
+                    break;
+                case 0x26:
+                    radioPrepV_F_MFV_001();
+                    break;
+                case 0x27:
+                    radioPrepV_L_PR_001();
+                    break;
+                case 0x28:
+                    radioPrepPT_L_T_001();
+                    break;
+                case 0x29:
+                    radioPrepV_L_V_001();
+                    break;
+                case 0x2A:
+                    radioPrepTC_L_F_001();
+                    break;
+                case 0x2B:
+                    radioPrepV_L_F_001();
+                    break;
+                case 0x2C:
+                    radioPrepPT_L_INJ_001();
+                    break;
+                case 0x2D:
+                    radioPrepV_L_MOV_001();
+                    break;
+                case 0x2E:
+                    radioPrepV_L_BLD_001();
+                    break;
+                case 0x2F:
+                    radioPrepTC_L_BLD_001();
+                    break;
+                case 0x30:
+                    radioPrepDataDump();
+                    break;
+            }
+        }
+
+    }
 }
