@@ -8,7 +8,6 @@
 #include "buffer.h"
 #include "radio.h"
 
-#define STATE_CHANGE_WATERSHED 0x40
 
 cbufHandle_t radioBufTX;
 

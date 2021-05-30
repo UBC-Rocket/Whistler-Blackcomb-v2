@@ -17,6 +17,9 @@ add_library(IMU_interpret STATIC
     src/IMU_interpret.c
 )
 
+add_library(variables STATIC src/variables.c)
+target_link_libraries(variables freertos)
+
 add_library(state_machine STATIC src/state_machine.c)
 add_library(prediction STATIC src/prediction.c)
 

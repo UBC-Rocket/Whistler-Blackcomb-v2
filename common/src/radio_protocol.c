@@ -2,6 +2,8 @@
 #include "board.h"
 
 #define CONFIG_PACKET_LENGTH 43
+#define STATE_CHANGE_WATERSHED 0x40
+
 
 //loops
 

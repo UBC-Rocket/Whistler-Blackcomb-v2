@@ -21,3 +21,7 @@ target_include_directories(radio PUBLIC
 target_include_directories(radio_protocol PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )
+
+target_include_directories(variables PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
+)
