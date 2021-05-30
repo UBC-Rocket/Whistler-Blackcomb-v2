@@ -82,6 +82,7 @@ bool cbufCheckEmpty(cbufHandle_t cbuf)
     xSemaphoreGive(cbuf->semaphore);
 
     return returnVal;
+}
 
 size_t cbufGetCapacity(cbufHandle_t cbuf)
 {
