@@ -380,52 +380,43 @@ static void StateTask(void *pv) {
 
 }
 
-hal_can_packet_t txPacket = { .c = { 0x0, 0x0, 0x40, 0xA9, 0x99, 0x9A } };
 hal_can_packet_t rxPacket;
+hal_can_packet_t txPacket;
 flexcan_frame_t rxFrame;
 static void CanTask(void *pv) {
 	hal_can_handle_t can_handle;
 	canInit(&can_handle, CAN1);
-//	canSend(&can_handle, 0x123, txPacket, 6);
 	for (EVER) {
 		canReceive(&can_handle, &rxFrame);
-//		rxPacket.c[0] = rxFrame.dataByte0;
-//		rxPacket.c[1] = rxFrame.dataByte1;
-//		rxPacket.c[2] = rxFrame.dataByte2;
-//		rxPacket.c[3] = rxFrame.dataByte3;
-//		rxPacket.c[4] = rxFrame.dataByte4;
-//		rxPacket.c[5] = rxFrame.dataByte5;
-//		rxPacket.c[6] = rxFrame.dataByte6;
-//		rxPacket.c[7] = rxFrame.dataByte7;
 
 		hal_can_packet_id_t id = canGetId(&rxFrame);
 		switch (id) {
-		case can_packet_id_pt:
-			hal_can_pt_id_t sensor_id = canGetPTId(&rxFrame);
-			float pressure = canGetPTValue(&rxFrame);
+		case can_packet_id_pt:{
+			hal_can_pt_id_t sensor_id = canGetSensorId(&rxFrame);
+			float pressure = canGetSensorValue(&rxFrame);
 			pt_data[sensor_id] = pressure;
-			printf("PT 0: %f\n", pt_data[0]);
 			break;
+		}
+		case can_packet_id_tc:{
+			hal_can_tc_id_t sensor_id = canGetSensorId(&rxFrame);
+			float temp = canGetSensorValue(&rxFrame);
+			tc_data[sensor_id] = temp;
+			break;
+		}
 		default:
 			break;
 		}
-		if (canGetId(&rxFrame) == 0) {
-			hal_can_pt_id_t sensor_id = canGetPTId(&rxFrame);
-			float pressure = canGetPTValue(&rxFrame);
-			pt_data[sensor_id] = pressure;
-			printf("PT 0: %f\n", pt_data[0]);
-		} else if (rxPacket.sensor_read.type == 1) {
-			tc_data[rxPacket.sensor_read.sensor_id] =
-					rxPacket.sensor_read.reading;
-		}
 
-//		txPacket.sensor_read.type=0;
-//		txPacket.sensor_read.sensor_id=1;
-//		txPacket.sensor_read.reading=5.3;
 
-//		canSetId(&txPacket, can_packet_id_sensor_read);
-//		canSetPTId(&txPacket, can_pt_1);
-//		canSetPTValue(&txPacket, 5.3);
+		/* For debugging sending side of can bus communication */
+//		canSetId(&txPacket, can_packet_id_pt);
+//		canSetSensorId(&txPacket, can_pt_1);
+//		canSetSensorValue(&txPacket, 5.3);
+//		canSend(&can_handle, 0x123, txPacket, 6);
+//
+//		canSetId(&txPacket, can_packet_id_tc);
+//		canSetSensorId(&txPacket, can_tc_1);
+//		canSetSensorValue(&txPacket, 45.7);
 //		canSend(&can_handle, 0x123, txPacket, 6);
 //		vTaskDelay(pdMS_TO_TICKS(1000));
 	}

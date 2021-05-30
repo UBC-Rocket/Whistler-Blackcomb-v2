@@ -50,7 +50,7 @@ static void flexcan_callback(CAN_Type *base, flexcan_handle_t *handle,
 	}
 }
 
-int canInit(hal_can_handle_t *handle, CAN_Type *base) {
+void canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	handle->base = base;
 	FLEXCAN_GetDefaultConfig(&handle->config);
 	/* Change configuration settings here before init */
@@ -80,13 +80,11 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 	xSemaphoreGive(handle->txSem);
 }
 
-int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
+void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
 		handle->fifo_transfer.frame = rxFrame;
-		if (FLEXCAN_TransferReceiveFifoNonBlocking(handle->base,
-				&(handle->transfer_handle), &(handle->fifo_transfer))
-				!= kStatus_Success)
-			printf("CAN Receive Failed!\n");
+		FLEXCAN_TransferReceiveFifoNonBlocking(handle->base,
+				&(handle->transfer_handle), &(handle->fifo_transfer));
 	}
 	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
 		rxFrame = handle->fifo_transfer.frame;
@@ -94,7 +92,7 @@ int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 	xSemaphoreGive(handle->rxSem);
 }
 
-int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
+void canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 		uint32_t length) {
 	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
 		/* Doesn't just accept this directly because macros are unavailable in
@@ -119,10 +117,8 @@ int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 				(uint8_t) (8 + FLEXCAN_GetInstance(handle->base));
 		handle->txXfer.frame = &txFrame;
 
-		if (FLEXCAN_TransferSendNonBlocking(handle->base,
-				&(handle->transfer_handle), &(handle->txXfer))
-				!= kStatus_Success)
-			printf("CAN Send Failed!\n");
+		FLEXCAN_TransferSendNonBlocking(handle->base,
+				&(handle->transfer_handle), &(handle->txXfer));
 	}
 	/* Wait until message sent before returning */
 	xSemaphoreTake(handle->rxSem, portMAX_DELAY);
@@ -137,15 +133,15 @@ void canSetId(hal_can_packet_t *packet, hal_can_packet_id_t id) {
 	packet->c[0] = id;
 }
 
-hal_can_pt_id_t canGetPTId(flexcan_frame_t *rxFrame) {
+int canGetSensorId(flexcan_frame_t *rxFrame) {
 	return rxFrame->dataByte1;
 }
 
-void canSetPTId(hal_can_packet_t *packet, hal_can_pt_id_t id) {
+void canSetSensorId(hal_can_packet_t *packet, int id) {
 	packet->c[1] = id;
 }
 
-float canGetPTValue(flexcan_frame_t *rxFrame) {
+float canGetSensorValue(flexcan_frame_t *rxFrame) {
 	float pressure;
 	char *c = (char*) &pressure;
 	c[0] = rxFrame->dataByte2;
@@ -155,8 +151,8 @@ float canGetPTValue(flexcan_frame_t *rxFrame) {
 	return pressure;
 }
 
-void canSetPTValue(hal_can_packet_t *packet, float pressure) {
-	char *c = (char*) &pressure;
+void canSetSensorValue(hal_can_packet_t *packet, float value) {
+	char *c = (char*) &value;
 	packet->c[2] = c[0];
 	packet->c[3] = c[1];
 	packet->c[4] = c[2];

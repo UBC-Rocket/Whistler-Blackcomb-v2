@@ -23,34 +23,20 @@
 typedef union _hal_can_packet_t {
 	uint8_t c[8];
 	uint32_t i[2];
-	float f[2];
-	struct {
-		/*
-		 * Type of sensor being sent
-		 * 0: Thermocouple (C)
-		 * 1: Pressure Transducer (kPa)
-		 */
-		uint8_t type;
-		/*
-		 * ID of the sensor in question
-		 */
-		uint8_t sensor_id;
-		/*
-		 * Reading of the sensor, in the units described above
-		 */
-		float reading;
-		uint8_t c[2];
-
-	} sensor_read;
 } hal_can_packet_t;
 
 typedef enum {
 	can_packet_id_pt,
+	can_packet_id_tc,
 } hal_can_packet_id_t;
 
 typedef enum {
 	can_pt_1,
 } hal_can_pt_id_t;
+
+typedef enum {
+	can_tc_1,
+} hal_can_tc_id_t;
 
 #ifdef COMPILE_BOARD
 
@@ -121,7 +107,7 @@ typedef struct _flexcan_frame
  * @param base the base of the CAN controller
  * @return ?
  */
-int canInit(hal_can_handle_t *handle, CAN_Type *base);
+void canInit(hal_can_handle_t *handle, CAN_Type *base);
 
 /**
  * Blocks until FIFO buffer is non-empty, then retrieves latest message. If
@@ -130,7 +116,7 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base);
  * @param rxFrame the frame of the received message
  * @return ?
  */
-int canReceive(hal_can_handle_t *handle, flexcan_frame_t* rxFrame);
+void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame);
 
 /**
  * Sends message over can bus
@@ -141,34 +127,53 @@ int canReceive(hal_can_handle_t *handle, flexcan_frame_t* rxFrame);
  * @param length length of buffer, must be 8 or less
  * @return ?
  */
-int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet, uint32_t length);
+void canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
+		uint32_t length);
 
 /**
  * Extracts id from can packet, i.e. first byte
  * @param rxFrame the frame to extract id from
  * @return the id of the packet in rxFrame
  */
-hal_can_packet_id_t canGetId(flexcan_frame_t* rxFrame);
+hal_can_packet_id_t canGetId(flexcan_frame_t *rxFrame);
 
-void canSetId(hal_can_packet_t* packet, hal_can_packet_id_t id);
-
-/**
- * Extracts pressure transducer from can packet, i.e. second byte
- * @param rxFrame the frame to extract sensor from, must be PT_READ type
- * @return the pressure transducer of the packet in rxFrame
- */
-hal_can_pt_id_t canGetPTId(flexcan_frame_t* rxFrame);
-
-void canSetPTId(hal_can_packet_t* packet, hal_can_pt_id_t id);
 
 /**
- * Extracts pressure transducer read data from can packet, i.e. second byte
- * @param rxFrame the frame to extract sensor read from, must be PT_READ type
- * @return the pressure in kPa of the packet in rxFrame
+ * Sets id of  a packet
+ * @param packet a pointer to the packet to set data for
+ * @param id the id to set
  */
-float canGetPTValue(flexcan_frame_t* rxFrame);
+void canSetId(hal_can_packet_t *packet, hal_can_packet_id_t id);
 
-void canSetPTValue(hal_can_packet_t* packet, float pressure);
+/**
+ * Gets sensor id from a frame, works for tcs and pts
+ * @param rxFrame the frame to extract from, must have id of sensor read type
+ * @return the id of the sensor, depending on the sensor type either refers to
+ * hal_can_pt_id_t or hal_can_tc_id_t
+ */
+int canGetSensorId(flexcan_frame_t *rxFrame);
 
+/**
+ * Sets sensor id for a frame, works for tcs and pts
+ * @param rxFrame the frame to set id for
+ * @param id the id of the sensor, depending on the sensor type either refers to
+ * hal_can_pt_id_t or hal_can_tc_id_t
+ */
+void canSetSensorId(hal_can_packet_t *packet, int id);
+
+/**
+ * Gets value of sensor from a frame
+ * @param rxFrame the frame to extract from, must have id of a sensor read type
+ * @return the value of the sensor in the units of the sensor, either pressure
+ * or temperature
+ */
+float canGetSensorValue(flexcan_frame_t *rxFrame);
+
+/**
+ * Sets sensor value for a packet
+ * @param packet the packet to set, must have id of a sensor read type
+ * @param value the value to set for the packet
+ */
+void canSetSensorValue(hal_can_packet_t *packet, float value);
 
 #endif
