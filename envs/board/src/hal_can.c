@@ -10,12 +10,13 @@
 /*******************************************************************************
  * Variables
  ******************************************************************************/
+/* TODO: Implement id scheme for DAQ board and flight computer */
 uint32_t rxFifoFilter[] = {
 //		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 0, 0),
 //		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x321, 1, 0),
 		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x123, 0, 0),
 //		FLEXCAN_RX_FIFO_STD_FILTER_TYPE_A(0x123, 1, 0)
-};
+		};
 
 /*******************************************************************************
  * Implementations
@@ -29,21 +30,21 @@ uint32_t rxFifoFilter[] = {
  */
 static void flexcan_callback(CAN_Type *base, flexcan_handle_t *handle,
 		status_t status, uint32_t result, void *userData) {
-	hal_can_handle_t* hal_handle = (hal_can_handle_t*)userData;
+	hal_can_handle_t *hal_handle = (hal_can_handle_t*) userData;
 	/* Note: it's important to use FromISR versions of semaphore taking, since
 	 * normal versions won't work inside a interrupt */
 	switch (status) {
-        case kStatus_FLEXCAN_RxIdle:
-            break;
+	case kStatus_FLEXCAN_RxIdle:
+		break;
 
-        case kStatus_FLEXCAN_TxIdle:
-        	xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
-            break;
-        case kStatus_FLEXCAN_RxFifoIdle:
-        	xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
-        	break;
-        case kStatus_FLEXCAN_ErrorStatus:
-        	break;
+	case kStatus_FLEXCAN_TxIdle:
+		xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
+		break;
+	case kStatus_FLEXCAN_RxFifoIdle:
+		xSemaphoreGiveFromISR(hal_handle->rxSem, NULL);
+		break;
+	case kStatus_FLEXCAN_ErrorStatus:
+		break;
 	default:
 		break;
 	}
@@ -67,8 +68,7 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 
 	/* Sets up TX buffer. 8 offset because of FIFO buffer */
 	FLEXCAN_SetTxMbConfig(handle->base, 8 + FLEXCAN_GetInstance(handle->base),
-			true);
-
+	true);
 
 	FLEXCAN_TransferCreateHandle(handle->base, &(handle->transfer_handle),
 			flexcan_callback, handle);
@@ -81,12 +81,14 @@ int canInit(hal_can_handle_t *handle, CAN_Type *base) {
 }
 
 int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
-	if(xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE){
+	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
 		handle->fifo_transfer.frame = rxFrame;
-		if(FLEXCAN_TransferReceiveFifoNonBlocking(handle->base, &(handle->transfer_handle), &(handle->fifo_transfer))!=kStatus_Success)
+		if (FLEXCAN_TransferReceiveFifoNonBlocking(handle->base,
+				&(handle->transfer_handle), &(handle->fifo_transfer))
+				!= kStatus_Success)
 			printf("CAN Receive Failed!\n");
 	}
-	if(xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE){
+	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
 		rxFrame = handle->fifo_transfer.frame;
 	}
 	xSemaphoreGive(handle->rxSem);
@@ -94,7 +96,7 @@ int canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 
 int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 		uint32_t length) {
-	if(xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE){
+	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
 		/* Doesn't just accept this directly because macros are unavailable in
 		 * x86
 		 * Instead sets up transmit packet in this function*/
@@ -113,14 +115,51 @@ int canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 						buffer[4]) | CAN_WORD1_DATA_BYTE_5(buffer[5]) | CAN_WORD1_DATA_BYTE_6(buffer[6]) |
 						CAN_WORD1_DATA_BYTE_7(buffer[7]);
 
-		handle->txXfer.mbIdx = (uint8_t) (8+FLEXCAN_GetInstance(handle->base));
+		handle->txXfer.mbIdx =
+				(uint8_t) (8 + FLEXCAN_GetInstance(handle->base));
 		handle->txXfer.frame = &txFrame;
 
-		if(FLEXCAN_TransferSendNonBlocking(handle->base,
-				&(handle->transfer_handle), &(handle->txXfer))!=kStatus_Success)
+		if (FLEXCAN_TransferSendNonBlocking(handle->base,
+				&(handle->transfer_handle), &(handle->txXfer))
+				!= kStatus_Success)
 			printf("CAN Send Failed!\n");
 	}
 	/* Wait until message sent before returning */
 	xSemaphoreTake(handle->rxSem, portMAX_DELAY);
 	xSemaphoreGive(handle->rxSem);
 }
+
+hal_can_packet_id_t canGetId(flexcan_frame_t *rxFrame) {
+	return rxFrame->dataByte0;
+}
+
+void canSetId(hal_can_packet_t *packet, hal_can_packet_id_t id) {
+	packet->c[0] = id;
+}
+
+hal_can_pt_id_t canGetPTId(flexcan_frame_t *rxFrame) {
+	return rxFrame->dataByte1;
+}
+
+void canSetPTId(hal_can_packet_t *packet, hal_can_pt_id_t id) {
+	packet->c[1] = id;
+}
+
+float canGetPTValue(flexcan_frame_t *rxFrame) {
+	float pressure;
+	char *c = (char*) &pressure;
+	c[0] = rxFrame->dataByte2;
+	c[1] = rxFrame->dataByte3;
+	c[2] = rxFrame->dataByte4;
+	c[3] = rxFrame->dataByte5;
+	return pressure;
+}
+
+void canSetPTValue(hal_can_packet_t *packet, float pressure) {
+	char *c = (char*) &pressure;
+	packet->c[2] = c[0];
+	packet->c[3] = c[1];
+	packet->c[4] = c[2];
+	packet->c[5] = c[3];
+}
+
