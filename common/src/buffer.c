@@ -1,6 +1,6 @@
 #include "buffer.h"
 
-
+//stolen from https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and-c/, for the most part
 
 
 
@@ -72,8 +72,12 @@ bool cbufCheckEmpty(cbufHandle_t cbuf)
 {
     assert(cbuf);
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
-    return (!cbuf->full && (cbuf->head == cbuf->tail));
+
+    bool returnVal=(!cbuf->full && (cbuf->head == cbuf->tail));
+
     xSemaphoreGive(cbuf->semaphore);
+
+    return returnVal;
 }
 
 size_t cbufGetCapacity(cbufHandle_t cbuf)

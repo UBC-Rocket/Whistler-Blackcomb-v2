@@ -36,6 +36,7 @@ add_library(radio_protocol STATIC src/radio_protocol.c)
 
 target_link_libraries(radio_protocol buffer)
 target_link_libraries(radio_protocol radio)
+target_link_libraries(radio_protocol variables)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(xbee)

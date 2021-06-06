@@ -1,5 +1,7 @@
 #include "variables.h"
 
+/* I feel bad about this code. It is bad and sad and makes me mad. Sorry.*/
+
 
 //GPS
 
@@ -113,7 +115,7 @@ float getPT_HP_T_001(void){
     return value;
 }
 
-//HP Tank Outlet TC
+//HP Tank Out Valve TC
 struct singleFloatSemphr_s TC_HP_OUT_001data;
 void setTC_HP_OUT_001(float value){
     xSemaphoreTake(TC_HP_OUT_001data.semaphore,portMAX_DELAY);

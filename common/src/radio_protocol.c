@@ -1,8 +1,18 @@
 #include "radio_protocol.h"
 #include "board.h"
+#include "variables.h"
 
 #define CONFIG_PACKET_LENGTH 43
+#define GPS_PACKET_LENGTH 13
+#define ORIENT_PACKET_LENGTH 17
+#define ACCEL_PACKET_LENGTH 13
+#define SINGLE_FLOAT_PACKET_LENGTH 5
+#define SINGLE_INT_PACKET_LENGTH 2
+
+#define MAX_RADIO_WAIT_MS 120000
+
 #define STATE_CHANGE_WATERSHED 0x40
+
 
 
 //loops
@@ -48,6 +58,13 @@ static void inputLoop(void *pv)
 static void outputLoop(void *pv)
 {
     //this loop should send all messages in the send buffer
+    
+
+    //TODO: Make this work if the messages come slowly, i.e. don't force wait until buffer full
+    TickType_t maxRadioWaitTicks = pdMS_TO_TICKS(MAX_RADIO_WAIT_MS);
+    TickType_t ticksAtLastSend = xTaskGetTickCount();    
+    //we shouldn't have overflow problems here
+    //will overflow after about 50 days. 
 
     uint8_t *message=pvPortMalloc(256*sizeof(uint8_t));
     uint8_t length=0;
@@ -71,6 +88,15 @@ static void outputLoop(void *pv)
                 length=individLength;
             }
         }
+
+        if((xTaskGetTickCount()-ticksAtLastSend)>=maxRadioWaitTicks){
+            radioTxRequest(&radio,message,length);
+            length=0;
+            ticksAtLastSend=xTaskGetTickCount();
+            /* This feels like it isn't the most efficient way to do this but
+            at least it keeps it all in one task*/
+        }
+
     }
 
 }
@@ -81,9 +107,9 @@ static void outputLoop(void *pv)
 
 void GSRadioInit(void)
 {
-    // radioBufTX = cbufInit(2048); //this would fit 8 full packets (but they might not be full!)
+   // radioBufTX = cbufInit(2048); //this would fit 8 full packets (but they might not be full!)
     // radioBufRXCrit = cbufInit(256);
-    // radioBufRXLow = cbufInit(256);
+    // radioBufRXLow = cbufInit(256); 
 
     //init the two tasks
 
@@ -144,72 +170,266 @@ void radioPrepConfig(void){
     }
 
     cbufPut(radioBufTX,CONFIG_PACKET_LENGTH,message);
+
+    vPortFree(message);
 }
 
+static void radioPrepGPS(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*GPS_PACKET_LENGTH);//TODO: adjust length
+    uint8_t ID=0x04;
+    float curGPS[3];
+    getGPS(curGPS);
+    message[0]=ID;
+    memcpy(&message[1],&curGPS[0],4);
+    memcpy(&message[5],&curGPS[1],4);
+    memcpy(&message[9],&curGPS[2],4);
+    cbufPut(radioBufTX,GPS_PACKET_LENGTH,message);
 
-
-
-static void radioPrepGPS(void);
+    vPortFree(message);
+}
 
 static void radioPrepState(void);
 
-static void radioPrepOrientation(void);
+static void radioPrepOrientation(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*ORIENT_PACKET_LENGTH);
+    uint8_t ID=0x06;
+    float curOrient[4];
+    getOrientation(curOrient);
 
-static void radioPrepAccel(void);
+    message[0] = ID;
+    memcpy(&message[1],&curOrient[0],16);
+    cbufPut(radioBufTX,ORIENT_PACKET_LENGTH,message);
+    vPortFree(message);
+
+}
+
+static void radioPrepAccel(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*ACCEL_PACKET_LENGTH);
+    uint8_t ID=0x07;
+    float curAccel[3];
+    getAccel(curAccel);
+
+    message[0] = ID;
+    memcpy(&message[1],&curAccel[0],16);
+    cbufPut(radioBufTX,ACCEL_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //HP Tank PT
-static void radioPrepPT_HP_T_001(void); 
+static void radioPrepPT_HP_T_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x1E;
+    float value = getPT_HP_T_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message); 
+}
 
 //HP Tank Out Valve TC
-static void radioPrepTC_HP_OUT_001(void); 
+static void radioPrepTC_HP_OUT_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x1F;
+    float value = getTC_HP_OUT_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message); 
+}
 
 //HP Press Valve
-static void radioPrepV_HP_P_001(void); 
+static void radioPrepV_HP_P_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x20;
+    uint8_t value = getV_HP_P_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message); 
+}
 
 //Fuel Press Valve
-static void radioPrepV_F_PR_001(void); 
+static void radioPrepV_F_PR_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x21;
+    uint8_t value = getV_F_PR_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message); 
+}
 
 //Fuel Vent Valve
-static void radioPrepV_F_V_001(void); 
+static void radioPrepV_F_V_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x22;
+    uint8_t value = getV_F_V_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message); 
+} 
 
 //Fuel Tank PT
-static void radioPrepPT_F_T_001(void); 
+static void radioPrepPT_F_T_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x23;
+    float value = getPT_F_T_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message);
+} 
 
 //Fuel Fill Valve
-static void radioPrepV_F_F_001(void); 
+static void radioPrepV_F_F_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x24;
+    uint8_t value = getV_F_F_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //Fuel Injector PT
-static void radioPrepPT_F_INJ_001(void); 
+static void radioPrepPT_F_INJ_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x25;
+    float value = getPT_F_INJ_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message);
+} 
 
 //Main Fuel Valve
-static void radioPrepV_F_MFV_001(void); 
+static void radioPrepV_F_MFV_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x26;
+    uint8_t value = getV_F_MFV_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+} 
 
 //LOX Press Valve
-static void radioPrepV_L_PR_001(void);
+static void radioPrepV_L_PR_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x27;
+    uint8_t value = getV_L_PR_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Tank PT
-static void radioPrepPT_L_T_001(void);
+static void radioPrepPT_L_T_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x28;
+    float value = getPT_L_T_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Vent Valve
-static void radioPrepV_L_V_001(void);
+static void radioPrepV_L_V_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x29;
+    uint8_t value = getV_L_V_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Fill TC
-static void radioPrepTC_L_F_001(void);
+static void radioPrepTC_L_F_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x2A; // this is the gun rights packet.
+    float value = getTC_L_F_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Fill Valve
-static void radioPrepV_L_F_001(void);
+static void radioPrepV_L_F_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x2B;
+    uint8_t value = getV_L_F_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Injector PT
-static void radioPrepPT_L_INJ_001(void);
+static void radioPrepPT_L_INJ_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x2C;
+    float value = getPT_L_INJ_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //Main Oxidizer Valve
-static void radioPrepV_L_MOV_001(void);
+static void radioPrepV_L_MOV_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x2D;
+    uint8_t value = getV_L_MOV_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Bleed Valve
-static void radioPrepV_L_BLD_001(void);
+static void radioPrepV_L_BLD_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_INT_PACKET_LENGTH);
+    uint8_t ID=0x2E;
+    uint8_t value = getV_L_BLD_001();
+
+    message[0] = ID;
+    message[1] = value;
+    cbufPut(radioBufTX,SINGLE_INT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //LOX Bleed TC
-static void radioPrepTC_L_BLD_001(void);
+static void radioPrepTC_L_BLD_001(void){
+    uint8_t *message=pvPortMalloc(sizeof(uint8_t)*SINGLE_FLOAT_PACKET_LENGTH);
+    uint8_t ID=0x2F;
+    float value = getTC_L_BLD_001();
+
+    message[0] = ID;
+    memcpy(&message[1],&value,4);
+    cbufPut(radioBufTX,SINGLE_FLOAT_PACKET_LENGTH,message);
+    vPortFree(message);
+}
 
 //Data Dump
 static void radioPrepDataDump(void);
