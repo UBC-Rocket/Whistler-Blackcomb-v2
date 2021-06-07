@@ -5,6 +5,11 @@
 #include "FreeRTOS.h"
 #include "semphr.h" 
 
+//Sensor Status, in sensor order - see docs
+void setSensorStatus(int sensorID, int status);
+
+int getSensorStatus(int sensorID);
+
 //GPS, [lat,lon,Alt]
 void setGPS(float value[3]);
 //GPS, [lat,lon,Alt]

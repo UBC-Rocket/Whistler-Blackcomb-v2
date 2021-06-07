@@ -2,6 +2,28 @@
 
 /* I feel bad about this code. It is bad and sad and makes me mad. Sorry.*/
 
+struct sensorStatus_s{
+    uint8_t status[0x2F]; 
+    uint8_t criticalStatus;
+    SemaphoreHandle_t semaphore;
+}sensorStatus;
+
+void setSensorStatus(int sensorID, int status){
+    xSemaphoreTake(sensorStatus.semaphore,portMAX_DELAY);
+    sensorStatus.status[sensorID] = status;
+    if(status>sensorStatus.criticalStatus){
+        sensorStatus.criticalStatus=status;
+    }
+    xSemaphoreGive(sensorStatus.semaphore);
+}
+
+int getSensorStatus(int sensorID){
+    xSemaphoreTake(sensorStatus.semaphore,portMAX_DELAY);
+    int status = sensorStatus.status[sensorID];
+    xSemaphoreGive(sensorStatus.semaphore);
+    return status;
+}
+
 
 //GPS
 
@@ -351,4 +373,29 @@ float getTC_L_BLD_001(void){
     float value=TC_L_BLD_001data.value;
     xSemaphoreGive(TC_L_BLD_001data.semaphore);
     return value;
+}
+
+void initVariables(void){
+    sensorStatus.semaphore=xSemaphoreCreateMutex();
+    GPSdata.semaphore=xSemaphoreCreateMutex();
+    orientData.semaphore=xSemaphoreCreateMutex();
+    accelData.semaphore=xSemaphoreCreateMutex();
+    PT_HP_T_001data.semaphore=xSemaphoreCreateMutex();
+    TC_HP_OUT_001data.semaphore=xSemaphoreCreateMutex();
+    V_HP_P_001data.semaphore=xSemaphoreCreateMutex();
+    V_F_PR_001data.semaphore=xSemaphoreCreateMutex();
+    V_F_V_001data.semaphore=xSemaphoreCreateMutex();
+    PT_F_T_001data.semaphore=xSemaphoreCreateMutex();
+    V_F_F_001data.semaphore=xSemaphoreCreateMutex();
+    PT_F_INJ_001data.semaphore=xSemaphoreCreateMutex();
+    V_F_MFV_001data.semaphore=xSemaphoreCreateMutex();
+    V_L_PR_001data.semaphore=xSemaphoreCreateMutex();
+    PT_L_T_001data.semaphore=xSemaphoreCreateMutex();
+    V_L_V_001data.semaphore=xSemaphoreCreateMutex();
+    TC_L_F_001data.semaphore=xSemaphoreCreateMutex();
+    V_L_F_001data.semaphore=xSemaphoreCreateMutex();
+    PT_L_INJ_001data.semaphore=xSemaphoreCreateMutex();
+    V_L_MOV_001data.semaphore=xSemaphoreCreateMutex();
+    V_L_BLD_001data.semaphore=xSemaphoreCreateMutex();
+    TC_L_BLD_001data.semaphore=xSemaphoreCreateMutex();
 }

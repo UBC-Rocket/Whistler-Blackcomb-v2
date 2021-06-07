@@ -7,6 +7,10 @@
 //#include "include/FreeRTOS.h"
 #include "buffer.h"
 #include "radio.h"
+#include "hal_time.h"
+#include "board.h"
+#include "variables.h"
+#include "state_machine.h"
 
 
 cbufHandle_t radioBufTX;

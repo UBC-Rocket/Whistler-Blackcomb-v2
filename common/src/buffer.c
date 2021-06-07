@@ -25,7 +25,7 @@ cbufHandle_t cbufInit(size_t size)
     cbufHandle_t cbuf = pvPortMalloc(sizeof(cbuf_t));
     assert(cbuf);
     
-    cbuf->semaphore = xSemaphoreCreateBinary();
+    cbuf->semaphore = xSemaphoreCreateMutex();
     cbuf->buffer = buffer;
     cbuf->max = size;
     cbufReset(cbuf);
