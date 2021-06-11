@@ -20,10 +20,20 @@ add_library(IMU_interpret STATIC
 add_library(state_machine STATIC src/state_machine.c)
 add_library(prediction STATIC src/prediction.c)
 
+add_library(buffer STATIC src/buffer.c)
 
+target_link_libraries(buffer freertos)
 
 add_subdirectory(include)
 add_subdirectory(src)
+#add_subdirectory(../envs/x86/freertos freertos)
+#add_subdirectory(../source freertosconfig)
 
-
-
+find_package(Threads REQUIRED)
+if(THREADS_HAVE_PTHREAD_ARG)
+  set_property(TARGET buffer PROPERTY COMPILE_OPTIONS "-pthread")
+  set_property(TARGET buffer PROPERTY INTERFACE_COMPILE_OPTIONS "-pthread")
+endif()
+if(CMAKE_THREAD_LIBS_INIT)
+  target_link_libraries(buffer "${CMAKE_THREAD_LIBS_INIT}")
+endif()
