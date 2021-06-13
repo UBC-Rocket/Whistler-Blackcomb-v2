@@ -36,9 +36,9 @@ void statesResetTest(void){
     setNextState(&input);
     TEST_ASSERT_EQUAL(input.GSE_triggerIgnition,FALSE); //is it reset?
 
-    input.HMI_triggerGroundAbort = TRUE;
+    input.HMI_triggerAbort = TRUE;
     setNextState(&input);
-    TEST_ASSERT_EQUAL(input.HMI_triggerGroundAbort,FALSE); //is it reset?
+    TEST_ASSERT_EQUAL(input.HMI_triggerAbort,FALSE); //is it reset?
 }
 
 /*test that it changes state on HMI triggers*/
@@ -76,7 +76,7 @@ void examplePathTest(void){ //how to name these tests?
     for(int i=0;i<22;i++){
         
         
-        testStateInput.HMI_triggerGroundAbort = testInputsExpectedOutputs[i][0];
+        testStateInput.HMI_triggerAbort = testInputsExpectedOutputs[i][0];
         testStateInput.HMI_triggerStandby = testInputsExpectedOutputs[i][1];
         testStateInput.HMI_triggerFueling = testInputsExpectedOutputs[i][2];
         testStateInput.GSE_triggerIgnition = testInputsExpectedOutputs[i][3];

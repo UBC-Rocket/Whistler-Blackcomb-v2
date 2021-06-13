@@ -89,7 +89,7 @@ typedef struct stateInput_t
 
     /* HMI Triggers (examples) */
 
-    char HMI_triggerGroundAbort; //holy snake-camel, Batman!
+    char HMI_triggerAbort; //holy snake-camel, Batman!
     char HMI_triggerStandby;
     char HMI_triggerFueling;
     

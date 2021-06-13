@@ -54,7 +54,6 @@ void placeAndRecieveTest(void *pv){
     uint8_t testData1[4]={1,2,3,4};
     uint8_t testData2=255;
     uint8_t testData3[10]={100,6,7,8,9,10,11,12,13,14};
-    
     cbufHandle_t testbuf=cbufInit(100);
     cbufPut(testbuf,4,testData1);
     cbufPut(testbuf,1,&testData2);

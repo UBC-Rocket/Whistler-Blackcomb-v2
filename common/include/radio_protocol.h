@@ -23,9 +23,7 @@ xbee_dev_t radio; //These might have more descriptive names in the future.
 
 xbee_serial_t serial;
 
-//typedef enum componentResponse_t{
 
-//}
 
 /*******************************************************************************
  * Declarations

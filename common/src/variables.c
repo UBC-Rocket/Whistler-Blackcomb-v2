@@ -4,16 +4,12 @@
 
 struct sensorStatus_s{
     uint8_t status[0x2F]; 
-    uint8_t criticalStatus;
     SemaphoreHandle_t semaphore;
 }sensorStatus;
 
 void setSensorStatus(int sensorID, int status){
     xSemaphoreTake(sensorStatus.semaphore,portMAX_DELAY);
     sensorStatus.status[sensorID] = status;
-    if(status>sensorStatus.criticalStatus){
-        sensorStatus.criticalStatus=status;
-    }
     xSemaphoreGive(sensorStatus.semaphore);
 }
 
