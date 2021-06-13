@@ -8,6 +8,8 @@
 void baseTest(void *pv){
     TEST_ASSERT_EQUAL_HEX8(2,2);
     vTaskEndScheduler();
+    
+    
 }
 
 void baseTest_RTOS(void){
@@ -77,6 +79,8 @@ void placeAndRecieveTest(void *pv){
     TEST_ASSERT_EQUAL_UINT8_ARRAY(testData3,recievedData3,10);
 
     vTaskEndScheduler();
+
+    
 }
 
 void placeAndRecieveTest_RTOS(void){
@@ -109,32 +113,16 @@ void bufferWraparoundTest(void *pv){
     uint8_t recievedData1[8];
     uint8_t recievedData2;
     uint8_t recievedData3[10];
-    uint8_t length=cbufGet(testbuf,recievedData3);
-    printf("length: %d\n",length);
-    for(int i=0;i<length;i++){
-        printf("recieved Data 1-%d: %d\n",i,recievedData3[i]);
-    }
+    uint8_t length=cbufGet(testbuf,&recievedData2);
+    length = cbufGet(testbuf,recievedData3);
 
-    
-
-    //cbufGet(testbuf,&recievedData2);
-    //printf("recieved Data 2: %d\n",recievedData2);
-
-    length=cbufGet(testbuf,recievedData3);
-    printf("length: %d\n",length);
-    for(int i=0;i<length;i++){
-        printf("recieved Data 3-%d: %d\n",i,recievedData3[i]);
-    }
-
-    length=cbufGet(testbuf,recievedData3);
-    printf("length: %d\n",length);
     cbufFree(testbuf);
-
-    TEST_ASSERT_EQUAL_UINT8_ARRAY(testData1,recievedData1,4);
     TEST_ASSERT_EQUAL_INT8(testData2,recievedData2);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(testData3,recievedData3,10);
 
     vTaskEndScheduler();
+
+    
 }
 
 void bufferWraparoundTest_RTOS(void){

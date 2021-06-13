@@ -2,6 +2,7 @@
 
 //stolen from https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and-c/, for the most part
 
+#define APPROPRIATE_DELAY_TICS 100
 
 
 
@@ -38,7 +39,7 @@ cbufHandle_t cbufInit(size_t size)
 
 void cbufReset(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
     
     assert(cbuf);
     
@@ -50,7 +51,7 @@ void cbufReset(cbufHandle_t cbuf)
 
 void cbufFree(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf);
     
@@ -62,7 +63,7 @@ void cbufFree(cbufHandle_t cbuf)
 
 bool cbufCheckFull(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
     assert(cbuf);
     xSemaphoreGive(cbuf->semaphore);
     return cbuf->full;
@@ -71,7 +72,7 @@ bool cbufCheckFull(cbufHandle_t cbuf)
 bool cbufCheckEmpty(cbufHandle_t cbuf)
 {
     assert(cbuf);
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     bool returnVal=(!cbuf->full && (cbuf->head == cbuf->tail));
 
@@ -82,7 +83,7 @@ bool cbufCheckEmpty(cbufHandle_t cbuf)
 
 size_t cbufGetCapacity(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf);
     size_t max = cbuf->max;
@@ -94,7 +95,7 @@ size_t cbufGetCapacity(cbufHandle_t cbuf)
 
 size_t cbufGetSize(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf);
     size_t size = cbuf->max;
@@ -118,7 +119,7 @@ size_t cbufGetSize(cbufHandle_t cbuf)
 
 static void advance_pointer(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf);
 
@@ -141,7 +142,7 @@ static void advance_pointer(cbufHandle_t cbuf)
 
 static void retreat_pointer(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf);
 
@@ -157,7 +158,7 @@ static void retreat_pointer(cbufHandle_t cbuf)
 
 int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf && cbuf->buffer);
     uint8_t * message = pvPortMalloc((length+1)*sizeof(uint8_t));
@@ -179,7 +180,7 @@ int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 
 int cbufGet(cbufHandle_t cbuf, uint8_t *data)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    xSemaphoreTake(cbuf->semaphore,APPROPRIATE_DELAY_TICS);
 
     assert(cbuf && data && cbuf->buffer);
 
