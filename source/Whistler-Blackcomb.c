@@ -388,6 +388,7 @@ static void CanTask(void *pv) {
 	canInit(&can_handle, CAN1);
 	for (EVER) {
 		canReceive(&can_handle, &rxFrame);
+		printf("CAN received, b0: %d, b1: %d\n", rxFrame.dataByte0, rxFrame.dataByte1);
 
 		hal_can_packet_id_t id = canGetId(&rxFrame);
 		switch (id) {

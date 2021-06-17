@@ -2,6 +2,7 @@
  * Includes
  ******************************************************************************/
 #include "hal_can.h"
+#include "stdio_controller.h"
 
 /*******************************************************************************
  * Variables
@@ -24,8 +25,16 @@ void canInit(hal_can_handle_t *handle, CAN_Type *base) {
 
 void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
-	}
-	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
+        uint8_t data[8];
+        readFromBuf(RX, data, 'c');
+        rxFrame->dataByte0 = data[0];
+        rxFrame->dataByte1 = data[1];
+        rxFrame->dataByte2 = data[2];
+        rxFrame->dataByte3 = data[3];
+        rxFrame->dataByte4 = data[4];
+        rxFrame->dataByte5 = data[5];
+        rxFrame->dataByte6 = data[6];
+        rxFrame->dataByte7 = data[7];
 	}
 	xSemaphoreGive(handle->rxSem);
 }
