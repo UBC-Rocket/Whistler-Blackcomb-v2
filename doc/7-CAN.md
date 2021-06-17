@@ -19,3 +19,5 @@ To communicate between the DAQ board and the main flight computer, a can bus is 
     * [Will list TCs later once finalized]
   * Data bytes 2-5: reading in degrees C
     * data is transmitted in little endian format
+
+For SIM communication, the id byte is currently set to be 'c' for can packets to be received. 

@@ -26,6 +26,7 @@ void canInit(hal_can_handle_t *handle, CAN_Type *base) {
 void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
         uint8_t data[8];
+		// TODO: enumerate all SIM packet IDs somewhere centralized
         readFromBuf(RX, data, 'c');
         rxFrame->dataByte0 = data[0];
         rxFrame->dataByte1 = data[1];
@@ -42,9 +43,8 @@ void canReceive(hal_can_handle_t *handle, flexcan_frame_t *rxFrame) {
 void canSend(hal_can_handle_t *handle, uint32_t id, hal_can_packet_t packet,
 		uint32_t length) {
 	if (xSemaphoreTake(handle->rxSem, portMAX_DELAY) == pdTRUE) {
+		writeToBuf(TX, packet.c, 'c', length);
 	}
-	/* Wait until message sent before returning */
-	xSemaphoreTake(handle->rxSem, portMAX_DELAY);
 	xSemaphoreGive(handle->rxSem);
 }
 

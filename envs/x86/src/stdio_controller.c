@@ -213,7 +213,7 @@ uint8_t readFromBuf(int mode, uint8_t data[], uint8_t id)
         if (readpoint + 1 < packetBuffersReadLowerLimit[mode][id] + SIM_PACKET_BUFFER_SIZE)
         {
             packetBuffersReadIndex[mode][id]++;
-            xSemaphoreGive(packetBuffersNewFlag[mode][id]);
+            // xSemaphoreGive(packetBuffersNewFlag[mode][id]);
         }
     }
     return packetBuffers[mode][id][readpoint][0];
@@ -320,12 +320,12 @@ static void sendPackets()
 
     for (int id = 0; id < SIM_MAX_PACKET_IDS; id++)
     {
-        // if (packetBuffersNewFlag[TX][id] == FLAGGED)
-        // {
-        char buf[512];
-        char length = readFromBuf(TX, buf, id);
-        putPacket(id, buf, length);
-        // }
+        if (uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]))
+        {
+            char buf[512];
+            char length = readFromBuf(TX, buf, id);
+            putPacket(id, buf, length);
+        }
     }
 }
 
