@@ -1,6 +1,6 @@
 # CAN Communication
 
-To communicate between the DAQ board and the main flight computer, a can bus is used. Sensor reads and other events can then be transmitted over this bus to communicate. By default the can protocol only sets up a system for arbitrary packets of data bytes to be sent, with an id associated with it. For this project, the id of the packet is the id of the board (DAQ or FC) used to send it. The remaining bits then follow a scheme to determine what kind of data is contained. Note that this is currently now complete, as additional events (e.g. actuator activation) still have to be added, but the general setup should be similar. 
+To communicate between the DAQ board and the main flight computer, a can bus is used. Sensor reads and other events can then be transmitted over this bus to communicate. By default the can protocol only sets up a system for arbitrary packets of data bytes to be sent, with an id associated with it. For this project, the id of the packet is the id of the board (DAQ or FC) used to send it. The remaining bits then follow a scheme to determine what kind of data is contained. Note that this is currently not complete, as additional events (e.g. actuator activation) still have to be added, but the general setup should be similar. 
 
 * Data byte 0: data packet id
   * Determines what type of data is being conveyed in this packet
