@@ -83,6 +83,9 @@ void BOARD_InitDebugConsole(void);
 #define RADIO_UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
 #define RADIO_UART_RX_TX_IRQn UART2_RX_TX_IRQn
 
+#define CAN_CLK_SOURCE (kFLEXCAN_ClkSrc1)
+#define CAN_CLK_FREQ   CLOCK_GetFreq(kCLOCK_BusClk)
+
 #endif /* _BOARD_H_ */
 
 

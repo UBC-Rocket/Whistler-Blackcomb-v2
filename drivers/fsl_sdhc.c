@@ -941,6 +941,9 @@ void SDHC_GetCapability(SDHC_Type *base, sdhc_capability_t *capability)
 uint32_t SDHC_SetSdClock(SDHC_Type *base, uint32_t srcClock_Hz, uint32_t busClock_Hz)
 {
     assert(srcClock_Hz != 0U);
+    // This was manually inserted (by UBC Rocket) from this workaround:
+    // https://community.nxp.com/t5/Kinetis-Software-Development-Kit/KSDK-assertion-failed-clocking-the-SDHC-at-20MHz/m-p/824881
+    busClock_Hz = MIN(srcClock_Hz, busClock_Hz);
     assert((busClock_Hz != 0U) && (busClock_Hz <= srcClock_Hz));
 
     uint32_t totalDiv         = 0U;

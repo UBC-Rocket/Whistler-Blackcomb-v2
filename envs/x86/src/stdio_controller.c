@@ -49,7 +49,7 @@ int packetBuffersReadIndex[2][SIM_MAX_PACKET_IDS] = {0};
 int packetBuffersReadLowerLimit[2][SIM_MAX_PACKET_IDS] = {0}; //needs to be initialized in the init function
 //the upper packet limit is the lower limit + the packet buffer size. It's the
 //range of allowable readable values
-int packetBuffersNewFlag[2][SIM_MAX_PACKET_IDS] = {0};
+SemaphoreHandle_t packetBuffersNewFlag[2][SIM_MAX_PACKET_IDS];
 int handshakeRecieved = 0; //blocks sending until 1
 
 SemaphoreHandle_t simInSemaphore;
@@ -139,6 +139,12 @@ void stdioInit()
     fprintf(logfile, "id,length,message\n");
     fclose(logfile);
 
+    for(int i = 0; i < 2; ++i){
+        for(int j = 0; j < SIM_MAX_PACKET_IDS; ++j){
+            packetBuffersNewFlag[i][j] = xSemaphoreCreateBinary();
+        }
+    }
+
     //todo: verify I am using these correctly.
     simInSemaphore = xSemaphoreCreateMutex();
     assert(simInSemaphore != NULL); //basic error checking
@@ -190,27 +196,26 @@ void stdioInit()
  */
 uint8_t readFromBuf(int mode, uint8_t data[], uint8_t id)
 {
-    if (packetBuffersReadIndex[mode][id] >= SIM_PACKET_BUFFER_SIZE)
-    {
-        packetBuffersReadIndex[mode][id] = 0;
-    }
+    int readpoint;
+    if(xSemaphoreTake(packetBuffersNewFlag[mode][id], portMAX_DELAY)){
+        if (packetBuffersReadIndex[mode][id] >= SIM_PACKET_BUFFER_SIZE)
+        {
+            packetBuffersReadIndex[mode][id] = 0;
+        }
 
-    int readpoint = packetBuffersReadIndex[mode][id];
+        readpoint = packetBuffersReadIndex[mode][id];
 
-    for (int i = 1; i <= packetBuffers[mode][id][readpoint][0]; i++)
-    {
-        data[i - 1] = packetBuffers[mode][id][readpoint][i];
-    }
+        for (int i = 1; i <= packetBuffers[mode][id][readpoint][0]; i++)
+        {
+            data[i - 1] = packetBuffers[mode][id][readpoint][i];
+        }
 
-    if (readpoint + 1 < packetBuffersReadLowerLimit[mode][id] + SIM_PACKET_BUFFER_SIZE)
-    {
-        packetBuffersReadIndex[mode][id]++;
+        if (readpoint + 1 < packetBuffersReadLowerLimit[mode][id] + SIM_PACKET_BUFFER_SIZE)
+        {
+            packetBuffersReadIndex[mode][id]++;
+            // xSemaphoreGive(packetBuffersNewFlag[mode][id]);
+        }
     }
-    else
-    {
-        packetBuffersNewFlag[mode][id] = UNFLAGGED;
-    }
-
     return packetBuffers[mode][id][readpoint][0];
 }
 
@@ -226,7 +231,6 @@ uint8_t readFromBuf(int mode, uint8_t data[], uint8_t id)
 
 void writeToBuf(int mode, uint8_t data[], uint8_t id, uint16_t length)
 {
-    packetBuffersNewFlag[mode][id] = FLAGGED;
 
     if (packetBuffersWriteIndex[mode][id] >= SIM_PACKET_BUFFER_SIZE)
     {
@@ -248,6 +252,7 @@ void writeToBuf(int mode, uint8_t data[], uint8_t id, uint16_t length)
     {
         packetBuffersReadLowerLimit[mode][id] = 0;
     }
+    xSemaphoreGive(packetBuffersNewFlag[mode][id]);
 }
 
 //sets up the sim rx buffer
@@ -275,12 +280,15 @@ static void extractPacket()
     length = getFilteredCin();
     length <<= 8;
     length |= getFilteredCin();
+    // printf("id:%d ", id);
+    // printf("len:%d ", length);
 
     uint8_t buf[512];
 
     for (uint16_t i = 0; i <= length - 1; i++)
     {
         buf[i] = getFilteredCin();
+        // printf("%u ", buf[i]);
     }
 
     xSemaphoreTake(simInSemaphore, portMAX_DELAY);
@@ -312,7 +320,7 @@ static void sendPackets()
 
     for (int id = 0; id < SIM_MAX_PACKET_IDS; id++)
     {
-        if (packetBuffersNewFlag[TX][id] == FLAGGED)
+        if (uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]))
         {
             char buf[512];
             char length = readFromBuf(TX, buf, id);

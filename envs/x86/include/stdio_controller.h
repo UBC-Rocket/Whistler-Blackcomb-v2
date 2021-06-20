@@ -34,7 +34,7 @@ extern int packetBuffersReadIndex[2][SIM_MAX_PACKET_IDS];
 extern int packetBuffersReadLowerLimit[2][SIM_MAX_PACKET_IDS]; //needs to be initialized in the init function
 //the upper packet limit is the lower limit + the packet buffer size. It's the
 //range of allowable readable values
-extern int packetBuffersNewFlag[2][SIM_MAX_PACKET_IDS];
+// extern int packetBuffersNewFlag[2][SIM_MAX_PACKET_IDS];
 
 
 /*******************************************************************************
