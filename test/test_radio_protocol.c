@@ -3,9 +3,7 @@
 
 void baseTest(void){
     TEST_ASSERT_EQUAL_HEX8(2,2);
-}
-
-void 
+} 
 
 void setUp(void){}
 void tearDown(void){}
