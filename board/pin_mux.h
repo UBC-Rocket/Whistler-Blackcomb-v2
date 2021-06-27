@@ -96,6 +96,19 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_RADIO_UART_TX_PIN_MASK (1U << 3U)      /*!<@brief PORT pin mask */
                                                               /* @} */
 
+/*! @name PORTE26 (number 47), CAN1_STBN
+  @{ */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_CAN1_STBN_GPIO GPIOE                /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITPINS_CAN1_STBN_GPIO_PIN_MASK (1U << 26U) /*!<@brief GPIO pin mask */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_CAN1_STBN_PORT PORTE                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_CAN1_STBN_PIN 26U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_CAN1_STBN_PIN_MASK (1U << 26U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *

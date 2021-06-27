@@ -1,0 +1,7 @@
+ExitOnError 1
+r
+h
+loadfile "D:\rocket\workspace\Whistler-Blackcomb\Debug\Whistler-Blackcomb.hex" 0x0 
+qc
+
+qc

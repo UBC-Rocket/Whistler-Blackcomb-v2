@@ -49,8 +49,10 @@ typedef enum state_t
 
 /**
  * Convenience array for easy debug naming
+ * Fancy attribute thing is to prevent annoying unused message since this is
+ * only used for debugging
  */
-static char* stateNames[] = {
+__attribute__ ((unused)) static char*  stateNames[] = {
     "Error", 
     "Startup",
     "Fueling",

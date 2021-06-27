@@ -68,7 +68,7 @@ void sdOpen(HALFILE *file, const char *file_name) {
 	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
 		error = f_open(file, file_name, FA_WRITE);
 		if (error == FR_OK) {
-			printf("File opened");
+			printf("File opened.\r\n");
 		} else if (error == FR_NO_FILE) {
 			if (f_open(file, file_name, (FA_WRITE | FA_CREATE_NEW)) != FR_OK) {
 				printf("Create file failed.\r\n");

@@ -65,8 +65,12 @@ bool cbufCheckFull(cbufHandle_t cbuf)
 {
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
     assert(cbuf);
+
+    bool returnVal=cbuf->full;
     xSemaphoreGive(cbuf->semaphore);
-    return cbuf->full;
+
+
+    return returnVal;
 }
 
 bool cbufCheckEmpty(cbufHandle_t cbuf)

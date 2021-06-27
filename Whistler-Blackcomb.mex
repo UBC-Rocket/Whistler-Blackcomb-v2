@@ -30,6 +30,7 @@
                <pin_label pin_num="109" pin_signal="PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT" label="IMU_UART_RX" identifier="IMU_UART_RX;IMU_UART_TX"/>
                <pin_label pin_num="129" pin_signal="PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL" label="RADIO_UART_RX" identifier="RADIO_UART_RX"/>
                <pin_label pin_num="130" pin_signal="PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA" label="RADIO_UART_TX" identifier="RADIO_UART_TX"/>
+               <pin_label pin_num="47" pin_signal="PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN" label="CAN1_STBN" identifier="CAN1_STBN"/>
             </pin_labels>
          </pins_profile>
          <functions_list>
@@ -57,6 +58,11 @@
                      </feature>
                   </dependency>
                   <dependency resourceType="Peripheral" resourceId="SDHC" description="Peripheral SDHC is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="CAN1" description="Peripheral CAN1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
                      <feature name="initialized" evaluation="equal">
                         <data>true</data>
                      </feature>
@@ -145,6 +151,14 @@
                         <pin_feature name="pull_enable" value="enable"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="CAN1" signal="TX" pin_num="45" pin_signal="ADC0_SE17/PTE24/CAN1_TX/UART4_TX/I2C0_SCL/EWM_OUT_b"/>
+                  <pin peripheral="CAN1" signal="RX" pin_num="46" pin_signal="ADC0_SE18/PTE25/LLWU_P21/CAN1_RX/UART4_RX/I2C0_SDA/EWM_IN"/>
+                  <pin peripheral="GPIOE" signal="GPIO, 26" pin_num="47" pin_signal="PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN">
+                     <pin_features>
+                        <pin_feature name="direction" value="OUTPUT"/>
+                        <pin_feature name="gpio_init_state" value="true"/>
+                     </pin_features>
+                  </pin>
                </pins>
             </function>
          </functions_list>
@@ -192,20 +206,18 @@
                   <clock_source id="OSC.OSC.outFreq" value="16 MHz" locked="false" enabled="true"/>
                </clock_sources>
                <clock_outputs>
-                  <clock_output id="Bus_clock.outFreq" value="48 MHz" locked="false" accuracy=""/>
-                  <clock_output id="Core_clock.outFreq" value="96 MHz" locked="false" accuracy=""/>
-                  <clock_output id="Flash_clock.outFreq" value="24 MHz" locked="false" accuracy=""/>
-                  <clock_output id="FlexBus_clock.outFreq" value="48 MHz" locked="false" accuracy=""/>
+                  <clock_output id="Bus_clock.outFreq" value="10.48576 MHz" locked="false" accuracy=""/>
+                  <clock_output id="Core_clock.outFreq" value="20.97152 MHz" locked="false" accuracy=""/>
+                  <clock_output id="Flash_clock.outFreq" value="5.24288 MHz" locked="false" accuracy=""/>
+                  <clock_output id="FlexBus_clock.outFreq" value="10.48576 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPO_clock.outFreq" value="1 kHz" locked="false" accuracy=""/>
-                  <clock_output id="MCGFFCLK.outFreq" value="500 kHz" locked="false" accuracy=""/>
+                  <clock_output id="MCGFFCLK.outFreq" value="32.768 kHz" locked="false" accuracy=""/>
                   <clock_output id="MCGIRCLK.outFreq" value="32.768 kHz" locked="false" accuracy=""/>
-                  <clock_output id="System_clock.outFreq" value="96 MHz" locked="false" accuracy=""/>
+                  <clock_output id="PLLFLLCLK.outFreq" value="20.97152 MHz" locked="false" accuracy=""/>
+                  <clock_output id="System_clock.outFreq" value="20.97152 MHz" locked="false" accuracy=""/>
                </clock_outputs>
                <clock_settings>
-                  <setting id="MCGMode" value="PEE" locked="false"/>
                   <setting id="MCG.FRDIV.scale" value="32" locked="true"/>
-                  <setting id="MCG.IREFS.sel" value="MCG.FRDIV" locked="false"/>
-                  <setting id="MCG.PLLS.sel" value="MCG.PLLCS" locked="false"/>
                   <setting id="MCG.PRDIV.scale" value="2" locked="false"/>
                   <setting id="MCG.VDIV.scale" value="24" locked="false"/>
                   <setting id="MCG_C1_IRCLKEN_CFG" value="Enabled" locked="false"/>

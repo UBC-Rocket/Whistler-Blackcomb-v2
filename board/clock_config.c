@@ -63,14 +63,17 @@ extern uint32_t SystemCoreClock;
  ******************************************************************************/
 /*FUNCTION**********************************************************************
  *
- * Function Name : CLOCK_CONFIG_SetFllExtRefDiv
- * Description   : Configure FLL external reference divider (FRDIV).
- * Param frdiv   : The value to set FRDIV.
+ * Function Name : CLOCK_CONFIG_FllStableDelay
+ * Description   : This function is used to delay for FLL stable.
  *
  *END**************************************************************************/
-static void CLOCK_CONFIG_SetFllExtRefDiv(uint8_t frdiv)
+static void CLOCK_CONFIG_FllStableDelay(void)
 {
-    MCG->C1 = ((MCG->C1 & ~MCG_C1_FRDIV_MASK) | MCG_C1_FRDIV(frdiv));
+    uint32_t i = 30000U;
+    while (i--)
+    {
+        __NOP();
+    }
 }
 
 /*******************************************************************************
@@ -90,19 +93,17 @@ void BOARD_InitBootClocks(void)
 name: BOARD_BootClockRUN
 called_from_default_init: true
 outputs:
-- {id: Bus_clock.outFreq, value: 48 MHz}
-- {id: Core_clock.outFreq, value: 96 MHz}
-- {id: Flash_clock.outFreq, value: 24 MHz}
-- {id: FlexBus_clock.outFreq, value: 48 MHz}
+- {id: Bus_clock.outFreq, value: 10.48576 MHz}
+- {id: Core_clock.outFreq, value: 20.97152 MHz}
+- {id: Flash_clock.outFreq, value: 5.24288 MHz}
+- {id: FlexBus_clock.outFreq, value: 10.48576 MHz}
 - {id: LPO_clock.outFreq, value: 1 kHz}
-- {id: MCGFFCLK.outFreq, value: 500 kHz}
+- {id: MCGFFCLK.outFreq, value: 32.768 kHz}
 - {id: MCGIRCLK.outFreq, value: 32.768 kHz}
-- {id: System_clock.outFreq, value: 96 MHz}
+- {id: PLLFLLCLK.outFreq, value: 20.97152 MHz}
+- {id: System_clock.outFreq, value: 20.97152 MHz}
 settings:
-- {id: MCGMode, value: PEE}
 - {id: MCG.FRDIV.scale, value: '32', locked: true}
-- {id: MCG.IREFS.sel, value: MCG.FRDIV}
-- {id: MCG.PLLS.sel, value: MCG.PLLCS}
 - {id: MCG.PRDIV.scale, value: '2'}
 - {id: MCG.VDIV.scale, value: '24'}
 - {id: MCG_C1_IRCLKEN_CFG, value: Enabled}
@@ -122,7 +123,7 @@ sources:
  ******************************************************************************/
 const mcg_config_t mcgConfig_BOARD_BootClockRUN =
     {
-        .mcgMode = kMCG_ModePEE,                  /* PEE - PLL Engaged External */
+        .mcgMode = kMCG_ModeFEI,                  /* FEI - FLL Engaged Internal */
         .irclkEnableMode = kMCG_IrclkEnable,      /* MCGIRCLK enabled, MCGIRCLK disabled in STOP mode */
         .ircs = kMCG_IrcSlow,                     /* Slow internal reference clock selected */
         .fcrdiv = 0x1U,                           /* Fast IRC divider: divided by 2 */
@@ -172,12 +173,17 @@ void BOARD_BootClockRUN(void)
     CLOCK_SetInternalRefClkConfig(mcgConfig_BOARD_BootClockRUN.irclkEnableMode,
                                   mcgConfig_BOARD_BootClockRUN.ircs, 
                                   mcgConfig_BOARD_BootClockRUN.fcrdiv);
-    /* Configure FLL external reference divider (FRDIV). */
-    CLOCK_CONFIG_SetFllExtRefDiv(mcgConfig_BOARD_BootClockRUN.frdiv);
-    /* Set MCG to PEE mode. */
-    CLOCK_BootToPeeMode(mcgConfig_BOARD_BootClockRUN.oscsel,
-                        mcgConfig_BOARD_BootClockRUN.pllcs,
-                        &mcgConfig_BOARD_BootClockRUN.pll0Config);
+    /* Set MCG to FEI mode. */
+#if FSL_CLOCK_DRIVER_VERSION >= MAKE_VERSION(2, 2, 0)
+    CLOCK_BootToFeiMode(mcgConfig_BOARD_BootClockRUN.dmx32,
+                        mcgConfig_BOARD_BootClockRUN.drs,
+                        CLOCK_CONFIG_FllStableDelay);
+#else
+    CLOCK_BootToFeiMode(mcgConfig_BOARD_BootClockRUN.drs,
+                        CLOCK_CONFIG_FllStableDelay);
+#endif
+    /* Select the MCG external reference clock. */
+    CLOCK_SetExternalRefClkConfig(mcgConfig_BOARD_BootClockRUN.oscsel);
     /* Set the clock configuration in SIM module. */
     CLOCK_SetSimConfig(&simConfig_BOARD_BootClockRUN);
     /* Set SystemCoreClock variable. */

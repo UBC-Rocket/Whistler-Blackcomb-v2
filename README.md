@@ -38,4 +38,5 @@ All documentation are currently kept in the [doc/](doc/) directory.
 3. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md). 
 4. How continout integration works and how to access ours in this [guide](doc/4-Continuous-Integration.md). 
 5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md). 
-6. Radio system [guide](doc/4-Radio.h). 
+6. Radio system [guide](doc/6-Radio.md). 
+7. CAN communication [guide](doc/7-CAN.md)
