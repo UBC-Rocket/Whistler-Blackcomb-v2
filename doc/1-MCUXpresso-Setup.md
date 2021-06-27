@@ -8,12 +8,12 @@ Download from [here](https://www.nxp.com/design/software/development-software/mc
 
 Go to [here](https://mcuxpresso.nxp.com/download/78d26642c8a4ca1efecebe0f36145702) and download it. If that doesn't work for some reason you can also get the SDK package yourself [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
 
-![](doc/images/SDKSelect.png)
-![](doc/images/SDKDownload.png)
+![](images/SDKSelect.png)
+![](images/SDKDownload.png)
 
 After the SDK is installed open the Installed SDK window (if this isn't visible click Windows->Show View->Installed SDKs) on MCUXpresso and drag the SDK zip file. 
 
-![](doc/images/InstalledSDKs.png)
+![](images/InstalledSDKs.png)
 
 ### Setup Project
 
