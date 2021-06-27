@@ -49,5 +49,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_time.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_uart.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/hal_can.c
 
 )

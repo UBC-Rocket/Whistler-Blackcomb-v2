@@ -52,3 +52,16 @@ target_link_libraries(buffer_test_app
     buffer)
 
 add_test(buffer_test buffer_test_app)
+
+
+
+add_definitions( -DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\" )
+add_definitions( -DCOMPILE_x86 )
+add_executable(radio_protocol_test_app 
+test_radio_protocol.c)
+
+target_link_libraries(radio_protocol_test_app
+Unity
+radio_protocol)
+
+add_test(radio_protocol_test radio_protocol_test_app)
