@@ -13,7 +13,7 @@ This is a repository with the code for the UBC Rocket Whistler Blackcomb flight 
 All documentation are currently kept in the [doc/](doc/) directory. 
 
 1. Setting up the Project in MCUXpresso [guide](doc/1-MCUXpresso-Setup.md). If you are new to the project, **start here**.
-2. x86 Compilation explanation and setup [guide](doc/2-x86-Compilation.md).
+2. x86 Compilation explanation and setup [guide](doc/2-x86-Compilation.md). This is a good **second step**.
 3. Uploading to Teensy [guide](doc/3-Teensy-Upload.md).
 4. freeRTOS installation and usage [guide](doc/4-RTOS-Basics.md).
 5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md). 
