@@ -23,6 +23,7 @@
 #include "task.h"
 #include "queue.h"
 #include "timers.h"
+#include "variables.h"
 
 /* Includes common between MCU and x86 */
 #include "state_machine.h"
@@ -90,7 +91,6 @@ IMU_1 IMU;
  * State Transition Variables
  ******************************************************************************/
 
-stateInput_t stateTransitonInput = {0};
 
 /*******************************************************************************
  * Main

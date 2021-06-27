@@ -17,7 +17,7 @@ void baseTest_RTOS(void){
     if (error = xTaskCreate( /* create task */
 	    baseTest, /* pointer to the task */
 	    "Base Test", /* task name for kernel awareness debugging */
-	    200 / sizeof(StackType_t), /* task stack size */
+	    2000 / sizeof(StackType_t), /* task stack size */
 	    (void*) NULL, /* optional task startup argument */
 	    tskIDLE_PRIORITY + 2, /* initial priority */
 	    (TaskHandle_t*) NULL /* optional task handle_debug to create */
@@ -40,7 +40,7 @@ void initBufTest_RTOS(void){
     if (error = xTaskCreate( /* create task */
 	    initBufTest, /* pointer to the task */
 	    "Init Buf Test", /* task name for kernel awareness debugging */
-	    200 / sizeof(StackType_t), /* task stack size */
+	    2000 / sizeof(StackType_t), /* task stack size */
 	    (void*) NULL, /* optional task startup argument */
 	    tskIDLE_PRIORITY + 2, /* initial priority */
 	    (TaskHandle_t*) NULL /* optional task handle_debug to create */
@@ -78,6 +78,7 @@ void placeAndRecieveTest(void *pv){
     TEST_ASSERT_EQUAL_INT8(testData2,recievedData2);
     TEST_ASSERT_EQUAL_UINT8_ARRAY(testData3,recievedData3,10);
 
+
     vTaskEndScheduler();
 
     
@@ -88,7 +89,7 @@ void placeAndRecieveTest_RTOS(void){
     if (error = xTaskCreate( /* create task */
 	    placeAndRecieveTest, /* pointer to the task */
 	    "Place and Recieve Test", /* task name for kernel awareness debugging */
-	    200 / sizeof(StackType_t), /* task stack size */
+	    2000 / sizeof(StackType_t), /* task stack size */
 	    (void*) NULL, /* optional task startup argument */
 	    tskIDLE_PRIORITY + 2, /* initial priority */
 	    (TaskHandle_t*) NULL /* optional task handle_debug to create */
@@ -98,6 +99,7 @@ void placeAndRecieveTest_RTOS(void){
 			    ; /* error! probably out of memory */
 	}
     vTaskStartScheduler();
+    
 }
 
 //need to rewrite this test, behaviour is as expected but the test results are 
@@ -126,13 +128,14 @@ void bufferWraparoundTest(void *pv){
 }
 
 void bufferWraparoundTest_RTOS(void){
+    printf("\nhere\n");
     BaseType_t error;
     if (error = xTaskCreate( /* create task */
 	    bufferWraparoundTest, /* pointer to the task */
 	    "Buffer Wraparound Test", /* task name for kernel awareness debugging */
 	    200 / sizeof(StackType_t), /* task stack size */
 	    (void*) NULL, /* optional task startup argument */
-	    tskIDLE_PRIORITY + 2, /* initial priority */
+	    tskIDLE_PRIORITY + 4, /* initial priority */
 	    (TaskHandle_t*) NULL /* optional task handle_debug to create */
 	    ) != pdPASS) {
 		    printf("Task init failed: %d\n", error);

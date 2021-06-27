@@ -1,6 +1,5 @@
 #include "radio_protocol.h"
 
-
 //these lengths inlcude the 1 byte ID and the 4 byte timestamp
 #define PING_PACKET_LENGTH 10
 #define MESSAGE_MIN_PACKET_LENGTH 6
@@ -12,12 +11,12 @@
 #define ACCEL_PACKET_LENGTH 17
 #define SINGLE_FLOAT_PACKET_LENGTH 9
 #define SINGLE_INT_PACKET_LENGTH 6
+#define DATA_DUMP_PACKET_LENGTH 86
 
 #define MAX_RADIO_WAIT_MS 120000
 
 #define CRITICAL_WATERSHED 0x40
 #define MAX_SENSOR_ID 0x2F
-
 
 //I am not sure this is the best way to do this, but it seems workable
 #ifdef COMPILE_BOARD
@@ -29,38 +28,17 @@
 //declarations
 static void inputLoop(void *pv);
 static void outputLoop(void *pv);
-void GSRadioInit(void);
 uint32_t getTimestamp();
-void modBitFieldSensorStatus(uint8_t sensorID,uint8_t offset,uint8_t *generalFailMode, uint32_t *bitfield);
-void radioPrepPing(void);
-void radioPrepMessage(char *messageStr, uint8_t lengthBytes);
-void radioPrepEvent(uint16_t eventCode);
-void radioPrepConfig(void);
-static void radioPrepGPS(void);
-static void radioPrepState(void);
-static void radioPrepOrientation(void);
-static void radioPrepAccel(void);
-static void radioPrepPT_HP_T_001(void);
-static void radioPrepTC_HP_OUT_001(void);
-static void radioPrepV_HP_P_001(void);
-static void radioPrepV_F_PR_001(void);
-static void radioPrepV_F_V_001(void);
-static void radioPrepPT_F_T_001(void);
-static void radioPrepV_F_F_001(void);
-static void radioPrepPT_F_INJ_001(void);
-static void radioPrepV_F_MFV_001(void);
-static void radioPrepV_L_PR_001(void);
-static void radioPrepPT_L_T_001(void);
-static void radioPrepV_L_V_001(void);
-static void radioPrepTC_L_F_001(void);
-static void radioPrepV_L_F_001(void);
-static void radioPrepPT_L_INJ_001(void);
-static void radioPrepV_L_MOV_001(void);
-static void radioPrepV_L_BLD_001(void);
-static void radioPrepTC_L_BLD_001(void);
-static void radioPrepDataDump(void);
-void dealWithLowMessages(void *pv);
+void modBitFieldSensorStatus(uint8_t sensorID, uint8_t offset, uint8_t *generalFailMode, uint32_t *bitfield);
 
+void dealWithLowMessages(void *pv);
+void dealWithCritMessages(void *pv);
+
+cbufHandle_t radioBufTX;
+
+cbufHandle_t radioBufRXCrit;
+
+cbufHandle_t radioBufRXLow;
 
 //loops
 
@@ -104,14 +82,6 @@ static void inputLoop(void *pv)
 
 static void outputLoop(void *pv)
 {
-    //this loop should send all messages in the send buffer
-
-    //TODO: Make this work if the messages come slowly, i.e. don't force wait until buffer full
-    TickType_t maxRadioWaitTicks = pdMS_TO_TICKS(MAX_RADIO_WAIT_MS);
-    TickType_t ticksAtLastSend = xTaskGetTickCount();
-    //we shouldn't have overflow problems here
-    //will overflow after about 50 days.
-
     uint8_t *message = pvPortMalloc(256 * sizeof(uint8_t));
     uint8_t length = 0;
     uint8_t *individMessage = pvPortMalloc(256 * sizeof(uint8_t));
@@ -140,19 +110,27 @@ static void outputLoop(void *pv)
                 length = individLength;
             }
         }
+    }
+}
 
-        if ((xTaskGetTickCount() - ticksAtLastSend) >= maxRadioWaitTicks)
+static void mandatoryOutput(void *pv)
+{
+    TickType_t maxRadioWaitTicks = pdMS_TO_TICKS(MAX_RADIO_WAIT_MS);
+
+    for (;;)
+    {
+        vTaskDelay(maxRadioWaitTicks);
+
+        if (cbufCheckEmpty(radioBufTX))
         {
-            if(length==0){
-                radioPrepPing();
-            }
+            uint8_t *message = pvPortMalloc(256 * sizeof(uint8_t));
+            uint8_t length;
+
+            radioPrepPing();
+
+            length = cbufGet(radioBufTX, message);
+
             radioTxRequest(&radio, message, length);
-            length = 0;
-            ticksAtLastSend = xTaskGetTickCount();
-            /* This feels like it isn't the most efficient way to do this but
-            at least it keeps it all in one task
-            
-            Need to do something to prevent empty messages? */
         }
     }
 }
@@ -184,6 +162,18 @@ void GSRadioInit(void)
             ;
     }
 
+        if (xTaskCreate(
+            mandatoryOutput,
+            "radio mandatory out controller",
+            50000 / sizeof(StackType_t),
+            (void *)NULL,
+            tskIDLE_PRIORITY + 2,
+            (TaskHandle_t *)NULL) != pdPASS)
+    {
+        for (;;)
+            ;
+    }
+
     if (xTaskCreate(
             inputLoop,
             "radio in controller",
@@ -195,24 +185,53 @@ void GSRadioInit(void)
         for (;;)
             ;
     }
+
+    if (xTaskCreate(
+            dealWithLowMessages,
+            "deal with low messages",
+            1000 / sizeof(StackType_t),
+            (void *)NULL,
+            tskIDLE_PRIORITY + 2,
+            (TaskHandle_t *)NULL) != pdPASS)
+    {
+        for (;;)
+            ;
+    }
+
+    if (xTaskCreate(
+            dealWithCritMessages,
+            "deal with low messages",
+            1000 / sizeof(StackType_t),
+            (void *)NULL,
+            tskIDLE_PRIORITY + 2,
+            (TaskHandle_t *)NULL) != pdPASS)
+    {
+        for (;;)
+            ;
+    }
 }
 
-uint32_t getTimestamp(){
-    return (uint32_t)(timeSinceStartup()/1000);
+uint32_t getTimestamp()
+{
+    return (uint32_t)(timeSinceStartup() / 1000);
 }
 
-void modBitFieldSensorStatus(uint8_t sensorID,uint8_t offset,
-uint8_t *generalFailMode, uint32_t *bitfield){
+void modBitFieldSensorStatus(uint8_t sensorID, uint8_t offset,
+                             uint8_t *generalFailMode, uint32_t *bitfield)
+{
     *bitfield |= 0; //dereference the pointers (?)
     *generalFailMode |= 0;
-    uint8_t status=getSensorStatus(sensorID);
-    if(status>0){
-        
-        *bitfield = (*bitfield|(0x01<<offset));
-        if(status>1){
+    uint8_t status = getSensorStatus(sensorID);
+    if (status > 0)
+    {
+
+        *bitfield = (*bitfield | (0x01 << offset));
+        if (status > 1)
+        {
             *generalFailMode = 0x03;
         }
-        else{
+        else
+        {
             *generalFailMode = 0x01;
         }
     }
@@ -224,82 +243,79 @@ void radioPrepPing(void)
     uint8_t ID = 0x00;
     uint32_t timestamp = getTimestamp();
     //timestamp
-    
-    uint8_t generalFailMode=0;
 
+    uint8_t generalFailMode = 0;
 
     uint32_t senStatusBitFieldA = 0x00; //these 4 bits represent sensor status,
-                                        //and a few other statuses, like camera and SD    
+                                        //and a few other statuses, like camera and SD
 
-    //this is very explicit and not very elegant but I don't like assuming that 
+    //this is very explicit and not very elegant but I don't like assuming that
     //you can always enumerate through the sensors.
 
-    modBitFieldSensorStatus(0x04,31,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x05,30,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x06,29,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x07,28,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x1E,27,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x1F,26,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x20,25,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x21,24,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x22,23,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x23,22,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x24,21,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x25,20,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x26,19,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x27,18,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x28,17,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x29,16,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x2A,15,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x2B,14,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x2C,13,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x2D,12,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x2E,11,&generalFailMode,&senStatusBitFieldA);
-    modBitFieldSensorStatus(0x2F,10,&generalFailMode,&senStatusBitFieldA);
+    modBitFieldSensorStatus(0x04, 31, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x05, 30, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x06, 29, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x07, 28, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x1E, 27, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x1F, 26, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x20, 25, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x21, 24, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x22, 23, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x23, 22, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x24, 21, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x25, 20, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x26, 19, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x27, 18, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x28, 17, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x29, 16, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x2A, 15, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x2B, 14, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x2C, 13, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x2D, 12, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x2E, 11, &generalFailMode, &senStatusBitFieldA);
+    modBitFieldSensorStatus(0x2F, 10, &generalFailMode, &senStatusBitFieldA);
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = generalFailMode;
-    memcpy(&message[6],&senStatusBitFieldA,4);
+    memcpy(&message[6], &senStatusBitFieldA, 4);
 
     cbufPut(radioBufTX, PING_PACKET_LENGTH, message);
 
     vPortFree(message);
-
-    
 }
 
-void radioPrepMessage(char *messageStr, uint8_t lengthBytes){
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * (MESSAGE_MIN_PACKET_LENGTH+lengthBytes));
+void radioPrepMessage(char *messageStr, uint8_t lengthBytes)
+{
+    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * (MESSAGE_MIN_PACKET_LENGTH + lengthBytes));
     uint8_t ID = 0x01;
     uint32_t timestamp = getTimestamp();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = lengthBytes;
 
-    memcpy(&message[6],messageStr,lengthBytes);
+    memcpy(&message[6], messageStr, lengthBytes);
 
-    cbufPut(radioBufTX, (MESSAGE_MIN_PACKET_LENGTH+lengthBytes), message);
+    cbufPut(radioBufTX, (MESSAGE_MIN_PACKET_LENGTH + lengthBytes), message);
 
     vPortFree(message);
 }
 
-void radioPrepEvent(uint16_t eventCode){
+void radioPrepEvent(uint16_t eventCode)
+{
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * EVENT_PACKET_LENGTH);
     uint8_t ID = 0x02;
     uint32_t timestamp = getTimestamp();
 
-
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
-    memcpy(&message[5],&eventCode,2);
+    memcpy(&message[1], &timestamp, 4);
+    memcpy(&message[5], &eventCode, 2);
 
     cbufPut(radioBufTX, PING_PACKET_LENGTH, message);
 
     vPortFree(message);
 }
-
 
 void radioPrepConfig(void)
 {
@@ -307,16 +323,16 @@ void radioPrepConfig(void)
     uint8_t ID = 0x03;
     uint32_t timestamp = getTimestamp();
     uint8_t SIMstatus = SIM_ACTIVE;
-    uint8_t deviceID = 5; //magig number bad
+    uint8_t deviceID = 5;        //magig number bad
     uint8_t verString[40] = {0}; //in future will be better to remove this step?
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = SIMstatus;
     message[6] = deviceID;
     for (int index = 0; index < 40; index++)
     {
-        message[index+7] = verString[index];
+        message[index + 7] = verString[index];
     }
 
     cbufPut(radioBufTX, CONFIG_PACKET_LENGTH, message);
@@ -330,9 +346,9 @@ static void radioPrepGPS(void)
     uint8_t ID = 0x04;
     uint32_t timestamp = getTimestamp();
     float curGPS[3];
-    getGPS(curGPS);
+    getGPSValue(curGPS);
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &curGPS[0], 4);
     memcpy(&message[9], &curGPS[1], 4);
     memcpy(&message[16], &curGPS[2], 4);
@@ -341,19 +357,19 @@ static void radioPrepGPS(void)
     vPortFree(message);
 }
 
-static void radioPrepState(void){
+static void radioPrepState(void)
+{
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * STATE_PACKET_LENGTH);
     uint8_t ID = 0x05;
     uint32_t timestamp = getTimestamp();
     uint16_t curState = getState();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &curState, 2);
     cbufPut(radioBufTX, STATE_PACKET_LENGTH, message);
 
     vPortFree(message);
-
 }
 
 static void radioPrepOrientation(void)
@@ -362,10 +378,10 @@ static void radioPrepOrientation(void)
     uint8_t ID = 0x06;
     uint32_t timestamp = getTimestamp();
     float curOrient[4];
-    getOrientation(curOrient);
+    getOrientationValue(curOrient);
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &curOrient[0], 16);
     cbufPut(radioBufTX, ORIENT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -377,10 +393,10 @@ static void radioPrepAccel(void)
     uint8_t ID = 0x07;
     uint32_t timestamp = getTimestamp();
     float curAccel[3];
-    getAccel(curAccel);
+    getAccelValue(curAccel);
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &curAccel[0], 16);
     cbufPut(radioBufTX, ACCEL_PACKET_LENGTH, message);
     vPortFree(message);
@@ -392,10 +408,10 @@ static void radioPrepPT_HP_T_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x1E;
     uint32_t timestamp = getTimestamp();
-    float value = getPT_HP_T_001();
+    float value = getPT_HP_T_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -407,10 +423,10 @@ static void radioPrepTC_HP_OUT_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x1F;
     uint32_t timestamp = getTimestamp();
-    float value = getTC_HP_OUT_001();
+    float value = getTC_HP_OUT_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -422,10 +438,10 @@ static void radioPrepV_HP_P_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x20;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_HP_P_001();
+    uint8_t value = getV_HP_P_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -437,10 +453,10 @@ static void radioPrepV_F_PR_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x21;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_PR_001();
+    uint8_t value = getV_F_PR_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -452,10 +468,10 @@ static void radioPrepV_F_V_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x22;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_V_001();
+    uint8_t value = getV_F_V_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -467,10 +483,10 @@ static void radioPrepPT_F_T_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x23;
     uint32_t timestamp = getTimestamp();
-    float value = getPT_F_T_001();
+    float value = getPT_F_T_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -482,10 +498,10 @@ static void radioPrepV_F_F_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x24;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_F_001();
+    uint8_t value = getV_F_F_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -497,10 +513,10 @@ static void radioPrepPT_F_INJ_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x25;
     uint32_t timestamp = getTimestamp();
-    float value = getPT_F_INJ_001();
+    float value = getPT_F_INJ_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -512,10 +528,10 @@ static void radioPrepV_F_MFV_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x26;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_MFV_001();
+    uint8_t value = getV_F_MFV_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -527,10 +543,10 @@ static void radioPrepV_L_PR_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x27;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_PR_001();
+    uint8_t value = getV_L_PR_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -542,10 +558,10 @@ static void radioPrepPT_L_T_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x28;
     uint32_t timestamp = getTimestamp();
-    float value = getPT_L_T_001();
+    float value = getPT_L_T_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -557,10 +573,10 @@ static void radioPrepV_L_V_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x29;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_V_001();
+    uint8_t value = getV_L_V_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -572,10 +588,10 @@ static void radioPrepTC_L_F_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x2A; // this is the gun rights packet.
     uint32_t timestamp = getTimestamp();
-    float value = getTC_L_F_001();
+    float value = getTC_L_F_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -587,10 +603,10 @@ static void radioPrepV_L_F_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x2B;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_F_001();
+    uint8_t value = getV_L_F_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -602,10 +618,10 @@ static void radioPrepPT_L_INJ_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x2C;
     uint32_t timestamp = getTimestamp();
-    float value = getPT_L_INJ_001();
+    float value = getPT_L_INJ_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -617,10 +633,10 @@ static void radioPrepV_L_MOV_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x2D;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_MOV_001();
+    uint8_t value = getV_L_MOV_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -632,10 +648,10 @@ static void radioPrepV_L_BLD_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
     uint8_t ID = 0x2E;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_BLD_001();
+    uint8_t value = getV_L_BLD_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -647,10 +663,10 @@ static void radioPrepTC_L_BLD_001(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
     uint8_t ID = 0x2F;
     uint32_t timestamp = getTimestamp();
-    float value = getTC_L_BLD_001();
+    float value = getTC_L_BLD_001Value();
 
     message[0] = ID;
-    memcpy(&message[1],&timestamp,4);
+    memcpy(&message[1], &timestamp, 4);
     memcpy(&message[5], &value, 4);
     cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
@@ -659,10 +675,85 @@ static void radioPrepTC_L_BLD_001(void)
 //Data Dump
 static void radioPrepDataDump(void)
 {
+    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * DATA_DUMP_PACKET_LENGTH);
+    uint8_t ID = 0x30; //verify
+    uint32_t timestamp = getTimestamp();
 
+    float GPSValue[3];
+    getGPSValue(GPSValue);
+
+    float orientValue[4];
+    getOrientValue(orientValue);
+
+    float accelValue[3];
+    getAccelValue(accelValue);
+
+    float PT_HP_T_001Value = getPT_HP_T_001Value();
+
+    float TC_HP_OUT_001Value = getTC_HP_OUT_001Value();
+
+    uint8_t V_HP_P_001Value = getV_HP_P_001Value();
+
+    uint8_t V_F_PR_001Value = getV_F_PR_001Value();
+
+    uint8_t V_F_V_001Value = getV_F_V_001Value();
+
+    float PT_F_T_001Value = getPT_F_T_001Value();
+
+    uint8_t V_F_F_001Value = getV_F_F_001Value();
+
+    float PT_F_INJ_001Value = getPT_F_INJ_001Value();
+
+    uint8_t V_F_MFV_001Value = getV_F_MFV_001Value();
+
+    uint8_t V_L_PR_001Value = getV_L_PR_001Value();
+
+    float PT_L_T_001Value = getPT_L_T_001Value();
+
+    uint8_t V_L_V_001Value = getV_L_V_001Value();
+
+    float TC_L_F_001Value = getTC_L_F_001Value();
+
+    uint8_t V_L_F_001Value = getV_L_F_001Value();
+
+    float PT_L_INJ_001Value = getPT_L_INJ_001Value();
+
+    uint8_t V_L_MOV_001Value = getV_L_MOV_001Value();
+
+    uint8_t V_L_BLD_001Value = getV_L_BLD_001Value();
+
+    float TC_L_BLD_001Value = getTC_L_BLD_001Value();
+
+    message[0] = ID;
+    memcpy(&message[1], &timestamp, 4);
+    memcpy(&message[5], GPSValue, 12);
+    memcpy(&message[17], orientValue, 16);
+    memcpy(&message[33], accelValue, 12);
+    memcpy(&message[45], &PT_HP_T_001Value, 4);
+    memcpy(&message[49], &TC_HP_OUT_001Value, 4);
+    message[53] = V_HP_P_001Value;
+    message[54] = V_F_PR_001Value;
+    message[55] = V_F_V_001Value;
+    memcpy(&message[56], &PT_F_T_001Value, 4);
+    message[60] = V_F_F_001Value;
+    memcpy(&message[61], &PT_F_INJ_001Value, 4);
+    message[65] = V_F_MFV_001Value;
+    message[66] = V_L_PR_001Value;
+    memcpy(&message[67], &PT_L_T_001Value, 4);
+    message[71] = V_L_V_001Value;
+    memcpy(&message[72], &TC_L_F_001Value, 4);
+    message[76] = V_L_F_001Value;
+    memcpy(&message[77], &PT_L_INJ_001Value, 4);
+    message[81] = V_L_MOV_001Value;
+    message[82] = V_L_BLD_001Value;
+    memcpy(&message[83], &TC_L_BLD_001Value, 4);
+
+    cbufPut(radioBufTX, DATA_DUMP_PACKET_LENGTH, message);
+    vPortFree(message);
 }
 
-void dealWithHighMessages(void *pv){
+void dealWithCritMessages(void *pv)
+{
     uint8_t message = 0;
     for (;;)
     {
@@ -677,19 +768,24 @@ void dealWithHighMessages(void *pv){
                 radioPrepConfig();
                 break;
             case 0x41:
-                //trigger abort
+                xSemaphoreTake(stateTransitonInput.semaphore,portMAX_DELAY);
+                stateTransitonInput.HMI_triggerAbort = STATE_MACHINE_TRIGGERED;
+                xSemaphoreGive(stateTransitonInput.semaphore);
                 break;
             case 0x46:
-                //trigger fueling
+                xSemaphoreTake(stateTransitonInput.semaphore,portMAX_DELAY);
+                stateTransitonInput.HMI_triggerFueling = STATE_MACHINE_TRIGGERED;
+                xSemaphoreGive(stateTransitonInput.semaphore);
                 break;
             case 0x53:
-                //trigger standby
+                xSemaphoreTake(stateTransitonInput.semaphore,portMAX_DELAY);
+                stateTransitonInput.HMI_triggerStandby = STATE_MACHINE_TRIGGERED;
+                xSemaphoreGive(stateTransitonInput.semaphore);
                 break;
             }
         }
     }
 }
-
 
 void dealWithLowMessages(void *pv)
 {

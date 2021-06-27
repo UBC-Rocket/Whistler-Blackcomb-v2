@@ -27,6 +27,9 @@ add_library(buffer STATIC src/buffer.c)
 
 target_link_libraries(buffer freertos)
 
+target_link_libraries(state_machine freertos)
+
+
 add_library(radio STATIC src/radio.c)
 
 target_link_libraries(radio hal)

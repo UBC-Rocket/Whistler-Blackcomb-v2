@@ -1,6 +1,8 @@
 #ifndef _STATE_MACHINE_H_
 #define _STATE_MACHINE_H_
 
+#define STATE_MACHINE_TRIGGERED 1
+
 /**
  * This is a design for a state machine, mainly based on the techniques here: 
  * https://stackoverflow.com/questions/1371460/state-machines-tutorials
@@ -17,6 +19,9 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
+#include "FreeRTOS.h"
+#include "semphr.h" 
+
 
 /*******************************************************************************
  * Definitions
@@ -83,6 +88,8 @@ typedef enum stateRet_t
  */
 typedef struct stateInput_t
 {
+    SemaphoreHandle_t semaphore;
+    
     double vertVelocity;
     double vertPosition;
 

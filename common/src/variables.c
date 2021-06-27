@@ -30,7 +30,7 @@ struct GPSdata_s{
     SemaphoreHandle_t semaphore;
 } GPSdata;
 
-void setGPS(float value[3]){
+void setGPSValue(float value[3]){
     xSemaphoreTake(GPSdata.semaphore,portMAX_DELAY);
     GPSdata.lat=value[0];
     GPSdata.lon=value[1];
@@ -38,7 +38,7 @@ void setGPS(float value[3]){
     xSemaphoreGive(GPSdata.semaphore);
 }
 
-void getGPS(float value[3]){
+void getGPSValue(float value[3]){
     xSemaphoreTake(GPSdata.semaphore,portMAX_DELAY);
     value[0]=GPSdata.lat;
     value[1]=GPSdata.lon;
@@ -57,7 +57,7 @@ struct orientData_s{
     SemaphoreHandle_t semaphore;
 } orientData;
 
-void getOrientation(float value[4]){
+void getOrientationValue(float value[4]){
     xSemaphoreTake(orientData.semaphore,portMAX_DELAY);
     orientData.x=value[0];
     orientData.y=value[1];
@@ -66,7 +66,7 @@ void getOrientation(float value[4]){
     xSemaphoreGive(orientData.semaphore);
 }
 
-void setOrientation(float value[4]){
+void setOrientationValue(float value[4]){
     xSemaphoreTake(orientData.semaphore,portMAX_DELAY);
     value[0]=orientData.x;
     value[1]=orientData.y;
@@ -85,7 +85,7 @@ struct accelData_s{
     SemaphoreHandle_t semaphore;
 } accelData;
 
-void getAccel(float value[3]){
+void getAccelValue(float value[3]){
     xSemaphoreTake(accelData.semaphore,portMAX_DELAY);
     accelData.x=value[0];
     accelData.y=value[1];
@@ -93,7 +93,7 @@ void getAccel(float value[3]){
     xSemaphoreGive(accelData.semaphore);
 }
 
-void setAccel(float value[3]){
+void setAccelValue(float value[3]){
     xSemaphoreTake(accelData.semaphore,portMAX_DELAY);
     value[0]=accelData.x;
     value[1]=accelData.y;
@@ -121,12 +121,12 @@ struct singleIntSemphr_s{
 
 //HP Tank PT
 struct singleFloatSemphr_s PT_HP_T_001data;
-void setPT_HP_T_001(float value){
+void setPT_HP_T_001Value(float value){
     xSemaphoreTake(PT_HP_T_001data.semaphore,portMAX_DELAY);
     PT_HP_T_001data.value=value; //wow how descriptive, this is the epitome of self-documenting code
     xSemaphoreGive(PT_HP_T_001data.semaphore);
 }
-float getPT_HP_T_001(void){
+float getPT_HP_T_001Value(void){
     xSemaphoreTake(PT_HP_T_001data.semaphore,portMAX_DELAY);
     float value=PT_HP_T_001data.value;
     xSemaphoreGive(PT_HP_T_001data.semaphore);
@@ -135,12 +135,12 @@ float getPT_HP_T_001(void){
 
 //HP Tank Out Valve TC
 struct singleFloatSemphr_s TC_HP_OUT_001data;
-void setTC_HP_OUT_001(float value){
+void setTC_HP_OUT_001Value(float value){
     xSemaphoreTake(TC_HP_OUT_001data.semaphore,portMAX_DELAY);
     TC_HP_OUT_001data.value=value;
     xSemaphoreGive(TC_HP_OUT_001data.semaphore);
 }
-float getTC_HP_OUT_001(void){
+float getTC_HP_OUT_001Value(void){
     xSemaphoreTake(TC_HP_OUT_001data.semaphore,portMAX_DELAY);
     float value=TC_HP_OUT_001data.value;
     xSemaphoreGive(TC_HP_OUT_001data.semaphore);
@@ -149,12 +149,12 @@ float getTC_HP_OUT_001(void){
 
 //HP Press Valve
 struct singleIntSemphr_s V_HP_P_001data;
-void setV_HP_P_001(uint8_t value){
+void setV_HP_P_001Value(uint8_t value){
     xSemaphoreTake(V_HP_P_001data.semaphore,portMAX_DELAY);
     V_HP_P_001data.value=value;
     xSemaphoreGive(V_HP_P_001data.semaphore);
 }
-uint8_t getV_HP_P_001(void){
+uint8_t getV_HP_P_001Value(void){
     xSemaphoreTake(V_HP_P_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_HP_P_001data.value;
     xSemaphoreGive(V_HP_P_001data.semaphore);
@@ -163,12 +163,12 @@ uint8_t getV_HP_P_001(void){
 
 //Fuel Press Valve
 struct singleIntSemphr_s V_F_PR_001data;
-void setV_F_PR_001(uint8_t value){
+void setV_F_PR_001Value(uint8_t value){
     xSemaphoreTake(V_F_PR_001data.semaphore,portMAX_DELAY);
     V_F_PR_001data.value=value;
     xSemaphoreGive(V_F_PR_001data.semaphore);
 }
-uint8_t getV_F_PR_001(void){
+uint8_t getV_F_PR_001Value(void){
     xSemaphoreTake(V_F_PR_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_F_PR_001data.value;
     xSemaphoreGive(V_F_PR_001data.semaphore);
@@ -177,12 +177,12 @@ uint8_t getV_F_PR_001(void){
 
 //Fuel Vent Valve
 struct singleIntSemphr_s V_F_V_001data;
-void setV_F_V_001(uint8_t value){
+void setV_F_V_001Value(uint8_t value){
     xSemaphoreTake(V_F_V_001data.semaphore,portMAX_DELAY);
     V_F_V_001data.value=value;
     xSemaphoreGive(V_F_V_001data.semaphore);
 }
-uint8_t getV_F_V_001(void){
+uint8_t getV_F_V_001Value(void){
     xSemaphoreTake(V_F_V_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_F_V_001data.value;
     xSemaphoreGive(V_F_V_001data.semaphore);
@@ -191,12 +191,12 @@ uint8_t getV_F_V_001(void){
 
 //Fuel Tank PT
 struct singleFloatSemphr_s PT_F_T_001data;
-void setPT_F_T_001(float value){
+void setPT_F_T_001Value(float value){
     xSemaphoreTake(PT_F_T_001data.semaphore,portMAX_DELAY);
     PT_F_T_001data.value=value;
     xSemaphoreGive(PT_F_T_001data.semaphore);
 }
-float getPT_F_T_001(void){
+float getPT_F_T_001Value(void){
     xSemaphoreTake(PT_F_T_001data.semaphore,portMAX_DELAY);
     float value=PT_F_T_001data.value;
     xSemaphoreGive(PT_F_T_001data.semaphore);
@@ -205,12 +205,12 @@ float getPT_F_T_001(void){
 
 //Fuel Fill Valve
 struct singleIntSemphr_s V_F_F_001data;
-void setV_F_F_001(uint8_t value){
+void setV_F_F_001Value(uint8_t value){
     xSemaphoreTake(V_F_F_001data.semaphore,portMAX_DELAY);
     V_F_F_001data.value=value;
     xSemaphoreGive(V_F_F_001data.semaphore);
 }
-uint8_t getV_F_F_001(void){
+uint8_t getV_F_F_001Value(void){
     xSemaphoreTake(V_F_F_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_F_F_001data.value;
     xSemaphoreGive(V_F_F_001data.semaphore);
@@ -219,12 +219,12 @@ uint8_t getV_F_F_001(void){
 
 //Fuel Injector PT
 struct singleFloatSemphr_s PT_F_INJ_001data;
-void setPT_F_INJ_001(float value){
+void setPT_F_INJ_001Value(float value){
     xSemaphoreTake(PT_F_INJ_001data.semaphore,portMAX_DELAY);
     PT_F_INJ_001data.value=value;
     xSemaphoreGive(PT_F_INJ_001data.semaphore);
 }
-float getPT_F_INJ_001(void){
+float getPT_F_INJ_001Value(void){
     xSemaphoreTake(PT_F_INJ_001data.semaphore,portMAX_DELAY);
     float value=PT_F_INJ_001data.value;
     xSemaphoreGive(PT_F_INJ_001data.semaphore);
@@ -233,12 +233,12 @@ float getPT_F_INJ_001(void){
 
 //Main Fuel Valve
 struct singleIntSemphr_s V_F_MFV_001data;
-void setV_F_MFV_001(uint8_t value){
+void setV_F_MFV_001Value(uint8_t value){
     xSemaphoreTake(V_F_MFV_001data.semaphore,portMAX_DELAY);
     V_F_MFV_001data.value=value;
     xSemaphoreGive(V_F_MFV_001data.semaphore);
 }
-uint8_t getV_F_MFV_001(void){
+uint8_t getV_F_MFV_001Value(void){
     xSemaphoreTake(V_F_MFV_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_F_MFV_001data.value;
     xSemaphoreGive(V_F_MFV_001data.semaphore);
@@ -247,12 +247,12 @@ uint8_t getV_F_MFV_001(void){
 
 //LOX Press Valve
 struct singleIntSemphr_s V_L_PR_001data;
-void setV_L_PR_001(uint8_t value){
+void setV_L_PR_001Value(uint8_t value){
     xSemaphoreTake(V_L_PR_001data.semaphore,portMAX_DELAY);
     V_L_PR_001data.value=value;
     xSemaphoreGive(V_L_PR_001data.semaphore);
 }
-uint8_t getV_L_PR_001(void){
+uint8_t getV_L_PR_001Value(void){
     xSemaphoreTake(V_L_PR_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_L_PR_001data.value;
     xSemaphoreGive(V_L_PR_001data.semaphore);
@@ -261,12 +261,12 @@ uint8_t getV_L_PR_001(void){
 
 //LOX Tank PT
 struct singleFloatSemphr_s PT_L_T_001data;
-void setPT_L_T_001(float value){
+void setPT_L_T_001Value(float value){
     xSemaphoreTake(PT_L_T_001data.semaphore,portMAX_DELAY);
     PT_L_T_001data.value=value;
     xSemaphoreGive(PT_L_T_001data.semaphore);
 }
-float getPT_L_T_001(void){
+float getPT_L_T_001Value(void){
     xSemaphoreTake(PT_L_T_001data.semaphore,portMAX_DELAY);
     float value=PT_L_T_001data.value;
     xSemaphoreGive(PT_L_T_001data.semaphore);
@@ -275,12 +275,12 @@ float getPT_L_T_001(void){
 
 //LOX Vent Valve
 struct singleIntSemphr_s V_L_V_001data;
-void setV_L_V_001(uint8_t value){
+void setV_L_V_001Value(uint8_t value){
     xSemaphoreTake(V_L_V_001data.semaphore,portMAX_DELAY);
     V_L_V_001data.value=value;
     xSemaphoreGive(V_L_V_001data.semaphore);
 }
-uint8_t getV_L_V_001(void){
+uint8_t getV_L_V_001Value(void){
     xSemaphoreTake(V_L_V_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_L_V_001data.value;
     xSemaphoreGive(V_L_V_001data.semaphore);
@@ -289,12 +289,12 @@ uint8_t getV_L_V_001(void){
 
 //LOX Fill TC
 struct singleFloatSemphr_s TC_L_F_001data;
-void setTC_L_F_001(float value){
+void setTC_L_F_001Value(float value){
     xSemaphoreTake(TC_L_F_001data.semaphore,portMAX_DELAY);
     TC_L_F_001data.value=value;
     xSemaphoreGive(TC_L_F_001data.semaphore);
 }
-float getTC_L_F_001(void){
+float getTC_L_F_001Value(void){
     xSemaphoreTake(TC_L_F_001data.semaphore,portMAX_DELAY);
     float value=TC_L_F_001data.value;
     xSemaphoreGive(TC_L_F_001data.semaphore);
@@ -303,12 +303,12 @@ float getTC_L_F_001(void){
 
 //LOX Fill Valve
 struct singleIntSemphr_s V_L_F_001data;
-void setV_L_F_001(uint8_t value){
+void setV_L_F_001Value(uint8_t value){
     xSemaphoreTake(V_L_F_001data.semaphore,portMAX_DELAY);
     V_L_F_001data.value=value;
     xSemaphoreGive(V_L_F_001data.semaphore);
 }
-uint8_t getV_L_F_001(void){
+uint8_t getV_L_F_001Value(void){
     xSemaphoreTake(V_L_F_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_L_F_001data.value;
     xSemaphoreGive(V_L_F_001data.semaphore);
@@ -317,12 +317,12 @@ uint8_t getV_L_F_001(void){
 
 //LOX Injector PT
 struct singleFloatSemphr_s PT_L_INJ_001data;
-void setPT_L_INJ_001(float value){
+void setPT_L_INJ_001Value(float value){
     xSemaphoreTake(PT_L_INJ_001data.semaphore,portMAX_DELAY);
     PT_L_INJ_001data.value=value;
     xSemaphoreGive(PT_L_INJ_001data.semaphore);
 }
-float getPT_L_INJ_001(void){
+float getPT_L_INJ_001Value(void){
     xSemaphoreTake(PT_L_INJ_001data.semaphore,portMAX_DELAY);
     float value=PT_L_INJ_001data.value;
     xSemaphoreGive(PT_L_INJ_001data.semaphore);
@@ -331,12 +331,12 @@ float getPT_L_INJ_001(void){
 
 //Main Oxidizer Valve
 struct singleIntSemphr_s V_L_MOV_001data;
-void setV_L_MOV_001(uint8_t value){
+void setV_L_MOV_001Value(uint8_t value){
     xSemaphoreTake(V_L_MOV_001data.semaphore,portMAX_DELAY);
     V_L_MOV_001data.value=value;
     xSemaphoreGive(V_L_MOV_001data.semaphore);
 }
-uint8_t getV_L_MOV_001(void){
+uint8_t getV_L_MOV_001Value(void){
     xSemaphoreTake(V_L_MOV_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_L_MOV_001data.value;
     xSemaphoreGive(V_L_MOV_001data.semaphore);
@@ -345,12 +345,12 @@ uint8_t getV_L_MOV_001(void){
 
 //LOX Bleed Valve
 struct singleIntSemphr_s V_L_BLD_001data;
-void setV_L_BLD_001(uint8_t value){
+void setV_L_BLD_001Value(uint8_t value){
     xSemaphoreTake(V_L_BLD_001data.semaphore,portMAX_DELAY);
     V_L_BLD_001data.value=value;
     xSemaphoreGive(V_L_BLD_001data.semaphore);
 }
-uint8_t getV_L_BLD_001(void){
+uint8_t getV_L_BLD_001Value(void){
     xSemaphoreTake(V_L_BLD_001data.semaphore,portMAX_DELAY);
     uint8_t value=V_L_BLD_001data.value;
     xSemaphoreGive(V_L_BLD_001data.semaphore);
@@ -359,12 +359,12 @@ uint8_t getV_L_BLD_001(void){
 
 //LOX Bleed TC
 struct singleFloatSemphr_s TC_L_BLD_001data;
-void setTC_L_BLD_001(float value){
+void setTC_L_BLD_001Value(float value){
     xSemaphoreTake(TC_L_BLD_001data.semaphore,portMAX_DELAY);
     TC_L_BLD_001data.value=value;
     xSemaphoreGive(TC_L_BLD_001data.semaphore);
 }
-float getTC_L_BLD_001(void){
+float getTC_L_BLD_001Value(void){
     xSemaphoreTake(TC_L_BLD_001data.semaphore,portMAX_DELAY);
     float value=TC_L_BLD_001data.value;
     xSemaphoreGive(TC_L_BLD_001data.semaphore);
@@ -372,6 +372,7 @@ float getTC_L_BLD_001(void){
 }
 
 void initVariables(void){
+    stateTransitonInput.semaphore = xSemaphoreCreateMutex();
     sensorStatus.semaphore=xSemaphoreCreateMutex();
     GPSdata.semaphore=xSemaphoreCreateMutex();
     orientData.semaphore=xSemaphoreCreateMutex();
