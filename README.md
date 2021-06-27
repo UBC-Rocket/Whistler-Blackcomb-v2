@@ -12,10 +12,11 @@ This is a repository with the code for the UBC Rocket Whistler Blackcomb flight 
 
 All documentation are currently kept in the [doc/](doc/) directory. 
 
-1. Uploading to Teensy [guide](doc/1-Teensy-Upload.md).
-2. freeRTOS installation and usage [guide](doc/2-RTOS-Basics.md).
-3. x86 Compilation explanation and setup [guide](doc/3-x86-Compilation.md). 
-4. How continout integration works and how to access ours in this [guide](doc/4-Continuous-Integration.md). 
+1. Setting up the Project in MCUXpresso [guide](doc/1-MCUXpresso-Setup.md). If you are new to the project, **start here**.
+2. x86 Compilation explanation and setup [guide](doc/2-x86-Compilation.md).
+3. Uploading to Teensy [guide](doc/3-Teensy-Upload.md).
+4. freeRTOS installation and usage [guide](doc/4-RTOS-Basics.md).
 5. Setting up Windows compilation [guide](doc/5-Windows-Compilation-with-Cygwin.md). 
-6. Radio system [guide](doc/6-Radio.md). 
-7. CAN communication [guide](doc/7-CAN.md)
+6. How continout integration works and how to access ours in this [guide](doc/6-Continuous-Integration.md). 
+7. Radio system [guide](doc/7-Radio.md). 
+8. CAN communication [guide](doc/8-CAN.md)
