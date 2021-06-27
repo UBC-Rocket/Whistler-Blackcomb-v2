@@ -20,7 +20,7 @@ Note: this is by no means the only way of setting this up. If you'd prefer to ru
 
 1. Linux
 
-Right now, only Linux build is supported. This is something that should be fixed soon, but for now if you're on windows please download and set up Windows Subsystem for Linux (wsl). [This](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is a very good guide and should walk you through it. If it doesn't work bug me (Xander) to set up Windows freeRTOS for this compilation. 
+The project was originally designed for Linux compilation. There are [docs for compiling this project with windows](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2/blob/master/doc/5-Windows-Compilation-with-Cygwin.md), but it is easier and more supported to use Windows Subsystem for Linux (wsl). [This](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is a very good guide and should walk you through it. If it doesn't work bug me (Xander) to set up Windows freeRTOS for this compilation. 
 
 2. VSCode
 
