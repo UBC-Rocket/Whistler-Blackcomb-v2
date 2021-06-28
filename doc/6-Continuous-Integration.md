@@ -14,4 +14,4 @@ To get access, log in to circleci.com and give access to your github account. As
 
 ## Configuration
 
-Configuration of the Travis CI build is done through the [config.yml](../.circleci/config.yml) file. Any terminal commands you would run on your local machine (assuming you're running linux/wsl) can be run remotely. 
+Configuration of the CircleCI build is done through the [config.yml](../.circleci/config.yml) file. Any terminal commands you would run on your local machine (assuming you're running on linux or wsl) can be run remotely. 

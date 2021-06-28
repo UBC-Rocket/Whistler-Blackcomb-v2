@@ -20,11 +20,11 @@ Note: this is by no means the only way of setting this up. If you'd prefer to ru
 
 1. Linux
 
-The project was originally designed for Linux compilation. There are [docs for compiling this project with windows](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2/blob/master/doc/5-Windows-Compilation-with-Cygwin.md), but it is easier and more supported to use Windows Subsystem for Linux (wsl). [This](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is a very good guide and should walk you through it. If it doesn't work bug me (Xander) to set up Windows freeRTOS for this compilation. 
+The project was originally designed for Linux compilation. There are [docs for compiling this project with windows](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2/blob/master/doc/5-Windows-Compilation-with-Cygwin.md), but it is easier and more supported to use Windows Subsystem for Linux (wsl). [This](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is a very good guide and should walk you through it.
 
 2. VSCode
 
-Download however you want. If using wsl just download windows version and call it from wsl. [Download link](https://code.visualstudio.com/download). 
+Download however you want. If using wsl just download windows version and call it from wsl with ```code```. [Download link](https://code.visualstudio.com/download). 
 
 3. VSCode extensions
 
