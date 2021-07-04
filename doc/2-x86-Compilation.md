@@ -24,14 +24,15 @@ The project was originally designed for Linux compilation. There are [docs for c
 
 2. VSCode
 
-Download however you want. If using wsl just download windows version and call it from wsl with ```code```. [Download link](https://code.visualstudio.com/download). 
+Download however you want. If using wsl just download windows version and call it from wsl. [Download link](https://code.visualstudio.com/download). 
 
 3. VSCode extensions
 
-Open vscode in linux, go to extensions tab and install C/C++ and CMake Tools
+Open vscode in linux, go to extensions tab and install C/C++, CMake Tools, and Remote - WSL.
 
 ![](images/cpp-extension.png)
 ![](images/cmake-extension.png)
+![](images/wsl-extension.png)
 
 Make sure you have cmake installed by opening terminal and typing 
 
