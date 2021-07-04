@@ -47,7 +47,7 @@ sudo apt install cmake
 
 ### Build Project
 
-Open main project folder in vscode, and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
+Open main project folder in vscode (if you are using wsl, you'll need to navigate to the project directory through the WSL bash shell, and launch vs code with `code .`, and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
 
 ![](images/vscode-x86-build.png)
 
