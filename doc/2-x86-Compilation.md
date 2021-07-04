@@ -46,9 +46,13 @@ If not installed install it with (or with whatever your package manager of choic
 sudo apt install cmake
 ```
 
+### Install Submodules
+
+In order to compile the project for x86, we need to install a submodule — [Unity](https://github.com/ThrowTheSwitch/Unity) — which is used for unit testing. If you are cloning the project for the first time, you can pass `--recurse-submodules` when you `git clone`, but if you've already cloned the repository to your computer you need to run (from the project directoy, in your shell) `git submodule init` and then `git submodule update`. This lets git know that the empty folder in [externl](../external) called 'Unity' is a submodule, and then fills it up with what it should hold - the Unity unit testing framework.
+
 ### Build Project
 
-Open main project folder in vscode (if you are using WSL, you'll need to navigate to the project directory through the WSL bash shell, and launch vscode with `code .`), and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
+Open main project folder in vscode (if you are using WSL, you'll need to navigate to the project directory through the WSL bash shell, and launch vscode in the current directory with `code .`), and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
 
 ![](images/vscode-x86-build.png)
 
