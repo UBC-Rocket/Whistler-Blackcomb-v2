@@ -19,6 +19,24 @@
  * Implementations
  ******************************************************************************/
 
+/**
+ * Gets sim id from a uart handle
+ * @param handle the handle to check the sim packet id for
+ * @return the sim packet id
+ */
+static unsigned char getSimId(hal_uart_handle_t *handle){
+	UART_Type* base = handle->base;
+	unsigned char ret;
+	/* TODO: Implement the rest once they get assigned a letter */
+	if (base == RADIO_UART){
+		ret = 'R';
+	} else {
+		printf("You're trying to read from a uart line that's not associated with a sim packet, please add it in hal_uart.c. \n");
+		ret = 0;
+	}
+	return ret;
+}
+
 int uartInit(hal_uart_handle_t *handle) {
 	handle->rxSemaphore = xSemaphoreCreateMutex();
 	handle->rxEvent = xEventGroupCreate();
@@ -39,27 +57,34 @@ void uartConfig(hal_uart_handle_t *handle, UART_Type *base, uint32_t baudrate) {
 }
 
 int uartSend(hal_uart_handle_t *handle, const uint8_t *buffer, uint32_t length){
-	for(unsigned int i = 0; i < length; ++i){
-		// printf("%02hhX ", buffer[i]);
-		printf("%c", buffer[i]);
-	}
-	// printf("\n");
+	writeToBuf(TX, buffer, getSimId(handle), length);
 	return kStatus_Success;
 }
 
 int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 		size_t *received){
-	if(handle->cur_buffer_size < length)
-		xEventGroupWaitBits(handle->rxEvent, 
-				HAL_UART_COMPLETE | HAL_UART_RING_BUFFER_OVERRUN 
-				| HAL_UART_HARDWARE_BUFFER_OVERRUN,
-				pdTRUE, pdFALSE, portMAX_DELAY);
 
-	memcpy(buffer, &(handle->buffer[0]), length);
-	memcpy(&(handle->buffer[0]), &(handle->buffer[length]), 
-			handle->buffer_size - length);
-	handle->cur_buffer_size -= length;
-	*received = length;
+	xSemaphoreTake(handle->rxSemaphore, portMAX_DELAY);
+
+	*received = 0;
+	do{
+		if(!handle->cur_buffer_size){
+			char id = getSimId(handle);
+			handle->cur_buffer_size = readFromBuf(RX, handle->buffer, id);
+		}
+
+		/* Gets minimum between buffer size and amount you want to copy */
+		int copyAmount = length - *received > handle->cur_buffer_size ? handle->cur_buffer_size : length - *received;
+		/* Shifts the buffer */
+		memcpy(buffer + *received, &(handle->buffer[0]), copyAmount);
+		memcpy(&(handle->buffer[0]), &(handle->buffer[copyAmount]), 
+				handle->buffer_size - copyAmount);
+		handle->cur_buffer_size -= copyAmount;
+		*received += copyAmount;
+	} while (*received < length);
+
+
+	xSemaphoreGive(handle->rxSemaphore);
 
 	return kStatus_Success;
 }

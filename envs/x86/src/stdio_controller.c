@@ -277,10 +277,13 @@ static void extractPacket()
     uint16_t length;
 
     id = getFilteredCin();
+
+    // printf("id:%d ", id);
+
     length = getFilteredCin();
     length <<= 8;
     length |= getFilteredCin();
-    // printf("id:%d ", id);
+
     // printf("len:%d ", length);
 
     uint8_t buf[512];
@@ -290,6 +293,7 @@ static void extractPacket()
         buf[i] = getFilteredCin();
         // printf("%u ", buf[i]);
     }
+
 
     xSemaphoreTake(simInSemaphore, portMAX_DELAY);
     writeToBuf(RX, buf, id, length);
@@ -307,6 +311,7 @@ static void extractPacket()
     str[++i] = '\0';
     fprintf(logfile, "%d,%d,%s\n", id, length, str);
     fclose(logfile);
+
 }
 /**
  * Reads the oldest unread entry in the SIM TX buffer for the specified ID.
