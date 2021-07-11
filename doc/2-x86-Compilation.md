@@ -20,7 +20,7 @@ Note: this is by no means the only way of setting this up. If you'd prefer to ru
 
 1. Linux
 
-Right now, only Linux build is supported. This is something that should be fixed soon, but for now if you're on windows please download and set up Windows Subsystem for Linux (wsl). [This](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is a very good guide and should walk you through it. If it doesn't work bug me (Xander) to set up Windows freeRTOS for this compilation. 
+The project was originally designed for Linux compilation. There are [docs for compiling this project with windows](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2/blob/master/doc/5-Windows-Compilation-with-Cygwin.md), but it is easier and more supported to use Windows Subsystem for Linux (wsl). [This](https://docs.microsoft.com/en-us/windows/wsl/install-win10) is a very good guide and should walk you through it.
 
 2. VSCode
 
@@ -28,10 +28,11 @@ Download however you want. If using wsl just download windows version and call i
 
 3. VSCode extensions
 
-Open vscode in linux, go to extensions tab and install C/C++ and CMake Tools
+Open vscode in linux, go to extensions tab and install C/C++, CMake Tools, and Remote - WSL.
 
 ![](images/cpp-extension.png)
 ![](images/cmake-extension.png)
+![](images/wsl-extension.png)
 
 Make sure you have cmake installed by opening terminal and typing 
 
@@ -45,9 +46,13 @@ If not installed install it with (or with whatever your package manager of choic
 sudo apt install cmake
 ```
 
+### Install Submodules
+
+In order to compile the project for x86, we need to install a submodule — [Unity](https://github.com/ThrowTheSwitch/Unity) — which is used for unit testing. If you are cloning the project for the first time, you can pass `--recurse-submodules` when you `git clone`, but if you've already cloned the repository to your computer you need to run (from the project directoy, in your shell) `git submodule init` and then `git submodule update`. This lets git know that the empty folder in [externl](../external) called 'Unity' is a submodule, and then fills it up with what it should hold - the Unity unit testing framework.
+
 ### Build Project
 
-Open main project folder in vscode, and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
+Open main project folder in vscode (if you are using WSL, you'll need to navigate to the project directory through the WSL bash shell, and launch vscode in the current directory with `code .`), and cmake should automatically configure. Press F7 to build (or build button on bottom ribbon to build). There should be no errors building. To run either execute build file in the [build](../build) folder or use run/debug button on bottom ribbon. 
 
 ![](images/vscode-x86-build.png)
 

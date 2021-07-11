@@ -50,7 +50,7 @@ typedef struct _hal_uart_handle_t {
 typedef struct _hal_uart_handle_t {
 	UART_Type* base;
 	uint32_t baudrate;
-	uint8_t buffer[200];
+	uint8_t buffer[512];
 	uint32_t buffer_size;
 	uint32_t cur_buffer_size;
 
@@ -66,6 +66,8 @@ enum{
 	kStatus_UART_RxRingBufferOverrun = 1, 
 	kStatus_UART_RxHardwareOverrun = 2,
 };
+
+
 #endif
 
 /*******************************************************************************

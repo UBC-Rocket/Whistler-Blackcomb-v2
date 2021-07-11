@@ -260,6 +260,18 @@ static void ReadImuTask(void *pv) {
 		vTaskSuspend(NULL);
 	}
 
+	// For testing UART
+	// for(EVER){
+	// 	unsigned char c[10];
+	// 	size_t numRead;
+	// 	uartReceive(&hal_uart_imu, c, 3, &numRead);
+	// 	uartReceive(&hal_uart_imu, c, 7, &numRead);
+	// 	for(int i = 0; i < 7; ++i){
+	// 		printf("UART character: %c\n", c[i]);
+	// 	}
+	// 	uartSend(&hal_uart_imu, c, 5);
+	// }
+
 	/* Receive input from imu and parse it. */
 	do {
 		uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);
