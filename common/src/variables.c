@@ -372,7 +372,7 @@ float getTC_L_BLD_001Value(void){
 }
 
 void initVariables(void){
-    stateTransitonInput.semaphore = xSemaphoreCreateMutex();
+    stateTransitionInput.semaphore = xSemaphoreCreateMutex();
     sensorStatus.semaphore=xSemaphoreCreateMutex();
     GPSdata.semaphore=xSemaphoreCreateMutex();
     orientData.semaphore=xSemaphoreCreateMutex();

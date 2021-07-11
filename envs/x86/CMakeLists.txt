@@ -50,5 +50,16 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_uart.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_can.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/stdio_controller.c
 
 )
+
+find_package(Threads REQUIRED)
+if(THREADS_HAVE_PTHREAD_ARG)
+  set_property(TARGET freertos PROPERTY COMPILE_OPTIONS "-pthread")
+
+  set_property(TARGET freertos PROPERTY COMPILE_OPTIONS "-pthread")
+endif()
+if(CMAKE_THREAD_LIBS_INIT)
+  target_link_libraries(freertos "${CMAKE_THREAD_LIBS_INIT}")
+endif()

@@ -683,7 +683,7 @@ static void radioPrepDataDump(void)
     getGPSValue(GPSValue);
 
     float orientValue[4];
-    getOrientValue(orientValue);
+    getOrientationValue(orientValue);
 
     float accelValue[3];
     getAccelValue(accelValue);
@@ -768,19 +768,19 @@ void dealWithCritMessages(void *pv)
                 radioPrepConfig();
                 break;
             case 0x41:
-                xSemaphoreTake(stateTransitonInput.semaphore,portMAX_DELAY);
-                stateTransitonInput.HMI_triggerAbort = STATE_MACHINE_TRIGGERED;
-                xSemaphoreGive(stateTransitonInput.semaphore);
+                xSemaphoreTake(stateTransitionInput.semaphore,portMAX_DELAY);
+                stateTransitionInput.HMI_triggerAbort = STATE_MACHINE_TRIGGERED;
+                xSemaphoreGive(stateTransitionInput.semaphore);
                 break;
             case 0x46:
-                xSemaphoreTake(stateTransitonInput.semaphore,portMAX_DELAY);
-                stateTransitonInput.HMI_triggerFueling = STATE_MACHINE_TRIGGERED;
-                xSemaphoreGive(stateTransitonInput.semaphore);
+                xSemaphoreTake(stateTransitionInput.semaphore,portMAX_DELAY);
+                stateTransitionInput.HMI_triggerFueling = STATE_MACHINE_TRIGGERED;
+                xSemaphoreGive(stateTransitionInput.semaphore);
                 break;
             case 0x53:
-                xSemaphoreTake(stateTransitonInput.semaphore,portMAX_DELAY);
-                stateTransitonInput.HMI_triggerStandby = STATE_MACHINE_TRIGGERED;
-                xSemaphoreGive(stateTransitonInput.semaphore);
+                xSemaphoreTake(stateTransitionInput.semaphore,portMAX_DELAY);
+                stateTransitionInput.HMI_triggerStandby = STATE_MACHINE_TRIGGERED;
+                xSemaphoreGive(stateTransitionInput.semaphore);
                 break;
             }
         }

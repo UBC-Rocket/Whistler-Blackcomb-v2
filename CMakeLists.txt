@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.13.0)
 project(whistler-blackcomb VERSION 0.1.0)
 
 ### Require out-of-source builds

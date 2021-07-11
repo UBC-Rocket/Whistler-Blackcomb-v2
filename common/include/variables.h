@@ -1,15 +1,14 @@
 #ifndef _VARIABLES_H_
 #define _VARIABLES_H_
 
+
 #include <stdint.h>
 #include "FreeRTOS.h"
 #include "semphr.h" 
 #include "state_machine.h"
 
 
-stateInput_t stateTransitonInput = {0};
-
-
+stateInput_t stateTransitionInput;
 
 //Sensor Status, in sensor order - see docs
 void setSensorStatus(int sensorID, int status);
