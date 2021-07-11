@@ -52,117 +52,117 @@ void radioPrepConfig(void);
 /**
  * Load a GPS packet into the "to transmit" buffer
  */
-static void radioPrepGPS(void);
+void radioPrepGPS(void);
 
 /**
  * Load a state packet into the "to transmit" buffer
  */
-static void radioPrepState(void);
+void radioPrepState(void);
 
 /**
  * Load an orientation packet into the "to transmit" buffer
  */
-static void radioPrepOrientation(void);
+void radioPrepOrientation(void);
 
 /**
  * Load an acceleration packet into the "to transmit" buffer
  */
-static void radioPrepAccel(void);
+void radioPrepAccel(void);
 
 /**
  * Load an HP Tank PT packet into the "to transmit" buffer
  */
-static void radioPrepPT_HP_T_001(void);
+void radioPrepPT_HP_T_001(void);
 
 /**
  * Load an HP Tank Outlet TC packet into the "to transmit" buffer
  */
-static void radioPrepTC_HP_OUT_001(void);
+void radioPrepTC_HP_OUT_001(void);
 
 /**
  * Load an HP Press Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_HP_P_001(void);
+void radioPrepV_HP_P_001(void);
 
 /**
  * Load a Fuel Press Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_F_PR_001(void);
+void radioPrepV_F_PR_001(void);
 
 /**
  * Load a Fuel Vent Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_F_V_001(void);
+void radioPrepV_F_V_001(void);
 
 /**
  * Load a Fuel Tank PT packet into the "to transmit" buffer
  */
-static void radioPrepPT_F_T_001(void);
+void radioPrepPT_F_T_001(void);
 
 /**
  * Load a Fuel Fill Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_F_F_001(void);
+void radioPrepV_F_F_001(void);
 
 /**
  * Load a Fuel Injector PT into the "to transmit" buffer
  */
-static void radioPrepPT_F_INJ_001(void);
+void radioPrepPT_F_INJ_001(void);
 
 /**
  * Load a Main Fuel Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_F_MFV_001(void);
+void radioPrepV_F_MFV_001(void);
 
 /**
  * Load a LOX Press Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_L_PR_001(void);
+void radioPrepV_L_PR_001(void);
 
 /**
  * Load a LOX Tank PT packet into the "to transmit" buffer
  */
-static void radioPrepPT_L_T_001(void);
+void radioPrepPT_L_T_001(void);
 
 /**
  * Load a LOX Vent Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_L_V_001(void);
+void radioPrepV_L_V_001(void);
 
 /**
  * Load a LOX Fill TC packet into the "to transmit" buffer
  */
-static void radioPrepTC_L_F_001(void);
+void radioPrepTC_L_F_001(void);
 
 /**
  * Load a LOX Fill Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_L_F_001(void);
+void radioPrepV_L_F_001(void);
 
 /**
  * Load a LOX Injector PT packet into the "to transmit" buffer
  */
-static void radioPrepPT_L_INJ_001(void);
+void radioPrepPT_L_INJ_001(void);
 
 /**
  * Load a Main Oxidizer Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_L_MOV_001(void);
+void radioPrepV_L_MOV_001(void);
 
 /**
  * Load a LOX Bleed Valve packet into the "to transmit" buffer
  */
-static void radioPrepV_L_BLD_001(void);
+void radioPrepV_L_BLD_001(void);
 
 /**
  * Load a LOX Bleed TC packet into the "to transmit" buffer
  */
-static void radioPrepTC_L_BLD_001(void);
+void radioPrepTC_L_BLD_001(void);
 
 /**
  * Load a data dump packet into the "to transmit" buffer
  */
-static void radioPrepDataDump(void);
+void radioPrepDataDump(void);
 
 
 

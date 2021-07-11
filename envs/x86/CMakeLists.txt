@@ -51,6 +51,7 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/src/hal.c
         ${CMAKE_CURRENT_LIST_DIR}/src/hal_can.c
         ${CMAKE_CURRENT_LIST_DIR}/src/stdio_controller.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/console.c
 
 )
 

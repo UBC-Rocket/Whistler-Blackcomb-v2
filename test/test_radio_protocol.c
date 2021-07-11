@@ -27,7 +27,33 @@ void baseTest_RTOS(void){
 
 
 void packetPlaceTest(void *pv){
-    radioPrepEvent(15);
+	radioPrepPing();
+	radioPrepMessage("Hello World!",12);
+    radioPrepEvent(15); //this is literally a random number. It could be anything you want
+	radioPrepConfig();
+	radioPrepGPS();
+	radioPrepState();
+	radioPrepOrientation();
+	radioPrepAccel();
+	radioPrepPT_HP_T_001();
+	radioPrepTC_HP_OUT_001();
+	radioPrepV_HP_P_001();
+	radioPrepV_F_PR_001();
+	radioPrepV_F_V_001();
+	radioPrepPT_F_T_001();
+	radioPrepV_F_F_001();
+	radioPrepPT_F_INJ_001();
+	radioPrepV_F_MFV_001();
+	radioPrepV_L_PR_001();
+	radioPrepPT_L_T_001();
+	radioPrepV_L_V_001();
+	radioPrepTC_L_F_001();
+	radioPrepV_L_F_001();
+	radioPrepPT_L_INJ_001();
+	radioPrepV_L_MOV_001();
+	radioPrepV_L_BLD_001();
+	radioPrepTC_L_BLD_001();
+	radioPrepDataDump();
     vTaskEndScheduler();
     
     
@@ -50,10 +76,13 @@ void packetPlaceTest_RTOS(void){
     vTaskStartScheduler();
 }
 
+
+
 void setUp(void){}
 void tearDown(void){}
 int main (void){
     UNITY_BEGIN();
     RUN_TEST(baseTest_RTOS);
+	RUN_TEST(packetPlaceTest_RTOS);
     return UNITY_END();
 }
