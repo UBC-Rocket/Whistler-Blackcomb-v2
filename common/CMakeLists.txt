@@ -59,6 +59,7 @@ target_link_libraries(radio_protocol variables)
 target_link_libraries(radio_protocol state_machine)
 target_sources(radio_protocol PUBLIC ${SRCS})
 target_sources(radio_protocol PUBLIC ${PORT})
+
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(xbee)

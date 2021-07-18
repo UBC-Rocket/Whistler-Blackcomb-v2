@@ -386,7 +386,7 @@ static void LogTask(void *pv) {
 static void StateTask(void *pv) {
 	for (EVER) {
 		/*TODO: set all the state inputs...*/
-		setNextState(&stateTransitonInput);
+		setNextState(&stateTransitionInput);
 		vTaskDelay(pdMS_TO_TICKS(10));
 	}
 

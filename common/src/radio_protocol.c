@@ -323,7 +323,7 @@ void radioPrepConfig(void)
     uint8_t ID = 0x03;
     uint32_t timestamp = getTimestamp();
     uint8_t SIMstatus = SIM_ACTIVE;
-    uint8_t deviceID = 5;        //magig number bad
+    uint8_t deviceID = 0;        //magig number bad
     uint8_t verString[40] = {0}; //in future will be better to remove this step?
 
     message[0] = ID;
