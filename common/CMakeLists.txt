@@ -13,6 +13,9 @@ file(GLOB_RECURSE PORT ${CMAKE_CURRENT_LIST_DIR}/xbee/ports/whistler/*.c)
 target_sources(whistler-blackcomb PUBLIC ${SRCS})
 target_sources(whistler-blackcomb PUBLIC ${PORT})
 
+file(GLOB_RECURSE CCONTROL_SRCS ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Sources/*.c)
+target_sources(whistler-blackcomb PUBLIC ${CCONTORL_SRCS})
+
 add_library(IMU_interpret STATIC
     src/IMU_interpret.c
 )
