@@ -21,7 +21,10 @@ add_library(IMU_interpret STATIC
 )
 
 add_library(state_machine STATIC src/state_machine.c)
-add_library(prediction STATIC src/prediction.c)
+add_library(prediction STATIC src/prediction.c ${CCONTROL_SRCS})
+target_include_directories(prediction PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Headers
+)
 
 add_library(buffer STATIC src/buffer.c)
 

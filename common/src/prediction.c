@@ -5,7 +5,7 @@
 
 #include <prediction.h>
 #include <math.h>
-#include "CControl/Functions.h"
+#include "Functions.h"
 
 /*******************************************************************************
  * Implementations
