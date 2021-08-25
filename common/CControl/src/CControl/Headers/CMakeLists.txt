@@ -1,3 +1,3 @@
-target_include_directories(prediction_refactor PUBLIC
+target_include_directories(prediction PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )

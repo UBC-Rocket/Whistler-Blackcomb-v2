@@ -5,6 +5,7 @@
 
 #include <prediction.h>
 #include <math.h>
+#include <Functions.h>
 
 /*******************************************************************************
  * Implementations

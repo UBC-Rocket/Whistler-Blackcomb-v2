@@ -2,7 +2,6 @@ target_sources(
     whistler-blackcomb
     PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/src/prediction.c
-        ${CMAKE_CURRENT_LIST_DIR}/src/prediction_refactor.c
         ${CMAKE_CURRENT_LIST_DIR}/src/IMU_interpret.c
         ${CMAKE_CURRENT_LIST_DIR}/src/radio.c
         ${CMAKE_CURRENT_LIST_DIR}/src/state_machine.c
@@ -20,7 +19,6 @@ add_library(IMU_interpret STATIC
 
 add_library(state_machine STATIC src/state_machine.c)
 add_library(prediction STATIC src/prediction.c)
-add_library(prediction_refactor STATIC src/prediction_refactor.c)
 
 add_library(buffer STATIC src/buffer.c)
 
