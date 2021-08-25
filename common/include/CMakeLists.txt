@@ -10,6 +10,10 @@ target_include_directories(prediction PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
+target_include_directories(prediction_refactor PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}
+)
+
 target_include_directories(buffer PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}
 )

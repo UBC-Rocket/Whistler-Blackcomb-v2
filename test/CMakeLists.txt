@@ -44,6 +44,19 @@ target_link_libraries(prediction_test_app
 
  add_test(prediction_test prediction_test_app)
 
+ add_executable(prediction_refactor_test_app
+ test_prediction_refactor.c
+)
+
+target_link_libraries(prediction_refactor_test_app
+ Unity
+ prediction_refactor
+ m
+)
+
+add_test(prediction_test_refactor prediction_refactor_test_app)
+
+
  add_executable(buffer_test_app 
     test_buffer.c)
 
