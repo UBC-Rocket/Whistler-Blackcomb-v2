@@ -10,6 +10,13 @@ void compareSquareMatrix(double testArray[MATRIX_SIZE][MATRIX_SIZE],
     }
 }
 
+void newCompareSquareMatrix(float testArray[MATRIX_SIZE * MATRIX_SIZE],
+    float expectedArray[MATRIX_SIZE * MATRIX_SIZE]) {
+        for (int i=0;i<MATRIX_SIZE;i++) {
+            TEST_ASSERT_EQUAL_FLOAT(expectedArray[i],testArray[i]);
+        }
+}
+
 void compareQ(quaternion testQ, quaternion expectedQ){
     TEST_ASSERT_EQUAL_FLOAT(expectedQ.re, testQ.re);
     TEST_ASSERT_EQUAL_FLOAT(expectedQ.i, testQ.i);
@@ -20,111 +27,122 @@ void compareQ(quaternion testQ, quaternion expectedQ){
 void baseTest(void){
     TEST_ASSERT_EQUAL_HEX8(2,2);
 }
+
 void matMultTest(void){
-    //for this one, I tried more tests. Hopefully all testing different cases here.
+    //testing CControl functions.
 
     int numMats = 4;
-    double testMats[][MATRIX_SIZE][MATRIX_SIZE] = {
-        {{1,2},{3,4}},
-        {{-5,-6},{-7,-8}},
-        {{0,0},{0,0}},
-        {{pow(10,5),10},{pow(10,-5),-10}}
+    float testMats[][MATRIX_SIZE * MATRIX_SIZE] = {
+        {1,2,3,4},
+        {-5,-6,-7,-8},
+        {0,0,0,0},
+        {pow(10,5),10,pow(10,-5),-10}
         };
-    double expectedResults[][MATRIX_SIZE][MATRIX_SIZE] = {
-        {{-19,-22},{-43,-50}},
-        {{0,0},{0,0}},
-        {{5000000001/50000, -10}, {7500000001/25000, -10}},
-        {{0,0},{0,0}},
-        {{-25000000003/50000, 10}, {-8750000001/12500, 10}},
-        {{0,0},{0,0}}
+    float expectedResults[][MATRIX_SIZE * MATRIX_SIZE] = {
+        {-19,-22,-43,-50},
+        {0,0,0,0},
+        {5000000001/50000, -10, 7500000001/25000, -10},
+        {0,0,0,0},
+        {-25000000003/50000, 10, -8750000001/12500, 10},
+        {0,0,0,0}
         };
-    double result[MATRIX_SIZE][MATRIX_SIZE];
+    float result[MATRIX_SIZE * MATRIX_SIZE];
     
     int resultIndex=0;
     for(int i=0;i<numMats;i++){
         for(int j=i+1;j<numMats;j++){
-            matMult(testMats[i],testMats[j],result);
-            compareSquareMatrix(result,expectedResults[resultIndex]);
+            newMatMult(testMats[i],testMats[j], result, MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE);
+            for (int k = 0; k < sizeof(result) / sizeof(result[0]); k++) {
+                TEST_ASSERT_EQUAL_FLOAT(result[k], expectedResults[resultIndex][k]);
+            }
             resultIndex++;
         }
     }
 }
 
 void transposeTest(void){
-    double testMat[2][2] = {{1,2},{3,4}};
-    double expectedResult[MATRIX_SIZE][MATRIX_SIZE] = {{1,3},{2,4}};
+    float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1,2,3,4};
+    float expectedResult[MATRIX_SIZE * MATRIX_SIZE] = {1,3,2,4};
 
-    transpose(testMat);
+    newTranspose(testMat, MATRIX_SIZE, MATRIX_SIZE);
 
-    compareSquareMatrix(testMat,expectedResult);
+    newCompareSquareMatrix(testMat, expectedResult);
 }
 
 void matVecMultTest(void){
-    double testMat[][MATRIX_SIZE] = {{1,2},{3,4}};
-    double testVec[MATRIX_SIZE] = {5,6};
-    double resultVec[MATRIX_SIZE];
+    float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1,2,3,4};
+    float testVec[MATRIX_SIZE] = {5,6};
+    float resultVec[MATRIX_SIZE];
 
-    double expectedVec[MATRIX_SIZE] = {17,39};
+    float expectedVec[MATRIX_SIZE] = {17,39};
 
-    matVecMult(testMat,testVec,resultVec);
+    newMatMult(testMat, testVec, resultVec, MATRIX_SIZE, MATRIX_SIZE, 1);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedVec,resultVec,MATRIX_SIZE);
 }
 
 void scalMultTest(void){
-    double testVec[MATRIX_SIZE]={1,2};
-    double testScal = 3;
-    double resultVec[MATRIX_SIZE];
+    float testVec[MATRIX_SIZE]={1,2};
+    float testScal = 3;
+    float resultVec[MATRIX_SIZE];
 
-    double expectedVec[MATRIX_SIZE] = {3,6};
+    float expectedVec[MATRIX_SIZE] = {3,6};
 
-    scalMult(testVec,testScal,resultVec);
+    newScalMult(testVec,testScal,resultVec, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedVec,resultVec,MATRIX_SIZE);
 }
 
 void addSubtractMatTest(void){
-    double testMat1[][MATRIX_SIZE] = {{1,2},{3,4}};
-    double testMat2[][MATRIX_SIZE] = {{5,6},{7,8}};
-    double resultMat[MATRIX_SIZE][MATRIX_SIZE];
+    float testMat1[MATRIX_SIZE * MATRIX_SIZE] = {1,2,3,4};
+    float testMat2[MATRIX_SIZE * MATRIX_SIZE] = {5,6,7,8};
+    float resultMat[MATRIX_SIZE * MATRIX_SIZE];
 
-    double expectedAddMat[MATRIX_SIZE][MATRIX_SIZE] = {{6,8},{10,12}};
-    double expectedSubMat[MATRIX_SIZE][MATRIX_SIZE] = {{-4,-4},{-4,-4}};
+    float expectedAddMat[MATRIX_SIZE * MATRIX_SIZE] = {6,8,10,12};
+    float expectedSubMat[MATRIX_SIZE * MATRIX_SIZE] = {-4,-4,-4,-4};
 
-    addMat(testMat1,testMat2,resultMat);
+    newAddMat(testMat1,testMat2,resultMat, MATRIX_SIZE, MATRIX_SIZE);
 
-    compareSquareMatrix(resultMat,expectedAddMat);
+    newCompareSquareMatrix(resultMat,expectedAddMat);
 
-    subtractMat(testMat1,testMat2,resultMat);
+    newSubtractMat(testMat1,testMat2,resultMat, MATRIX_SIZE, MATRIX_SIZE);
 
-    compareSquareMatrix(resultMat,expectedSubMat);
+    newCompareSquareMatrix(resultMat,expectedSubMat);
 }
 
 void addSubtractVecTest(void){
-    double testVec1[MATRIX_SIZE] = {1,2};
-    double testVec2[MATRIX_SIZE] = {3,4};
-    double resultVec[MATRIX_SIZE];
+    float testVec1[MATRIX_SIZE] = {1,2};
+    float testVec2[MATRIX_SIZE] = {3,4};
+    float resultVec[MATRIX_SIZE];
 
-    double expectedAddVec[MATRIX_SIZE] = {4,6};
-    double expectedSubVec[MATRIX_SIZE] = {-2,-2};
+    float expectedAddVec[MATRIX_SIZE] = {4,6};
+    float expectedSubVec[MATRIX_SIZE] = {-2,-2};
 
-    addVec(testVec1,testVec2,resultVec);
+    newAddMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedAddVec,resultVec,MATRIX_SIZE);
 
-    subtractVec(testVec1,testVec2,resultVec);
+    newSubtractMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedSubVec,resultVec,MATRIX_SIZE);
 }
 
-void inverseTest(void){
-    double testMat[][MATRIX_SIZE] = {{1.0,2.0},{3.0,4.0}};
-    double resultMat[MATRIX_SIZE][MATRIX_SIZE];
-    double expectedResultMat[][MATRIX_SIZE] = {{-2.0,1.0},{3.0/2,-1.0/2}};
+void determinantTest(void){
+    float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1.0,2.0, 3.0,4.0};
+    float expectedResult = -2.0;
+    float testResult = newDeterminant(testMat, MATRIX_SIZE);
 
-    inverse(testMat,resultMat);
+    TEST_ASSERT_EQUAL_FLOAT(expectedResult, testResult);
+}
+
+void inverseTest(void){
+    float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1.0,2.0, 3.0,4.0};
+    float resultMat[MATRIX_SIZE * MATRIX_SIZE];
+    float expectedResultMat[MATRIX_SIZE * MATRIX_SIZE] = {-2.0,1.0, 3.0/2,-1.0/2};
+
+    newInverse(testMat,resultMat, MATRIX_SIZE);
     
-    compareSquareMatrix(resultMat,expectedResultMat);
+    newCompareSquareMatrix(resultMat,expectedResultMat);
 }
 
 void qMultTest(void){
@@ -466,6 +484,7 @@ void (*predictionTests[])(void)={
     scalMultTest,
     addSubtractMatTest,
     addSubtractVecTest,
+    determinantTest,
     inverseTest,
     qMultTest,
     qSumTest,

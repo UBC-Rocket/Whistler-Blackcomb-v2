@@ -58,19 +58,31 @@ quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
 void matMult(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 		double result[][MATRIX_SIZE]);
 
+void newMatMult(float mat1[], float mat2[], float mat3[], int row_a, 
+	int column_a, int column_b);
+
 void transpose(double mat[][MATRIX_SIZE]);
+
+void newTranspose(float mat[], int row, int column);
 
 void matVecMult(double mat[][MATRIX_SIZE], double vec[], double result[]);
 
 void scalMult(double vec[], double scal, double result[]);
 
+void newScalMult(float vec[], float scal, float result[], int size);
+
 void addMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 		double result[][MATRIX_SIZE]);
+
+void newAddMat(float mat1[], float mat2[], float result[], int mat1_row, int mat1_col);
 
 void addVec(double vec1[], double vec2[], double result[]);
 
 void subtractMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 		double result[][MATRIX_SIZE]);
+
+void newSubtractMat(float mat1[], float mat2[], float result[],
+	int mat1_row, int mat1_col);
 
 void subtractVec(double vec1[], double vec2[], double result[]);
 
@@ -79,16 +91,20 @@ void getCofactor(double A[][MATRIX_SIZE], double temp[][MATRIX_SIZE], int p,
 
 double determinant(double A[][MATRIX_SIZE], int n);
 
+float newDeterminant(float A[], int row);
+
 void adjoint(double A[][MATRIX_SIZE], double adj[][MATRIX_SIZE]);
 
 int inverse(double A[][MATRIX_SIZE], double inverse[][MATRIX_SIZE]);
 
-void predictFilter(double deltaT, double position[], double velocity[],
-		double acceleration[], double stateCovariance[][2][2],
-		double processCovariance[2][2]);
+int newInverse(float A[], float inverse[], int row);
 
-void updateFilter(double position[], double velocity[], double gpsPos[],
-		double gpsVel[], double stateCovariance[][2][2],
-		double observationCovariance[2][2]);
+void predictFilter(float deltaT, float position[], float velocity[],
+		float acceleration[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float processCovariance[MATRIX_SIZE * MATRIX_SIZE]);
+
+void updateFilter(float position[], float velocity[], float gpsPos[],
+		float gpsVel[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float observationCovariance[MATRIX_SIZE * MATRIX_SIZE]);
 
 #endif

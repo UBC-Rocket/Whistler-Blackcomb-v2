@@ -124,6 +124,12 @@ void matMult(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 	}
 }
 
+// Matrix multiplication, assumes matrices have proper rows and columns
+void newMatMult(float mat1[], float mat2[], float mat3[], int row_a, int column_a, int column_b) {
+	mul(mat1, mat2, mat3, row_a, column_a, column_b);
+}
+
+
 // Transpose of matrix
 void transpose(double mat[][MATRIX_SIZE]) {
 	double temp;
@@ -136,7 +142,12 @@ void transpose(double mat[][MATRIX_SIZE]) {
 	}
 }
 
-// Matrix and vector multiplication
+void newTranspose(float mat[], int row, int column) {
+	tran(mat, row, column);
+}
+
+//TODO: Replace with matMult
+// Matrix and vetical vector multiplication
 void matVecMult(double mat[][MATRIX_SIZE], double vec[], double result[]) {
 	for (int i = 0; i < MATRIX_SIZE; ++i) {
 		result[i] = 0;
@@ -146,9 +157,15 @@ void matVecMult(double mat[][MATRIX_SIZE], double vec[], double result[]) {
 	}
 }
 
-// Scalar multiplication betwee vector and scalar
+// Scalar multiplication between vector and scalar
 void scalMult(double vec[], double scal, double result[]) {
 	for (int i = 0; i < MATRIX_SIZE; ++i) {
+		result[i] = vec[i] * scal;
+	}
+}
+
+void newScalMult(float vec[], float scal, float result[], int size) {
+	for (int i = 0; i < size; ++i) {
 		result[i] = vec[i] * scal;
 	}
 }
@@ -163,6 +180,14 @@ void addMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 	}
 }
 
+//assumes matrices have same dimensions
+void newAddMat(float mat1[], float mat2[], float result[], int mat1_row, int mat1_col) {
+	for (int i = 0; i < mat1_row * mat1_col; i++) {
+		result[i] = mat1[i] + mat2[i];
+	}
+}
+
+//TODO: remove
 // Vector addition
 void addVec(double vec1[], double vec2[], double result[]) {
 	for (int i = 0; i < MATRIX_SIZE; ++i) {
@@ -170,6 +195,7 @@ void addVec(double vec1[], double vec2[], double result[]) {
 	}
 }
 
+//TODO: remove
 // Matrix subtraction
 void subtractMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 		double result[][MATRIX_SIZE]) {
@@ -180,6 +206,14 @@ void subtractMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
 	}
 }
 
+//assumes matrices have same dimensions
+void newSubtractMat(float mat1[], float mat2[], float result[], int mat1_row, int mat1_col) {
+	for (int i = 0; i < mat1_row * mat1_col; ++i) {
+		result[i] = mat1[i] - mat2[i];
+	}
+}
+
+//TODO: remove
 // Vector subtraction
 void subtractVec(double vec1[], double vec2[], double result[]) {
 	for (int i = 0; i < MATRIX_SIZE; ++i) {
@@ -241,6 +275,10 @@ double determinant(double A[][MATRIX_SIZE], int n) {
 	return D;
 }
 
+float newDeterminant(float A[], int row) {
+	return det(A, row);
+}
+
 // Function to get adjoint of A[N][N] in adj[N][N]. 
 void adjoint(double A[][MATRIX_SIZE], double adj[][MATRIX_SIZE]) {
 	if (MATRIX_SIZE == 1) {
@@ -289,108 +327,114 @@ int inverse(double A[][MATRIX_SIZE], double inverse[][MATRIX_SIZE]) {
 	return 1;
 }
 
+int newInverse(float A[], float inverse[], int row) {
+	memcpy(inverse, A, row * row * sizeof(float));
+	return inv(inverse, row);
+}
+
 // Predict phase of Kalman filter
-void predictFilter(double deltaT, double position[], double velocity[],
-		double acceleration[], double stateCovariance[][2][2],
-		double processCovariance[2][2]) {
+void predictFilter(float deltaT, float position[], float velocity[],
+		float acceleration[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float processCovariance[MATRIX_SIZE * MATRIX_SIZE]) {
 	// State Transition Matrix, derived from kinematics (to be multiplied by state vector of position and velocity)
-	double F[][2] = { { 1, deltaT }, { 0, 1 } };
+	float F[MATRIX_SIZE * MATRIX_SIZE] = {1, deltaT, 0,1};
 	// Control input matrix, derived from kinematics (to be multiplied by acceleration)
-	double B[] = { 0.5f * deltaT * deltaT, deltaT };
+	float B[MATRIX_SIZE] = { 0.5f * deltaT * deltaT, deltaT };
 
 	// Iterate through values in x, y, z order
 	for (int axis = 0; axis < 3; axis++) {
 		// Previous estimate of state
-		double xPrev[] = { position[axis], velocity[axis] };
+		float xPrev[] = { position[axis], velocity[axis] };
 		// Predicted estimate of state after given observations
-		double xPred[2] = { 0 };
+		float xPred[2] = { 0 };
 		// Control vector
-		double u = acceleration[axis];
+		float u = acceleration[axis];
 		// Predicted covariance matrix
-		double PPred[2][2] = { 0 };
+		float PPred[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
 
 		// Temp vectors to calculate next state
-		double temp1[2] = { 0 };
-		double temp2[2] = { 0 };
-		double temp3[2][2] = { 0 };
-		double temp4[2][2] = { 0 };
+		float temp1[MATRIX_SIZE] = { 0 };
+		float temp2[MATRIX_SIZE] = { 0 };
+		float temp3[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
+		float temp4[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
 
 		// x_k = F*x_{k-1} + B*u
-		matVecMult(F, xPrev, temp1);
-		scalMult(B, u, temp2);
-		addVec(temp1, temp2, xPred);
+		newMatMult(F, xPrev, temp1, MATRIX_SIZE, MATRIX_SIZE, 1);
+		newScalMult(B, u, temp2, MATRIX_SIZE);
+		newAddMat(temp1, temp2, xPred, MATRIX_SIZE, 1);
 
 		// P_k = F*P_{k-1}*F^T + Q
-		transpose(F);
-		matMult(stateCovariance[axis], F, temp3);
-		transpose(F);
-		matMult(F, temp3, temp4);
-		addMat(temp4, processCovariance, PPred);
+		newTranspose(F, MATRIX_SIZE, MATRIX_SIZE);
+		newMatMult(stateCovariance[axis], F, temp3, MATRIX_SIZE, 
+			MATRIX_SIZE, MATRIX_SIZE);
+		newTranspose(F, MATRIX_SIZE, MATRIX_SIZE);
+		newMatMult(F, temp3, temp4, MATRIX_SIZE, MATRIX_SIZE,
+			MATRIX_SIZE);
+		newAddMat(temp4, processCovariance, PPred, MATRIX_SIZE, MATRIX_SIZE);
 
 		// Write back predictions to original variables
 		position[axis] = xPred[0];
 		velocity[axis] = xPred[1];
-		for (int i = 0; i < 2; ++i) {
-			for (int j = 0; j < 2; ++j) {
-				stateCovariance[axis][i][j] = PPred[i][j];
-			}
+		for (int i = 0; i < MATRIX_SIZE * MATRIX_SIZE; ++i) {
+			stateCovariance[axis][i] = PPred[i];
 		}
 	}
 }
 
 // Update phase of Kalman filter
-void updateFilter(double position[], double velocity[], double gpsPos[],
-		double gpsVel[], double stateCovariance[][2][2],
-		double observationCovariance[2][2]) {
+void updateFilter(float position[], float velocity[], float gpsPos[],
+		float gpsVel[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float observationCovariance[MATRIX_SIZE * MATRIX_SIZE]) {
 
 	// Iterate through values in x, y, z order
 	for (int axis = 0; axis < 3; axis++) {
 		// Measurement of true state, i.e. gps reading
-		double z[2] = { gpsPos[axis], gpsVel[axis] };
+		float z[2] = { gpsPos[axis], gpsVel[axis] };
 		// Previous estimate of state
-		double xPrev[] = { position[axis], velocity[axis] };
+		float xPrev[2] = { position[axis], velocity[axis] };
 		// Predicted estimate of state after given observations
-		double xPred[2] = { 0 };
+		float xPred[2] = { 0 };
 		// Predicted covariance matrix
-		double PPred[2][2] = { 0 };
+		float PPred[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
 		// Innovation
-		double y[2] = { 0 };
+		float y[2] = { 0 };
 		// Inovation covariance
-		double S[2][2] = { 0 };
+		float S[2 * 2] = { 0 };
 		// Kalman gain
-		double K[2][2] = { 0 };
+		float K[2 * 2] = { 0 };
 		// Identity
-		double I[2][2] = { { 1, 0 }, { 0, 1 } };
+		float I[2 * 2] = { 1, 0, 0, 1 };
 		// Temp variables for equations
-		double temp1[2];
-		double temp2[2][2];
+		float temp1[2];
+		float temp2[2 * 2];
 
 		// y = z - H*x_{k-1}, here H is the identity because we are directly measuring position and velocity through GPS
-		subtractVec(z, xPrev, y);
+		newSubtractMat(z, xPrev, y, MATRIX_SIZE, 1);
 
 		//S = H*P_{k-1}*H^T + R
-		addMat(stateCovariance[axis], observationCovariance, S);
+		newAddMat(stateCovariance[axis], observationCovariance, S,
+			MATRIX_SIZE, MATRIX_SIZE);
 
 		// K = P_{k-1}*H^T*S^{-1}
-		double SInverse[2][2] = { 0 };
-		inverse(S, SInverse);
-		matMult(stateCovariance[axis], SInverse, K);
+		float SInverse[2 * 2] = { 0 };
+		newInverse(S, SInverse, MATRIX_SIZE);
+		newMatMult(stateCovariance[axis], SInverse, K, MATRIX_SIZE,
+			MATRIX_SIZE, MATRIX_SIZE);
 
 		// x_k = x_{k-1} + K*y
-		matVecMult(K, y, temp1);
-		addVec(xPrev, temp1, xPred);
+		newMatMult(K, y, temp1, MATRIX_SIZE, MATRIX_SIZE, 1);
+		newAddMat(xPrev, temp1, xPred, MATRIX_SIZE, 1);
 
 		// P_k = (I - K*H)*P_{k-1}
-		subtractMat(I, K, temp2);
-		matMult(temp2, stateCovariance[axis], PPred);
+		newSubtractMat(I, K, temp2, MATRIX_SIZE, MATRIX_SIZE);
+		newMatMult(temp2, stateCovariance[axis], PPred, MATRIX_SIZE,
+			MATRIX_SIZE, MATRIX_SIZE);
 
 		// Write back predictions to original variables
 		position[axis] = xPred[0];
 		velocity[axis] = xPred[1];
-		for (int i = 0; i < 2; ++i) {
-			for (int j = 0; j < 2; ++j) {
-				stateCovariance[axis][i][j] = PPred[i][j];
-			}
+		for (int i = 0; i < 4; ++i) {
+			stateCovariance[axis][i] = PPred[i];
 		}
 	}
 }
