@@ -1,16 +1,7 @@
 #include <unity.h>
 #include <prediction.h>
 
-void compareSquareMatrix(double testArray[MATRIX_SIZE][MATRIX_SIZE], 
-    double expectedArray[MATRIX_SIZE][MATRIX_SIZE]){
-     for(int i=0;i<MATRIX_SIZE;i++){
-        for(int j=0;j<MATRIX_SIZE;j++){
-            TEST_ASSERT_EQUAL_FLOAT(expectedArray[i][j],testArray[i][j]);
-        }
-    }
-}
-
-void newCompareSquareMatrix(float testArray[MATRIX_SIZE * MATRIX_SIZE],
+void compareSquareMatrix(float testArray[MATRIX_SIZE * MATRIX_SIZE],
     float expectedArray[MATRIX_SIZE * MATRIX_SIZE]) {
         for (int i=0;i<MATRIX_SIZE;i++) {
             TEST_ASSERT_EQUAL_FLOAT(expectedArray[i],testArray[i]);
@@ -51,7 +42,7 @@ void matMultTest(void){
     int resultIndex=0;
     for(int i=0;i<numMats;i++){
         for(int j=i+1;j<numMats;j++){
-            newMatMult(testMats[i],testMats[j], result, MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE);
+            matMult(testMats[i],testMats[j], result, MATRIX_SIZE, MATRIX_SIZE, MATRIX_SIZE);
             for (int k = 0; k < sizeof(result) / sizeof(result[0]); k++) {
                 TEST_ASSERT_EQUAL_FLOAT(result[k], expectedResults[resultIndex][k]);
             }
@@ -64,9 +55,9 @@ void transposeTest(void){
     float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1,2,3,4};
     float expectedResult[MATRIX_SIZE * MATRIX_SIZE] = {1,3,2,4};
 
-    newTranspose(testMat, MATRIX_SIZE, MATRIX_SIZE);
+    transpose(testMat, MATRIX_SIZE, MATRIX_SIZE);
 
-    newCompareSquareMatrix(testMat, expectedResult);
+    compareSquareMatrix(testMat, expectedResult);
 }
 
 void matVecMultTest(void){
@@ -76,7 +67,7 @@ void matVecMultTest(void){
 
     float expectedVec[MATRIX_SIZE] = {17,39};
 
-    newMatMult(testMat, testVec, resultVec, MATRIX_SIZE, MATRIX_SIZE, 1);
+    matMult(testMat, testVec, resultVec, MATRIX_SIZE, MATRIX_SIZE, 1);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedVec,resultVec,MATRIX_SIZE);
 }
@@ -88,7 +79,7 @@ void scalMultTest(void){
 
     float expectedVec[MATRIX_SIZE] = {3,6};
 
-    newScalMult(testVec,testScal,resultVec, MATRIX_SIZE);
+    scalMult(testVec,testScal,resultVec, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedVec,resultVec,MATRIX_SIZE);
 }
@@ -101,13 +92,13 @@ void addSubtractMatTest(void){
     float expectedAddMat[MATRIX_SIZE * MATRIX_SIZE] = {6,8,10,12};
     float expectedSubMat[MATRIX_SIZE * MATRIX_SIZE] = {-4,-4,-4,-4};
 
-    newAddMat(testMat1,testMat2,resultMat, MATRIX_SIZE, MATRIX_SIZE);
+    addMat(testMat1,testMat2,resultMat, MATRIX_SIZE, MATRIX_SIZE);
 
-    newCompareSquareMatrix(resultMat,expectedAddMat);
+    compareSquareMatrix(resultMat,expectedAddMat);
 
-    newSubtractMat(testMat1,testMat2,resultMat, MATRIX_SIZE, MATRIX_SIZE);
+    subtractMat(testMat1,testMat2,resultMat, MATRIX_SIZE, MATRIX_SIZE);
 
-    newCompareSquareMatrix(resultMat,expectedSubMat);
+    compareSquareMatrix(resultMat,expectedSubMat);
 }
 
 void addSubtractVecTest(void){
@@ -118,11 +109,11 @@ void addSubtractVecTest(void){
     float expectedAddVec[MATRIX_SIZE] = {4,6};
     float expectedSubVec[MATRIX_SIZE] = {-2,-2};
 
-    newAddMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
+    addMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedAddVec,resultVec,MATRIX_SIZE);
 
-    newSubtractMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
+    subtractMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedSubVec,resultVec,MATRIX_SIZE);
 }
@@ -130,7 +121,7 @@ void addSubtractVecTest(void){
 void determinantTest(void){
     float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1.0,2.0, 3.0,4.0};
     float expectedResult = -2.0;
-    float testResult = newDeterminant(testMat, MATRIX_SIZE);
+    float testResult = determinant(testMat, MATRIX_SIZE);
 
     TEST_ASSERT_EQUAL_FLOAT(expectedResult, testResult);
 }
@@ -140,9 +131,9 @@ void inverseTest(void){
     float resultMat[MATRIX_SIZE * MATRIX_SIZE];
     float expectedResultMat[MATRIX_SIZE * MATRIX_SIZE] = {-2.0,1.0, 3.0/2,-1.0/2};
 
-    newInverse(testMat,resultMat, MATRIX_SIZE);
+    inverse(testMat,resultMat, MATRIX_SIZE);
     
-    newCompareSquareMatrix(resultMat,expectedResultMat);
+    compareSquareMatrix(resultMat,expectedResultMat);
 }
 
 void qMultTest(void){
