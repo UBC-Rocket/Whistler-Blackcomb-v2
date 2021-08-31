@@ -145,8 +145,13 @@ float determinant(float A[], int row) {
 }
 
 int inverse(float A[], float inverse[], int row) {
+	if (fabs(det(A, row)) < FLT_EPSILON) {
+		return 0;
+	}
+
 	memcpy(inverse, A, row * row * sizeof(float));
-	return inv(inverse, row);
+	int status = inv(inverse, row);
+	return status;
 }
 
 // Predict phase of Kalman filter

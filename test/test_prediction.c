@@ -130,10 +130,24 @@ void inverseTest(void){
     float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1.0,2.0, 3.0,4.0};
     float resultMat[MATRIX_SIZE * MATRIX_SIZE];
     float expectedResultMat[MATRIX_SIZE * MATRIX_SIZE] = {-2.0,1.0, 3.0/2,-1.0/2};
-
-    inverse(testMat,resultMat, MATRIX_SIZE);
+    
+    int status = inverse(testMat,resultMat, MATRIX_SIZE);
     
     compareSquareMatrix(resultMat,expectedResultMat);
+    TEST_ASSERT_EQUAL_INT(1, status);
+}
+
+//bandaid fix on inverse function to make this properly fail.
+void failInverseTest(void){
+    float testMat[MATRIX_SIZE * MATRIX_SIZE] = {1.0,2.0, 1.0,2.0};
+    float resultMat[MATRIX_SIZE * MATRIX_SIZE];
+    
+    int det = determinant(testMat, MATRIX_SIZE);
+    int status = inverse(testMat, resultMat, MATRIX_SIZE);
+    
+    TEST_ASSERT_EQUAL_INT(0, det);
+    TEST_ASSERT_EQUAL_INT(0, status);
+
 }
 
 void qMultTest(void){
@@ -477,6 +491,7 @@ void (*predictionTests[])(void)={
     addSubtractVecTest,
     determinantTest,
     inverseTest,
+    failInverseTest,
     qMultTest,
     qSumTest,
     qNormTest,
