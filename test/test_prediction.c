@@ -20,8 +20,6 @@ void baseTest(void){
 }
 
 void matMultTest(void){
-    //testing CControl functions.
-
     int numMats = 4;
     float testMats[][MATRIX_SIZE * MATRIX_SIZE] = {
         {1,2,3,4},
@@ -109,11 +107,11 @@ void addSubtractVecTest(void){
     float expectedAddVec[MATRIX_SIZE] = {4,6};
     float expectedSubVec[MATRIX_SIZE] = {-2,-2};
 
-    addMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
+    addMat(testVec1,testVec2,resultVec, MATRIX_SIZE, 1);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedAddVec,resultVec,MATRIX_SIZE);
 
-    subtractMat(testVec1,testVec2,resultVec, MATRIX_SIZE, MATRIX_SIZE);
+    subtractMat(testVec1,testVec2,resultVec, MATRIX_SIZE, 1);
 
     TEST_ASSERT_EQUAL_HEX8_ARRAY(expectedSubVec,resultVec,MATRIX_SIZE);
 }
@@ -147,7 +145,6 @@ void failInverseTest(void){
     
     TEST_ASSERT_EQUAL_INT(0, det);
     TEST_ASSERT_EQUAL_INT(0, status);
-
 }
 
 void qMultTest(void){
