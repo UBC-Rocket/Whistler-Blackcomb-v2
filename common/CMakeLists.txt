@@ -13,12 +13,18 @@ file(GLOB_RECURSE PORT ${CMAKE_CURRENT_LIST_DIR}/xbee/ports/whistler/*.c)
 target_sources(whistler-blackcomb PUBLIC ${SRCS})
 target_sources(whistler-blackcomb PUBLIC ${PORT})
 
+file(GLOB_RECURSE CCONTROL_SRCS ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Sources/*.c)
+target_sources(whistler-blackcomb PUBLIC ${CCONTROL_SRCS})
+
 add_library(IMU_interpret STATIC
     src/IMU_interpret.c
 )
 
 add_library(state_machine STATIC src/state_machine.c)
-add_library(prediction STATIC src/prediction.c)
+add_library(prediction STATIC src/prediction.c ${CCONTROL_SRCS})
+target_include_directories(prediction PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Headers
+)
 
 add_library(buffer STATIC src/buffer.c)
 
