@@ -44,7 +44,7 @@ quaternion qSum(quaternion qA, quaternion qB) {
 // Returns a normalized quaternion
 quaternion qNorm(quaternion q) {
 	quaternion qReturn;
-	double recipNorm = sqrt(q.re * q.re + q.i * q.i + q.j * q.j + q.k * q.k);
+	float recipNorm = sqrt(q.re * q.re + q.i * q.i + q.j * q.j + q.k * q.k);
 	qReturn.re = q.re / recipNorm;
 	qReturn.i = q.i / recipNorm;
 	qReturn.j = q.j / recipNorm;
@@ -62,8 +62,8 @@ quaternion qConjugate(quaternion q) {
 // Gets the orientation of quaternion from 1st order polynomial approximation for quaternions exponentiation. See here for details: 
 // https://www.ashwinnarayan.com/post/how-to-integrate-quaternions/
 // Is computationally cheaper, so if performance is an issue we could use this 
-quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
-		double gy, double gz) {
+quaternion getOrientationOrder1(float deltaT, quaternion qPrev, float gx,
+		float gy, float gz) {
 	gx *= deltaT / 2;
 	gy *= deltaT / 2;
 	gz *= deltaT / 2;
@@ -88,12 +88,12 @@ quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
  * @param gz z component of angular velocity (rads/sec)
  * @return new quaternion representing orientation 
  */
-quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
-		double gz) {
+quaternion getOrientation(float deltaT, quaternion qPrev, float gx, float gy,
+		float gz) {
 	quaternion q;
-	double norm = deltaT * sqrt(gx * gx + gy * gy + gz * gz);
+	float norm = deltaT * sqrt(gx * gx + gy * gy + gz * gz);
 	q.re = cos(norm / 2);
-	double sinNorm = sin(norm / 2); // Variable to avoid repeated sin computation
+	float sinNorm = sin(norm / 2); // Variable to avoid repeated sin computation
 	/* Check to make sure we don't get a divide by 0 error. 
 	   Note that in the case that norm is 0 we want the vector component
 	   of q to be zeros because this represents no rotation (i.e. multiplication

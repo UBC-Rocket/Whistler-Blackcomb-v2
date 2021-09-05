@@ -16,10 +16,10 @@
 
 // Quaternion struct definition
 typedef struct quaternions {
-	double re;
-	double i;
-	double j;
-	double k;
+	float re;
+	float i;
+	float j;
+	float k;
 } quaternion;
 
 /*******************************************************************************
@@ -36,8 +36,8 @@ quaternion qNorm(quaternion q);
 
 quaternion qConjugate(quaternion q);
 
-quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
-		double gy, double gz);
+quaternion getOrientationOrder1(float deltaT, quaternion qPrev, float gx,
+		float gy, float gz);
 
 /**
  * produces a quaternion representing orientation based on a previous orientation
@@ -52,8 +52,8 @@ quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
  * @param gz z component of angular velocity (rads/sec)
  * @return new quaternion representing orientation 
  */
-quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
-		double gz);
+quaternion getOrientation(float deltaT, quaternion qPrev, float gx, float gy,
+		float gz);
 
 void matMult(float mat1[], float mat2[], float mat3[], int row_a, 
 	int column_a, int column_b);

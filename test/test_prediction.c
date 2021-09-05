@@ -371,9 +371,9 @@ void basicGetOrientationTest(void){
     quaternion initalOrientation;
     quaternion finalOrientation;
     quaternion expectedOrientation;
-    double testGx;
-    double testGy;
-    double testGz;
+    float testGx;
+    float testGy;
+    float testGz;
 
     //testing w/ nice, pleasant right angles
 
@@ -429,9 +429,9 @@ void basicGetOrientationTest(void){
     quaternion initalOrientation;
     quaternion finalOrientation;
     quaternion expectedOrientation;
-    double testGx;
-    double testGy;
-    double testGz;
+    float testGx;
+    float testGy;
+    float testGz;
 
     /*Test 1*/
     testGx=0;
