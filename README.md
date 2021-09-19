@@ -8,6 +8,27 @@
 
 This is a repository with the code for the UBC Rocket Whistler Blackcomb flight computer. A compiled version of it should hopefully at some point be in [space](https://en.wikipedia.org/wiki/K%C3%A1rm%C3%A1n_line). 
 
+## Project Structure
+
+This is a high level overview of the file structure we use for this project. Any folders not mentioned here are libraries/drivers that are not custom developed. 
+
+* board
+  * Generated files by MCUXpresso for pin configuration
+* common
+  * Code that is shared between x86 and board implementations, i.e. logic code
+* data
+  * Misc. files used for testing or logging
+* doc
+  * Project documentation in markdown
+* envs
+  * Hardware abstraction layer that calls hardware level functionality directly
+* source
+  * Main program entrance point
+* test
+  * Unit test folder
+* tools
+  * Misc. tools for ease of development
+
 ## Project Documentation
 
 All documentation is currently kept in the [doc/](doc/) directory. Note that although this is the firmware repository, all documentation for the wb-avionics subteam is located here. 
@@ -21,8 +42,6 @@ All documentation is currently kept in the [doc/](doc/) directory. Note that alt
 1. MCUXpresso project setup [guide](doc/MCUXpresso-Setup.md). If you are new to the project, this is a good place to start.
 2. x86 Compilation explanation and setup [guide](doc/x86-Compilation.md). This is a good second step.
 3. Setting up Windows compilation with Cygwin [guide](doc/Windows-Compilation-with-Cygwin.md). This is only strictly  necessary if you want to be able to do software-in-the-loop testing with [groundstation](https://github.com/UBC-Rocket/UBCRocketGroundStation).
-
-### Electrical Project Setup
 
 ### Firmware Concept Guides
 

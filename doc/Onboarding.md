@@ -50,7 +50,7 @@ Even if you don't have your license yet, you can still get the projects set up. 
 * [Data acquisition board](https://github.com/UBC-Rocket/WB-AV-4500-FC)
 * [Battery management system](https://github.com/UBC-Rocket/WB-AV-4501-BMS)
 
-Once you get your student license you should be set up for firmware development. 
+Once you get your student license you should be set up for electronics development. 
 
 ### Software
 
