@@ -16,7 +16,7 @@ For team communication we have a UBC Rocket wide slack, with a wb-avionics chann
 
 ## Google Drive
 
-UBC Rocket uses google drive as a centralized location for resources and files relating to the team. We have a folder for our subteam at UBC Rocket -> WHISTLER BLACKCOMB -> Subteams -> Avionics, although finding things in the drive is quite difficult and most of our documentation is kept here on Github instead. 
+UBC Rocket uses google drive as a centralized location for resources and files relating to the team. If you're reading this you should have been added to it already, but if not let Xander know and it can be arranged. We have a folder for our subteam at UBC Rocket -> WHISTLER BLACKCOMB -> Subteams -> Avionics, although finding things in the drive is quite difficult and most of our documentation is kept here on Github instead. 
 
 ## Whistler Blackcomb Project Background
 
@@ -55,3 +55,7 @@ Once you get your student license you should be set up for electronics developme
 ### Software
 
 This section to be completed later...
+
+## Your turn!
+
+If there was anything you found confusing or misleading in any of the onboarding documentation, please don't hesitate to help improve it! If you found something confusing other people might too, so please either let someone on the team know or implement the change/clarification in the markdown yourself. 
