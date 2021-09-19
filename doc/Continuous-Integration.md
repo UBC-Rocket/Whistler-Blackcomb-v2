@@ -4,7 +4,7 @@
 
 Continuous integration is where code is integrated into a fully working and stable form on a rolling basis, which enables much faster and easier development. What it means in practice is making sure that the master branch is always in a stable and working form through automated testing/builds, and at no point does someone submit a pull request that "breaks the build " as it were. 
 
-To enable this, we're using CircleCI, a free service that allows you to do automated testing everytime a pull request/push to master is made. That way even if it compiles on your machine, a remote server confirms that everything is actually working as intended and it will actually build. 
+To enable this, we're using CircleCI, a free service that allows you to do automated testing every time a pull request/push to master is made. That way even if it compiles on your machine, a remote server confirms that everything is actually working as intended and it will actually build. 
 
 ## Access
 
