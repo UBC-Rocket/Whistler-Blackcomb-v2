@@ -31,7 +31,7 @@ This is a high level overview of the file structure we use for this project. Any
 
 ## Project Documentation
 
-All documentation is currently kept in the [doc/](doc/) directory. Note that although this is the firmware repository, all documentation for the wb-avionics subteam is located here. 
+All documentation is currently kept in the [doc/](doc/) directory. Note that although this is the firmware repository, all documentation for the wb-avionics subteam is located here for ease of finding things. 
 
 ### Onboarding Documents
 
@@ -39,8 +39,8 @@ All documentation is currently kept in the [doc/](doc/) directory. Note that alt
 
 ### Firmware Project Setup
 
-1. MCUXpresso project setup [guide](doc/MCUXpresso-Setup.md). If you are new to the project, this is a good place to start.
-2. x86 Compilation explanation and setup [guide](doc/x86-Compilation.md). This is a good second step.
+1. MCUXpresso project setup [guide](doc/MCUXpresso-Setup.md). 
+2. x86 Compilation explanation and setup [guide](doc/x86-Compilation.md). 
 3. Setting up Windows compilation with Cygwin [guide](doc/Windows-Compilation-with-Cygwin.md). This is only strictly  necessary if you want to be able to do software-in-the-loop testing with [groundstation](https://github.com/UBC-Rocket/UBCRocketGroundStation).
 
 ### Firmware Concept Guides
@@ -52,4 +52,4 @@ All documentation is currently kept in the [doc/](doc/) directory. Note that alt
 
 ### Legacy Functionality
 
-* Uploading to Teensy [guide](doc/Teensy-Upload.md).
+1. Uploading to Teensy [guide](doc/Teensy-Upload.md).

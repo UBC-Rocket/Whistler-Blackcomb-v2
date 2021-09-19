@@ -34,9 +34,9 @@ Depending on what you'll primarily be working on, here are some next steps to ge
 
 ### Firmware
 
-The firmware for the flight computer is on github [here](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2). The first steps to get set up with it, regardless of operating system is to follow [this guide](doc/MCUXpresso-Setup.md), which will get you set up with MCUXpresso for board compilation. 
+The firmware for the flight computer is on github [here](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2). The first steps to get set up with it, regardless of operating system is to follow [this guide](../doc/MCUXpresso-Setup.md), which will get you set up with MCUXpresso for board compilation. 
 
-Next, follow [this guide](doc/x86-Compilation.md) to set up your ability to compile our firmware for your local machine for testing. A more detailed explanation of this functionality is in the guide. If you are running Windows and either don't want to install wsl or want a native build system, then follow [this guide](doc/Windows-Compilation-with-Cygwin.md) to enable native building instead of wsl. 
+Next, follow [this guide](../doc/x86-Compilation.md) to set up your ability to compile our firmware for your local machine for testing. A more detailed explanation of this functionality is in the guide. If you are running Windows and either don't want to install wsl or want a native build system, then follow [this guide](../doc/Windows-Compilation-with-Cygwin.md) to enable native building instead of wsl. 
 
 After doing these your development environment should be all set for firmware work! Explanations of specific implementations are linked in the readme file for the firmware. 
 
