@@ -16,7 +16,7 @@ For team communication we have a UBC Rocket wide slack, with a wb-avionics chann
 
 ## Google Drive
 
-UBC Rocket uses google drive as a centralized location for resources and files relating to the team. If you're reading this you should have been added to it already, but if not let Xander know and it can be arranged. We have a folder for our subteam at UBC Rocket -> WHISTLER BLACKCOMB -> Subteams -> Avionics, although finding things in the drive is quite difficult and most of our documentation is kept here on Github instead. 
+UBC Rocket uses google drive as a centralized location for resources and files relating to the team. If you're reading this you should have been added to it already, but if not let Xander know and it can be arranged. We have a folder for our subteam at UBC Rocket -> WHISTLER BLACKCOMB -> Subteams -> Avionics, although finding things in the drive is quite difficult and most of our documentation is kept here on GitHub instead. 
 
 ## Whistler Blackcomb Project Background
 
@@ -24,9 +24,9 @@ To get familiar with the setup and organization of the Whistler Blackcomb Projec
 
 As for how the team works, generally work is divided between electrical, firmware and software tasks. Electrical work is things like PCB design and manufacturing, firmware is working on code that will be on the flight computer sent to space and software tasks are those pertaining to the ground station GUI. 
 
-## Github Access
+## GitHub Access
 
-No matter what type of work you will be doing, you will need access to the teams Github repositories. Given this guide is itself hosted on Github you likely already know how to access the team's repos, and to get member status contact Xander. 
+No matter what type of work you will be doing, you will need access to the teams GitHub repositories. Given this guide is itself hosted on GitHub you likely already know how to access the team's repos, and to get member status contact Xander. 
 
 ## Next Steps
 
@@ -34,7 +34,7 @@ Depending on what you'll primarily be working on, here are some next steps to ge
 
 ### Firmware
 
-The firmware for the flight computer is on github [here](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2). The first steps to get set up with it, regardless of operating system is to follow [this guide](../doc/MCUXpresso-Setup.md), which will get you set up with MCUXpresso for board compilation. 
+The firmware for the flight computer is on GitHub [here](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2). The first steps to get set up with it, regardless of operating system is to follow [this guide](../doc/MCUXpresso-Setup.md), which will get you set up with MCUXpresso for board compilation. 
 
 Next, follow [this guide](../doc/x86-Compilation.md) to set up your ability to compile our firmware for your local machine for testing. A more detailed explanation of this functionality is in the guide. If you are running Windows and either don't want to install wsl or want a native build system, then follow [this guide](../doc/Windows-Compilation-with-Cygwin.md) to enable native building instead of wsl. 
 
