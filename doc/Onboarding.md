@@ -2,7 +2,7 @@
 
 Welcome to Whistler-Blackcomb Avionics! We are thrilled with your new aura joining our spirit collective (this is a direct sarcastic quote from Eric). 
 
-Here's a few things that you might need to know when joining the team:
+Here's a few things that you might want to know when joining the team:
 
 ## Meetings
 
@@ -22,7 +22,13 @@ UBC Rocket uses google drive as a centralized location for resources and files r
 
 To get familiar with the setup and organization of the Whistler Blackcomb Project, by far the best resource is the [external design review](https://docs.google.com/document/d/1aMXL6ogCYWBh2T_MYrKgUeNxM_nnbr7gomK3zXRZ8YI/edit?usp=sharing) that was completed at the beginning of 2021. It's obviously way too long and too detailed for a full reading, but skimming over the main sections quickly will give a good sense about a high level overview of the project. For a description of what the avionics system looks like specifically, read our section in the EDR in more detail. Note that specific things might have changed since its writing, but most high level things are the same. 
 
-As for how the team works, generally work is divided between electrical, firmware and software tasks. Electrical work is things like PCB design and manufacturing, firmware is working on code that will be on the flight computer sent to space and software tasks are those pertaining to the ground station GUI. 
+## Team Structure
+
+Generally work is divided between electrical, firmware and software tasks. Electrical work is things like PCB design and manufacturing, firmware is working on code that will be on the flight computer sent to space and software tasks are those pertaining to the ground station GUI. 
+
+To keep track of tasks and who is responsible for completing them, we use github projects. This can be seen [here](https://github.com/orgs/UBC-Rocket/projects/1) (you have to be logged in to see it). Tasks are initially in the todo section before any actual work has started on them, and once you start working you can move them to the in progress column. Once it's completed and you merge you're pull request/close the issue the item will automatically go to the finished column. The nice thing about using the built in functionality of github in this way is that because each of the tasks is tied to an issue it makes keeping track of progress much simpler. 
+
+For code/pcb contributions, we use github as version control to keep everyone up to date with the current version of the project. We follow the fairly standard github workflow of doing work on a new branch, and then starting a pull request to merge to master/main once the work has been completed. For pull requests you should have someone review your work before finally merging. 
 
 ## GitHub Access
 
@@ -30,7 +36,7 @@ No matter what type of work you will be doing, you will need access to the teams
 
 ## Next Steps
 
-Depending on what you'll primarily be working on, here are some next steps to get started contributing to the project. Even if you're only expecting to do one kind of work, if you're interested I'd definitely encourage you to set up the development environment for the other aspects of the team if only to get a fuller understanding of what's going on in the project. 
+Depending on what you'll primarily be working on, here are some next steps to get started contributing to the project. Even if you're only expecting to do one kind of work, if you're interested I'd definitely encourage you to set up the development environment for the other aspects of the team if only to get a better understanding of what's going on in the project. 
 
 ### Firmware
 
