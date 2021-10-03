@@ -401,7 +401,7 @@ static void CanTask(void *pv) {
 	for (EVER) {
 		canReceive(&can_handle, &rxFrame);
 		printf("CAN received, b0: %d, b1: %d\n", rxFrame.dataByte0, rxFrame.dataByte1);
-		canSend(&can_handle, 0x123, (hal_can_packet_t){'a', 'b', 'c', 'd'}, 4);
+		canSend(&can_handle, 0x123, (hal_can_packet_t){{'a', 'b', 'c', 'd'}}, 4);
 
 		hal_can_packet_id_t id = canGetId(&rxFrame);
 		switch (id) {
