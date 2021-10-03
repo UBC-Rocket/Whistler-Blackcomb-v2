@@ -132,7 +132,7 @@ int main(void) {
 	tskIDLE_PRIORITY + 2, /* initial priority */
 	(TaskHandle_t*) NULL /* optional task handle_debug to create */
 	)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			; /* error! probably out of memory */
 	}
@@ -142,7 +142,7 @@ int main(void) {
 	NULL,
 	debug_uart_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -152,7 +152,7 @@ int main(void) {
 	NULL,
 	radio_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -162,7 +162,7 @@ int main(void) {
 	NULL,
 	log_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -171,7 +171,7 @@ int main(void) {
 	NULL,
 	state_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -180,7 +180,7 @@ int main(void) {
 	NULL,
 	can_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
