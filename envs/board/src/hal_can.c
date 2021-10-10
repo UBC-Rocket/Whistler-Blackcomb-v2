@@ -133,15 +133,24 @@ void canSetId(hal_can_packet_t *packet, hal_can_packet_id_t id) {
 	packet->c[0] = id;
 }
 
-int canGetSensorId(flexcan_frame_t *rxFrame) {
+int canGetFloatId(flexcan_frame_t *rxFrame) {
 	return rxFrame->dataByte1;
 }
 
-void canSetSensorId(hal_can_packet_t *packet, int id) {
+void canSetFloatId(hal_can_packet_t *packet, int id) {
 	packet->c[1] = id;
 }
 
-float canGetSensorValue(flexcan_frame_t *rxFrame) {
+int canGetIntId(flexcan_frame_t *rxFrame) {
+	return rxFrame->dataByte1;
+}
+
+void canSetIntId(hal_can_packet_t *packet, int id) {
+	packet->c[1] = id;
+}
+
+
+float canGetFloatValue(flexcan_frame_t *rxFrame) {
 	float pressure;
 	char *c = (char*) &pressure;
 	c[0] = rxFrame->dataByte2;
@@ -151,7 +160,7 @@ float canGetSensorValue(flexcan_frame_t *rxFrame) {
 	return pressure;
 }
 
-void canSetSensorValue(hal_can_packet_t *packet, float value) {
+void canSetFloatValue(hal_can_packet_t *packet, float value) {
 	char *c = (char*) &value;
 	packet->c[2] = c[0];
 	packet->c[3] = c[1];
@@ -159,3 +168,20 @@ void canSetSensorValue(hal_can_packet_t *packet, float value) {
 	packet->c[5] = c[3];
 }
 
+int canGetIntValue(flexcan_frame_t *rxFrame) {
+	int command;
+	char *c = (char*) &command;
+	c[0] = rxFrame->dataByte2;
+	c[1] = rxFrame->dataByte3;
+	c[2] = rxFrame->dataByte4;
+	c[3] = rxFrame->dataByte5;
+	return command;
+}
+
+void canSetIntValue(hal_can_packet_t *packet, int value) {
+	char *c = (char*) &value;
+	packet->c[2] = c[0];
+	packet->c[3] = c[1];
+	packet->c[4] = c[2];
+	packet->c[5] = c[3];
+}
