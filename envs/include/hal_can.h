@@ -156,7 +156,7 @@ void canSetId(hal_can_packet_t *packet, hal_can_packet_id_t id);
  * @return the id of the sensor, depending on the sensor type either refers to
  * hal_can_pt_id_t or hal_can_tc_id_t
  */
-int canGetFloatId(flexcan_frame_t *rxFrame);
+int canGetSensorId(flexcan_frame_t *rxFrame);
 
 /**
  * Sets sensor id for a frame, works for tcs and pts
@@ -164,21 +164,21 @@ int canGetFloatId(flexcan_frame_t *rxFrame);
  * @param id the id of the sensor, depending on the sensor type either refers to
  * hal_can_pt_id_t or hal_can_tc_id_t
  */
-void canSetFloatId(hal_can_packet_t *packet, int id);
+void canSetSensorId(hal_can_packet_t *packet, int id);
 
 /**
  * Gets command id from a frame
  * @param rxFrame the frame to extract from, must have id of command read type
  * @return the id of the command
  */
-int canGetIntId(flexcan_frame_t *rxFrame);
+int canGetCommandId(flexcan_frame_t *rxFrame);
 
 /**
  * Sets command id for a frame
  * @param rxFrame the frame to set id for
  * @param id the id of the command
  */
-void canSetIntId(hal_can_packet_t *packet, int id);
+void canSetCommandId(hal_can_packet_t *packet, int id);
 
 /**
  * Gets value of sensor from a frame

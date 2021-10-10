@@ -133,19 +133,19 @@ void canSetId(hal_can_packet_t *packet, hal_can_packet_id_t id) {
 	packet->c[0] = id;
 }
 
-int canGetFloatId(flexcan_frame_t *rxFrame) {
+int canGetSensorId(flexcan_frame_t *rxFrame) {
 	return rxFrame->dataByte1;
 }
 
-void canSetFloatId(hal_can_packet_t *packet, int id) {
+void canSetSensorId(hal_can_packet_t *packet, int id) {
 	packet->c[1] = id;
 }
 
-int canGetIntId(flexcan_frame_t *rxFrame) {
+int canGetCommandId(flexcan_frame_t *rxFrame) {
 	return rxFrame->dataByte1;
 }
 
-void canSetIntId(hal_can_packet_t *packet, int id) {
+void canSetCommandId(hal_can_packet_t *packet, int id) {
 	packet->c[1] = id;
 }
 
