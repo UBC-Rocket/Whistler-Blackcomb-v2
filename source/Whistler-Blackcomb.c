@@ -407,13 +407,13 @@ static void CanTask(void *pv) {
 		switch (id) {
 		case can_packet_id_pt:{
 			hal_can_pt_id_t sensor_id = canGetSensorId(&rxFrame);
-			float pressure = canGetSensorValue(&rxFrame);
+			float pressure = canGetFloatValue(&rxFrame);
 			pt_data[sensor_id] = pressure;
 			break;
 		}
 		case can_packet_id_tc:{
 			hal_can_tc_id_t sensor_id = canGetSensorId(&rxFrame);
-			float temp = canGetSensorValue(&rxFrame);
+			float temp = canGetFloatValue(&rxFrame);
 			tc_data[sensor_id] = temp;
 			break;
 		}
