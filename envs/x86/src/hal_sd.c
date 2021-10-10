@@ -29,7 +29,7 @@ void sdInit(void) {
 }
 
 void sdOpen(HALFILE *file, const char *file_name) {
-	const char* path = malloc(strlen(file_name) + strlen(prePath) + 1);
+	char* const path = malloc(strlen(file_name) + strlen(prePath) + 1);
 	strcpy(path, prePath);
 	strcat(path, file_name);
 	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
@@ -46,7 +46,7 @@ size_t sdWrite(HALFILE *file, const char *data) {
 }
 
 void sdMkDir(const char *dir_name){
-	const char* path = malloc(strlen(dir_name) + strlen(prePath) + 1);
+	char* const path = malloc(strlen(dir_name) + strlen(prePath) + 1);
 	strcpy(path, prePath);
 	strcat(path, dir_name);
 	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
