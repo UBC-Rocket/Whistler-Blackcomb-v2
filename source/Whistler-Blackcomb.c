@@ -372,7 +372,7 @@ static void RadioTask(void *pv) {
 }
 
 static void LogTask(void *pv) {
-	HALFILE file;
+	//HALFILE file;
 	sdInit();
 	for (EVER) {
 //		sdMkDir("/testdir");
