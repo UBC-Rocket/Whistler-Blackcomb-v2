@@ -29,6 +29,7 @@
 #include "state_machine.h"
 #include "IMU_interpret.h"
 #include "prediction.h"
+#include "radio_protocol.h"
 
 /* Includes specific to MCU or x86 */
 #include "hal_time.h"
@@ -67,6 +68,7 @@ static void RadioTask(void *pv);
 static void LogTask(void *pv);
 static void StateTask(void *pv);
 static void CanTask(void *pv);
+static void startGSRadioTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -113,6 +115,7 @@ float pt_data[sizeof(pt_names)];
 int main(void) {
 	initHal();
 	initTimers();
+	
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
@@ -185,8 +188,19 @@ int main(void) {
 			;
 	}
 
-	vTaskStartScheduler();
+		 //this feels bad?
 
+	if ((error = xTaskCreate(startGSRadioTask, "startGSRadio Task",
+	configMINIMAL_STACK_SIZE + 500,
+	NULL,
+	can_task_PRIORITY,
+	NULL)) != pdPASS) {
+		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
+
+	vTaskStartScheduler();
 	for (;;)
 		;
 }
@@ -250,13 +264,6 @@ static void ReadImuTask(void *pv) {
 	}
 
 	if (kStatus_Success != uartInit(&hal_uart_imu)) {
-		vTaskSuspend(NULL);
-	}
-
-	/* Send introduction message. */
-	if (kStatus_Success
-			!= uartSend(&hal_uart_debug, (uint8_t*) debug_intro_message,
-					strlen(debug_intro_message))) {
 		vTaskSuspend(NULL);
 	}
 
@@ -434,4 +441,10 @@ static void CanTask(void *pv) {
 //		canSend(&can_handle, 0x123, txPacket, 6);
 //		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
+}
+
+
+static void startGSRadioTask(void *pv){
+	vTaskDelay(pdMS_TO_TICKS(3000));
+	GSRadioInit();
 }

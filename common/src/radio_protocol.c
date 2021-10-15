@@ -1,4 +1,10 @@
 #include "radio_protocol.h"
+#include <stdio.h>
+
+//unbeleviably dumb mistake - now just tracking down some errors in my code.
+
+
+
 
 //these lengths inlcude the 1 byte ID and the 4 byte timestamp
 #define PING_PACKET_LENGTH 10
@@ -14,6 +20,8 @@
 #define DATA_DUMP_PACKET_LENGTH 86
 
 #define MAX_RADIO_WAIT_MS 120000
+
+#define MAX_PACKET_SIZE 243
 
 #define CRITICAL_WATERSHED 0x40
 #define MAX_SENSOR_ID 0x2F
@@ -82,16 +90,17 @@ static void inputLoop(void *pv)
 
 static void outputLoop(void *pv)
 {
-    uint8_t *message = pvPortMalloc(256 * sizeof(uint8_t));
+    uint8_t *message = pvPortMalloc(MAX_PACKET_SIZE * sizeof(uint8_t));
     uint8_t length = 0;
-    uint8_t *individMessage = pvPortMalloc(256 * sizeof(uint8_t));
+    uint8_t *individMessage = pvPortMalloc(MAX_PACKET_SIZE * sizeof(uint8_t));
     uint8_t individLength;
     for (;;)
     {
+        //radioPrepMessage('m',1);
         if (!cbufCheckEmpty(radioBufTX))
         {
             individLength = cbufGet(radioBufTX, individMessage);
-            if (length + individLength < 256)
+            if (length + individLength < MAX_PACKET_SIZE)
             {
                 for (int index = 0; index++; index < individLength)
                 {
@@ -123,7 +132,7 @@ static void mandatoryOutput(void *pv)
 
         if (cbufCheckEmpty(radioBufTX))
         {
-            uint8_t *message = pvPortMalloc(256 * sizeof(uint8_t));
+            uint8_t *message = pvPortMalloc(MAX_PACKET_SIZE * sizeof(uint8_t));
             uint8_t length;
 
             radioPrepPing();
@@ -139,16 +148,20 @@ static void mandatoryOutput(void *pv)
 
 void GSRadioInit(void)
 {
-
+    printf("GS radio init started");
     serial.baudrate = 9600;
+    radioBufTX=cbufInit(512);
+    radioBufRXCrit=cbufInit(512);
+    radioBufRXLow=cbufInit(512);
 
     uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
 
     xbee_dev_init(&radio, &serial, NULL, NULL);
 
     /* Add this for x86 testing */
-    // memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
+    //memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
     // radio.serport.uart_handle.cur_buffer_size = sizeof(radioPacket);
+
 
     if (xTaskCreate(
             outputLoop,
@@ -158,11 +171,13 @@ void GSRadioInit(void)
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
+        printf("something's fucked!");
         for (;;)
             ;
     }
 
-        if (xTaskCreate(
+
+    if (xTaskCreate(
             mandatoryOutput,
             "radio mandatory out controller",
             50000 / sizeof(StackType_t),
@@ -170,10 +185,10 @@ void GSRadioInit(void)
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
+        printf("something's fucked!");
         for (;;)
             ;
     }
-
     if (xTaskCreate(
             inputLoop,
             "radio in controller",
@@ -182,10 +197,10 @@ void GSRadioInit(void)
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
+        printf("something's fucked!");
         for (;;)
             ;
     }
-
     if (xTaskCreate(
             dealWithLowMessages,
             "deal with low messages",
@@ -194,21 +209,33 @@ void GSRadioInit(void)
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
+        printf("something's fucked!");
         for (;;)
             ;
     }
-
     if (xTaskCreate(
             dealWithCritMessages,
-            "deal with low messages",
+            "deal with crit messages",
             1000 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
+        printf("something's fucked!");
         for (;;)
             ;
     }
+    
+    printf("\nsending config packet:");
+    //immediately force send that config packet
+    uint8_t *message = pvPortMalloc(MAX_PACKET_SIZE * sizeof(uint8_t));
+    uint8_t length;
+    radioPrepConfig();
+    printf("\ngetting radio message");
+    length = cbufGet(radioBufTX, message);
+    radioTxRequest(&radio, message, length);
+
+    printf("GS radio init FINISHED");
 }
 
 uint32_t getTimestamp()
@@ -323,7 +350,7 @@ void radioPrepConfig(void)
     uint8_t ID = 0x03;
     uint32_t timestamp = getTimestamp();
     uint8_t SIMstatus = SIM_ACTIVE;
-    uint8_t deviceID = 0;        //magig number bad
+    uint8_t deviceID = 0;        //magic number bad
     uint8_t verString[40] = {0}; //in future will be better to remove this step?
 
     message[0] = ID;
@@ -334,9 +361,9 @@ void radioPrepConfig(void)
     {
         message[index + 7] = verString[index];
     }
-
+    printf("\nputting config packet into TX buffer");
     cbufPut(radioBufTX, CONFIG_PACKET_LENGTH, message);
-
+    printf("\ndone with buffer put");
     vPortFree(message);
 }
 
