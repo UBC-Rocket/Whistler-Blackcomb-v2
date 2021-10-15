@@ -63,7 +63,7 @@ static hal_uart_handle_t *uart_handles[1];
  ******************************************************************************/
 static void inputLoop(void *pv);
 static void outputLoop(void *pv);
-static void generateImuLoop(void *pv);
+// static void generateImuLoop(void *pv); // TODO:
 static void output(char c);
 static void synOut(char c);
 static void putPacket(const uint8_t id, const char *c, char const length);
