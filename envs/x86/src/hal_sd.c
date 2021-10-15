@@ -39,10 +39,12 @@ void sdOpen(HALFILE *file, const char *file_name) {
 }
 
 size_t sdWrite(HALFILE *file, const char *data) {
-	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {
-        fprintf(*file, "%s", data);
+	size_t byteswritten;
+	if (xSemaphoreTake(sfileAccessSemaphore, s_taskSleepTicks) == pdTRUE) {    
+		byteswritten = fprintf(*file, "%s", data);
 	}
 	xSemaphoreGive(sfileAccessSemaphore);
+	return byteswritten;
 }
 
 void sdMkDir(const char *dir_name){
