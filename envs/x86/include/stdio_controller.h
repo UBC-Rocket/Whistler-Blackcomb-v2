@@ -73,6 +73,6 @@ uint8_t readFromBuf(int mode, uint8_t data[], uint8_t id);
  * @param id sim ID of packet, in range 0-MAX_PACKET_IDS
  * @param length length of the packet, no more than MESSAGE_BUFFER_SIZE
  */
-void writeToBuf(int mode, uint8_t data[], uint8_t id, uint16_t length);
+void writeToBuf(int mode, const uint8_t data[], uint8_t id, uint16_t length);
 
 #endif
