@@ -333,7 +333,7 @@ static void sendPackets()
 
     for (int id = 0; id < SIM_MAX_PACKET_IDS; id++)
     {
-        printf("semaphoreCount for id %d = %d\n",id, uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]));
+        //printf("semaphoreCount for id %d = %d\n",id, uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]));
         if (uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]))
         {
             uint8_t buf[512];

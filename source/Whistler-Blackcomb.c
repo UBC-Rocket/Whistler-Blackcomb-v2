@@ -447,4 +447,5 @@ static void CanTask(void *pv) {
 static void startGSRadioTask(void *pv){
 	vTaskDelay(pdMS_TO_TICKS(3000));
 	GSRadioInit();
+	vTaskSuspend(NULL);
 }

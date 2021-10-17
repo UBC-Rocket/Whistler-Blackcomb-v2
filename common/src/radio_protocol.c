@@ -148,7 +148,7 @@ static void mandatoryOutput(void *pv)
 
 void GSRadioInit(void)
 {
-    printf("GS radio init started");
+    //printf("GS radio init started");
     serial.baudrate = 9600;
     radioBufTX=cbufInit(512);
     radioBufRXCrit=cbufInit(512);
@@ -192,7 +192,7 @@ void GSRadioInit(void)
     if (xTaskCreate(
             inputLoop,
             "radio in controller",
-            1000 / sizeof(StackType_t),
+            5000 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
@@ -204,7 +204,7 @@ void GSRadioInit(void)
     if (xTaskCreate(
             dealWithLowMessages,
             "deal with low messages",
-            1000 / sizeof(StackType_t),
+            5000 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
@@ -226,16 +226,16 @@ void GSRadioInit(void)
             ;
     }
     
-    printf("\nsending config packet:");
+    //printf("\nsending config packet:");
     //immediately force send that config packet
     uint8_t *message = pvPortMalloc(MAX_PACKET_SIZE * sizeof(uint8_t));
     uint8_t length;
     radioPrepConfig();
-    printf("\ngetting radio message");
+    //printf("\ngetting radio message\n");
     length = cbufGet(radioBufTX, message);
     radioTxRequest(&radio, message, length);
 
-    printf("GS radio init FINISHED");
+    //printf("\nGS radio init FINISHED");
 }
 
 uint32_t getTimestamp()
@@ -361,9 +361,9 @@ void radioPrepConfig(void)
     {
         message[index + 7] = verString[index];
     }
-    printf("\nputting config packet into TX buffer");
+    //printf("\nputting config packet into TX buffer");
     cbufPut(radioBufTX, CONFIG_PACKET_LENGTH, message);
-    printf("\ndone with buffer put");
+    //printf("\ndone with buffer put");
     vPortFree(message);
 }
 
