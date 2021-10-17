@@ -55,15 +55,11 @@ int handshakeRecieved = 0; //blocks sending until 1
 SemaphoreHandle_t simInSemaphore;
 SemaphoreHandle_t simOutSemaphore;
 
-/* TODO: update for all sensors */
-// static hal_uart_handle_t *uart_handles[1]; // TODO:
-
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
 static void inputLoop(void *pv);
 static void outputLoop(void *pv);
-// static void generateImuLoop(void *pv); // TODO:
 static void output(char c);
 static void synOut(char c);
 static void putPacket(const uint8_t id, const uint8_t *c, char const length);
