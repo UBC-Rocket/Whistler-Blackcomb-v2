@@ -33,3 +33,11 @@ Click File->Import, select Git->Projects from Git (with smart import) and select
 <img width="611" alt="image" src="https://user-images.githubusercontent.com/24193569/136500504-34572f9d-e98c-4dd1-9303-1a3c53e5976d.png">
 
 Once you have it working you can use your terminal to use Git and follow our normal methods for version control.
+
+
+# Building Source:
+
+Ensure that any changes you make to files shared by x86 and our Board compile without errors by doing a Build in MCUXpresso. This compiles for the Board enviroment instead of the x86 environment we build for in VSCode.
+
+<img width="722" alt="image" src="https://user-images.githubusercontent.com/24193569/137638808-2ae35c65-1d96-437e-aa6a-dd7e8e4c698b.png">
+
