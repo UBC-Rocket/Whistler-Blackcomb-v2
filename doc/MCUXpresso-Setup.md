@@ -41,3 +41,15 @@ Ensure that any changes you make to files shared by x86 and our Board compile wi
 
 <img width="722" alt="image" src="https://user-images.githubusercontent.com/24193569/137638808-2ae35c65-1d96-437e-aa6a-dd7e8e4c698b.png">
 
+
+# Pin Configuration View:
+To be able to configure the pins on the MK66F you press the button that has the little green plus mark on it to add a new view to the workspace:
+
+<img width="259" alt="image" src="https://user-images.githubusercontent.com/24193569/138611744-8c3285b4-55a5-42f3-a858-df31eff9ae33.png">
+
+Here it will ask you what you want configure and this was the setup I was guided to:
+
+<img width="750" alt="Screen Shot 2021-10-24 at 10 39 36 AM" src="https://user-images.githubusercontent.com/24193569/138611675-26f8beb3-1c6c-4116-a8e7-87b9dbb1ceb5.png">
+
+You should now have access to this view and be able to modify anything if you need to.
+
