@@ -372,27 +372,27 @@ float getTC_L_BLD_001Value(void){
 }
 
 void initVariables(void){
-    stateTransitionInput.semaphore = xSemaphoreCreateMutex();
-    sensorStatus.semaphore=xSemaphoreCreateMutex();
-    GPSdata.semaphore=xSemaphoreCreateMutex();
-    orientData.semaphore=xSemaphoreCreateMutex();
-    accelData.semaphore=xSemaphoreCreateMutex();
-    PT_HP_T_001data.semaphore=xSemaphoreCreateMutex();
-    TC_HP_OUT_001data.semaphore=xSemaphoreCreateMutex();
-    V_HP_P_001data.semaphore=xSemaphoreCreateMutex();
-    V_F_PR_001data.semaphore=xSemaphoreCreateMutex();
-    V_F_V_001data.semaphore=xSemaphoreCreateMutex();
-    PT_F_T_001data.semaphore=xSemaphoreCreateMutex();
-    V_F_F_001data.semaphore=xSemaphoreCreateMutex();
-    PT_F_INJ_001data.semaphore=xSemaphoreCreateMutex();
-    V_F_MFV_001data.semaphore=xSemaphoreCreateMutex();
-    V_L_PR_001data.semaphore=xSemaphoreCreateMutex();
-    PT_L_T_001data.semaphore=xSemaphoreCreateMutex();
-    V_L_V_001data.semaphore=xSemaphoreCreateMutex();
-    TC_L_F_001data.semaphore=xSemaphoreCreateMutex();
-    V_L_F_001data.semaphore=xSemaphoreCreateMutex();
-    PT_L_INJ_001data.semaphore=xSemaphoreCreateMutex();
-    V_L_MOV_001data.semaphore=xSemaphoreCreateMutex();
-    V_L_BLD_001data.semaphore=xSemaphoreCreateMutex();
-    TC_L_BLD_001data.semaphore=xSemaphoreCreateMutex();
+    stateTransitionInput.semaphore =    xSemaphoreCreateMutex();
+    sensorStatus.semaphore =            xSemaphoreCreateMutex();
+    GPSdata.semaphore =                 xSemaphoreCreateMutex();
+    orientData.semaphore =              xSemaphoreCreateMutex();
+    accelData.semaphore =               xSemaphoreCreateMutex();
+    PT_HP_T_001data.semaphore =         xSemaphoreCreateMutex();
+    TC_HP_OUT_001data.semaphore =       xSemaphoreCreateMutex();
+    V_HP_P_001data.semaphore =          xSemaphoreCreateMutex();
+    V_F_PR_001data.semaphore =          xSemaphoreCreateMutex();
+    V_F_V_001data.semaphore =           xSemaphoreCreateMutex();
+    PT_F_T_001data.semaphore =          xSemaphoreCreateMutex();
+    V_F_F_001data.semaphore =           xSemaphoreCreateMutex();
+    PT_F_INJ_001data.semaphore =        xSemaphoreCreateMutex();
+    V_F_MFV_001data.semaphore =         xSemaphoreCreateMutex();
+    V_L_PR_001data.semaphore =          xSemaphoreCreateMutex();
+    PT_L_T_001data.semaphore =          xSemaphoreCreateMutex();
+    V_L_V_001data.semaphore =           xSemaphoreCreateMutex();
+    TC_L_F_001data.semaphore =          xSemaphoreCreateMutex();
+    V_L_F_001data.semaphore =           xSemaphoreCreateMutex();
+    PT_L_INJ_001data.semaphore =        xSemaphoreCreateMutex();
+    V_L_MOV_001data.semaphore =         xSemaphoreCreateMutex();
+    V_L_BLD_001data.semaphore =         xSemaphoreCreateMutex();
+    TC_L_BLD_001data.semaphore =        xSemaphoreCreateMutex();
 }

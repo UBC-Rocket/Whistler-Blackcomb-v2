@@ -35,7 +35,7 @@ static unsigned char getSimId(hal_uart_handle_t *handle){
 	} else if (base == DEBUG_UART){
 		ret = 0;
 	} else {
-		printf("You're trying to read from a uart line that's not associated with a sim packet, please add it in hal_uart.c. \n");
+		printf("You're trying to access a uart line that's not associated with a sim packet, please add it in hal_uart.c. \n");
 		ret = 0;
 	}
 	return ret;

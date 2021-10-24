@@ -19,7 +19,7 @@
 #define SINGLE_INT_PACKET_LENGTH 6
 #define DATA_DUMP_PACKET_LENGTH 86
 
-#define MAX_RADIO_WAIT_MS 120000
+#define MAX_RADIO_WAIT_MS 10000
 
 #define MAX_PACKET_SIZE 243
 
@@ -154,9 +154,12 @@ void GSRadioInit(void)
     radioBufRXCrit=cbufInit(512);
     radioBufRXLow=cbufInit(512);
 
+    initVariables();
+
     uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
 
     xbee_dev_init(&radio, &serial, NULL, NULL);
+
 
     /* Add this for x86 testing */
     //memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));

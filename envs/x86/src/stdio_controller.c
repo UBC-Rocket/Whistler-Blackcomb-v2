@@ -115,7 +115,7 @@ static void outputLoop(void *pv)
 {
     printf("SYN"); /*this has to be the first thing to go out, I think*/
     fflush(stdout);
-    while(!handshakeRecieved);
+    while(!handshakeRecieved){};
     //xSemaphoreTake(handshakeRecieved, portMAX_DELAY);
     for (;;)
     {
@@ -144,7 +144,7 @@ void stdioInit()
 
     for(int i = 0; i < 2; ++i){
         for(int j = 0; j < SIM_MAX_PACKET_IDS; ++j){
-            packetBuffersNewFlag[i][j] = xSemaphoreCreateBinary();
+            packetBuffersNewFlag[i][j] = xSemaphoreCreateCounting(8,0);
         }
     }
 
