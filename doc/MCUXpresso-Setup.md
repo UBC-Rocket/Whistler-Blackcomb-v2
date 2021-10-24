@@ -32,7 +32,7 @@ Click File->Import, select Git->Projects from Git (with smart import) and select
 
 <img width="611" alt="image" src="https://user-images.githubusercontent.com/24193569/136500504-34572f9d-e98c-4dd1-9303-1a3c53e5976d.png">
 
-Once you have it working you can use your terminal to use Git and follow our normal methods for version control.
+If you get an error saying "Some projects cannot be imported because they already exist in the workspace error in Eclipse" then uncheck the box labelled "copy projects into workspace" and try again. Once you have it working you can use your terminal to use Git and follow our normal methods for version control.
 
 
 # Building Source:
