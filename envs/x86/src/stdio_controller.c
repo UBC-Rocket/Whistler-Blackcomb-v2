@@ -55,18 +55,14 @@ int  handshakeRecieved =0; //blocks sending until 1
 SemaphoreHandle_t simInSemaphore;
 SemaphoreHandle_t simOutSemaphore;
 
-/* TODO: update for all sensors */
-static hal_uart_handle_t *uart_handles[1];
-
 /*******************************************************************************
  * Declarations
  ******************************************************************************/
 static void inputLoop(void *pv);
 static void outputLoop(void *pv);
-static void generateImuLoop(void *pv);
 static void output(char c);
 static void synOut(char c);
-static void putPacket(const uint8_t id, const char *c, char const length);
+static void putPacket(const uint8_t id, const uint8_t *c, char const length);
 static void putConfigPacket();
 static uint8_t getCinForce();
 static uint8_t getFilteredCin();
@@ -235,7 +231,7 @@ uint8_t readFromBuf(int mode, uint8_t data[], uint8_t id)
  * @param length length of the packet, no more than MESSAGE_BUFFER_SIZE
  */
 
-void writeToBuf(int mode, uint8_t data[], uint8_t id, uint16_t length)
+void writeToBuf(int mode, const uint8_t data[], uint8_t id, uint16_t length)
 {
 
     if (packetBuffersWriteIndex[mode][id] >= SIM_PACKET_BUFFER_SIZE)
@@ -337,7 +333,7 @@ static void sendPackets()
         if (uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]))
         {
             uint8_t buf[512];
-            uint8_t length = readFromBuf(TX, buf, id);
+            char length = readFromBuf(TX, buf, id);
             putPacket(id, buf, length);
         }
     }
@@ -412,7 +408,7 @@ static void synOut(char c)
 /*
  * Sends a SIM packet 
  */
-static void putPacket(const uint8_t id, const char *c, char const length)
+static void putPacket(const uint8_t id, const uint8_t *c, char const length)
 {
     xSemaphoreTake(simOutSemaphore, portMAX_DELAY);
 
@@ -423,7 +419,7 @@ static void putPacket(const uint8_t id, const char *c, char const length)
 
     
 
-    for (char const *end = c + length; c != end; c++)
+    for (uint8_t const *end = c + length; c != end; c++)
     {
         synOut(*c);
     }
@@ -442,7 +438,7 @@ static void putConfigPacket()
     uint32_t int_test = 0x04030201;
     float float_test = -2.0; // 0xC000 0000;
 
-    char buf[8];
+    uint8_t buf[8];
     memmove(buf, &int_test, 4);
     memmove(buf + 4, &float_test, 4);
     putPacket(id, buf, 8);

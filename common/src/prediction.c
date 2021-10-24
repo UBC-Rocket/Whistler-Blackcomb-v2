@@ -5,6 +5,7 @@
 
 #include <prediction.h>
 #include <math.h>
+#include "Functions.h"
 
 /*******************************************************************************
  * Implementations
@@ -43,7 +44,7 @@ quaternion qSum(quaternion qA, quaternion qB) {
 // Returns a normalized quaternion
 quaternion qNorm(quaternion q) {
 	quaternion qReturn;
-	double recipNorm = sqrt(q.re * q.re + q.i * q.i + q.j * q.j + q.k * q.k);
+	float recipNorm = sqrt(q.re * q.re + q.i * q.i + q.j * q.j + q.k * q.k);
 	qReturn.re = q.re / recipNorm;
 	qReturn.i = q.i / recipNorm;
 	qReturn.j = q.j / recipNorm;
@@ -61,8 +62,8 @@ quaternion qConjugate(quaternion q) {
 // Gets the orientation of quaternion from 1st order polynomial approximation for quaternions exponentiation. See here for details: 
 // https://www.ashwinnarayan.com/post/how-to-integrate-quaternions/
 // Is computationally cheaper, so if performance is an issue we could use this 
-quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
-		double gy, double gz) {
+quaternion getOrientationOrder1(float deltaT, quaternion qPrev, float gx,
+		float gy, float gz) {
 	gx *= deltaT / 2;
 	gy *= deltaT / 2;
 	gz *= deltaT / 2;
@@ -87,12 +88,12 @@ quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
  * @param gz z component of angular velocity (rads/sec)
  * @return new quaternion representing orientation 
  */
-quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
-		double gz) {
+quaternion getOrientation(float deltaT, quaternion qPrev, float gx, float gy,
+		float gz) {
 	quaternion q;
-	double norm = deltaT * sqrt(gx * gx + gy * gy + gz * gz);
+	float norm = deltaT * sqrt(gx * gx + gy * gy + gz * gz);
 	q.re = cos(norm / 2);
-	double sinNorm = sin(norm / 2); // Variable to avoid repeated sin computation
+	float sinNorm = sin(norm / 2); // Variable to avoid repeated sin computation
 	/* Check to make sure we don't get a divide by 0 error. 
 	   Note that in the case that norm is 0 we want the vector component
 	   of q to be zeros because this represents no rotation (i.e. multiplication
@@ -110,286 +111,152 @@ quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
 	return qMult(q, qPrev);
 }
 
-// Matrix multiplication, assumes both matrices will be square
-void matMult(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
-		double result[][MATRIX_SIZE]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		for (int j = 0; j < MATRIX_SIZE; ++j) {
-			result[i][j] = 0;
-			for (int k = 0; k < MATRIX_SIZE; ++k) {
-				result[i][j] += mat1[i][k] * mat2[k][j];
-			}
-		}
-	}
+// Matrix multiplication, assumes matrices have proper rows and columns
+void matMult(float mat1[], float mat2[], float mat3[], int row_a, int column_a, int column_b) {
+	mul(mat1, mat2, mat3, row_a, column_a, column_b);
 }
 
-// Transpose of matrix
-void transpose(double mat[][MATRIX_SIZE]) {
-	double temp;
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		for (int j = i + 1; j < MATRIX_SIZE; ++j) {
-			temp = mat[i][j];
-			mat[i][j] = mat[j][i];
-			mat[j][i] = temp;
-		}
-	}
+void transpose(float mat[], int row, int column) {
+	tran(mat, row, column);
 }
 
-// Matrix and vector multiplication
-void matVecMult(double mat[][MATRIX_SIZE], double vec[], double result[]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		result[i] = 0;
-		for (int j = 0; j < MATRIX_SIZE; ++j) {
-			result[i] += mat[i][j] * vec[j];
-		}
-	}
-}
-
-// Scalar multiplication betwee vector and scalar
-void scalMult(double vec[], double scal, double result[]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
+void scalMult(float vec[], float scal, float result[], int size) {
+	for (int i = 0; i < size; ++i) {
 		result[i] = vec[i] * scal;
 	}
 }
 
-// Matrix addition
-void addMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
-		double result[][MATRIX_SIZE]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		for (int j = 0; j < MATRIX_SIZE; ++j) {
-			result[i][j] = mat1[i][j] + mat2[i][j];
-		}
+//assumes matrices have same dimensions
+void addMat(float mat1[], float mat2[], float result[], int mat1_row, int mat1_col) {
+	for (int i = 0; i < mat1_row * mat1_col; i++) {
+		result[i] = mat1[i] + mat2[i];
 	}
 }
 
-// Vector addition
-void addVec(double vec1[], double vec2[], double result[]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		result[i] = vec1[i] + vec2[i];
+//assumes matrices have same dimensions
+void subtractMat(float mat1[], float mat2[], float result[], int mat1_row, int mat1_col) {
+	for (int i = 0; i < mat1_row * mat1_col; ++i) {
+		result[i] = mat1[i] - mat2[i];
 	}
 }
 
-// Matrix subtraction
-void subtractMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
-		double result[][MATRIX_SIZE]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		for (int j = 0; j < MATRIX_SIZE; ++j) {
-			result[i][j] = mat1[i][j] - mat2[i][j];
-		}
-	}
+float determinant(float A[], int row) {
+	return det(A, row);
 }
 
-// Vector subtraction
-void subtractVec(double vec1[], double vec2[], double result[]) {
-	for (int i = 0; i < MATRIX_SIZE; ++i) {
-		result[i] = vec1[i] - vec2[i];
-	}
-}
-
-// Note: I got lazy, instead of coding inverse calculation by hand I copied it from here and then changed it a bit to handle doubles instead of ints:
-// https://www.geeksforgeeks.org/adjoint-inverse-matrix/
-
-// Function to get cofactor of A[p][q] in temp[][]. n is current 
-// dimension of A[][] 
-void getCofactor(double A[][MATRIX_SIZE], double temp[][MATRIX_SIZE], int p,
-		int q, int n) {
-	int i = 0, j = 0;
-
-	// Looping for each element of the matrix
-	for (int row = 0; row < n; row++) {
-		for (int col = 0; col < n; col++) {
-			//  Copying into temporary matrix only those element
-			//  which are not in given row and column
-			if (row != p && col != q) {
-				temp[i][j++] = A[row][col];
-
-				// Row is filled, so increase row index and
-				// reset col index
-				if (j == n - 1) {
-					j = 0;
-					i++;
-				}
-			}
-		}
-	}
-}
-
-/* Recursive function for finding determinant of matrix. 
- n is current dimension of A[][]. */
-double determinant(double A[][MATRIX_SIZE], int n) {
-	double D = 0; // Initialize result
-
-	//  Base case : if matrix contains single element
-	if (n == 1)
-		return A[0][0];
-
-	double temp[MATRIX_SIZE][MATRIX_SIZE]; // To store cofactors
-
-	int sign = 1;  // To store sign multiplier
-
-	// Iterate for each element of first row
-	for (int f = 0; f < n; f++) {
-		// Getting Cofactor of A[0][f]
-		getCofactor(A, temp, 0, f, n);
-		D += sign * A[0][f] * determinant(temp, n - 1);
-
-		// terms are to be added with alternate sign
-		sign = -sign;
-	}
-
-	return D;
-}
-
-// Function to get adjoint of A[N][N] in adj[N][N]. 
-void adjoint(double A[][MATRIX_SIZE], double adj[][MATRIX_SIZE]) {
-	if (MATRIX_SIZE == 1) {
-		adj[0][0] = 1;
-		return;
-	}
-
-	// temp is used to store cofactors of A[][]
-	int sign = 1;
-	double temp[MATRIX_SIZE][MATRIX_SIZE];
-
-	for (int i = 0; i < MATRIX_SIZE; i++) {
-		for (int j = 0; j < MATRIX_SIZE; j++) {
-			// Get cofactor of A[i][j]
-			getCofactor(A, temp, i, j, MATRIX_SIZE);
-
-			// sign of adj[j][i] positive if sum of row
-			// and column indexes is even.
-			sign = ((i + j) % 2 == 0) ? 1 : -1;
-
-			// Interchanging rows and columns to get the
-			// transpose of the cofactor matrix
-			adj[j][i] = (sign) * (determinant(temp, MATRIX_SIZE - 1));
-		}
-	}
-}
-
-// Function to calculate and store inverse, returns false if 
-// matrix is singular 
-int inverse(double A[][MATRIX_SIZE], double inverse[][MATRIX_SIZE]) {
-	// Find determinant of A[][]
-	double det = determinant(A, MATRIX_SIZE);
-	if (det == 0) {
+int inverse(float A[], float inverse[], int row) {
+	if (fabs(det(A, row)) < FLT_EPSILON) {
 		return 0;
 	}
 
-	// Find adjoint
-	double adj[MATRIX_SIZE][MATRIX_SIZE];
-	adjoint(A, adj);
-
-	// Find Inverse using formula "inverse(A) = adj(A)/det(A)"
-	for (int i = 0; i < MATRIX_SIZE; i++)
-		for (int j = 0; j < MATRIX_SIZE; j++)
-			inverse[i][j] = adj[i][j] / (double) det;
-
-	return 1;
+	memcpy(inverse, A, row * row * sizeof(float));
+	int status = inv(inverse, row);
+	return status;
 }
 
 // Predict phase of Kalman filter
-void predictFilter(double deltaT, double position[], double velocity[],
-		double acceleration[], double stateCovariance[][2][2],
-		double processCovariance[2][2]) {
+void predictFilter(float deltaT, float position[], float velocity[],
+		float acceleration[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float processCovariance[MATRIX_SIZE * MATRIX_SIZE]) {
 	// State Transition Matrix, derived from kinematics (to be multiplied by state vector of position and velocity)
-	double F[][2] = { { 1, deltaT }, { 0, 1 } };
+	float F[MATRIX_SIZE * MATRIX_SIZE] = {1, deltaT, 0,1};
 	// Control input matrix, derived from kinematics (to be multiplied by acceleration)
-	double B[] = { 0.5f * deltaT * deltaT, deltaT };
+	float B[MATRIX_SIZE] = { 0.5f * deltaT * deltaT, deltaT };
 
 	// Iterate through values in x, y, z order
 	for (int axis = 0; axis < 3; axis++) {
 		// Previous estimate of state
-		double xPrev[] = { position[axis], velocity[axis] };
+		float xPrev[] = { position[axis], velocity[axis] };
 		// Predicted estimate of state after given observations
-		double xPred[2] = { 0 };
+		float xPred[2] = { 0 };
 		// Control vector
-		double u = acceleration[axis];
+		float u = acceleration[axis];
 		// Predicted covariance matrix
-		double PPred[2][2] = { 0 };
+		float PPred[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
 
 		// Temp vectors to calculate next state
-		double temp1[2] = { 0 };
-		double temp2[2] = { 0 };
-		double temp3[2][2] = { 0 };
-		double temp4[2][2] = { 0 };
+		float temp1[MATRIX_SIZE] = { 0 };
+		float temp2[MATRIX_SIZE] = { 0 };
+		float temp3[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
+		float temp4[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
 
 		// x_k = F*x_{k-1} + B*u
-		matVecMult(F, xPrev, temp1);
-		scalMult(B, u, temp2);
-		addVec(temp1, temp2, xPred);
+		matMult(F, xPrev, temp1, MATRIX_SIZE, MATRIX_SIZE, 1);
+		scalMult(B, u, temp2, MATRIX_SIZE);
+		addMat(temp1, temp2, xPred, MATRIX_SIZE, 1);
 
 		// P_k = F*P_{k-1}*F^T + Q
-		transpose(F);
-		matMult(stateCovariance[axis], F, temp3);
-		transpose(F);
-		matMult(F, temp3, temp4);
-		addMat(temp4, processCovariance, PPred);
+		transpose(F, MATRIX_SIZE, MATRIX_SIZE);
+		matMult(stateCovariance[axis], F, temp3, MATRIX_SIZE, 
+			MATRIX_SIZE, MATRIX_SIZE);
+		transpose(F, MATRIX_SIZE, MATRIX_SIZE);
+		matMult(F, temp3, temp4, MATRIX_SIZE, MATRIX_SIZE,
+			MATRIX_SIZE);
+		addMat(temp4, processCovariance, PPred, MATRIX_SIZE, MATRIX_SIZE);
 
 		// Write back predictions to original variables
 		position[axis] = xPred[0];
 		velocity[axis] = xPred[1];
-		for (int i = 0; i < 2; ++i) {
-			for (int j = 0; j < 2; ++j) {
-				stateCovariance[axis][i][j] = PPred[i][j];
-			}
+		for (int i = 0; i < MATRIX_SIZE * MATRIX_SIZE; ++i) {
+			stateCovariance[axis][i] = PPred[i];
 		}
 	}
 }
 
 // Update phase of Kalman filter
-void updateFilter(double position[], double velocity[], double gpsPos[],
-		double gpsVel[], double stateCovariance[][2][2],
-		double observationCovariance[2][2]) {
+void updateFilter(float position[], float velocity[], float gpsPos[],
+		float gpsVel[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float observationCovariance[MATRIX_SIZE * MATRIX_SIZE]) {
 
 	// Iterate through values in x, y, z order
 	for (int axis = 0; axis < 3; axis++) {
 		// Measurement of true state, i.e. gps reading
-		double z[2] = { gpsPos[axis], gpsVel[axis] };
+		float z[2] = { gpsPos[axis], gpsVel[axis] };
 		// Previous estimate of state
-		double xPrev[] = { position[axis], velocity[axis] };
+		float xPrev[2] = { position[axis], velocity[axis] };
 		// Predicted estimate of state after given observations
-		double xPred[2] = { 0 };
+		float xPred[2] = { 0 };
 		// Predicted covariance matrix
-		double PPred[2][2] = { 0 };
+		float PPred[MATRIX_SIZE * MATRIX_SIZE] = { 0 };
 		// Innovation
-		double y[2] = { 0 };
+		float y[2] = { 0 };
 		// Inovation covariance
-		double S[2][2] = { 0 };
+		float S[2 * 2] = { 0 };
 		// Kalman gain
-		double K[2][2] = { 0 };
+		float K[2 * 2] = { 0 };
 		// Identity
-		double I[2][2] = { { 1, 0 }, { 0, 1 } };
+		float I[2 * 2] = { 1, 0, 0, 1 };
 		// Temp variables for equations
-		double temp1[2];
-		double temp2[2][2];
+		float temp1[2];
+		float temp2[2 * 2];
 
 		// y = z - H*x_{k-1}, here H is the identity because we are directly measuring position and velocity through GPS
-		subtractVec(z, xPrev, y);
+		subtractMat(z, xPrev, y, MATRIX_SIZE, 1);
 
 		//S = H*P_{k-1}*H^T + R
-		addMat(stateCovariance[axis], observationCovariance, S);
+		addMat(stateCovariance[axis], observationCovariance, S,
+			MATRIX_SIZE, MATRIX_SIZE);
 
 		// K = P_{k-1}*H^T*S^{-1}
-		double SInverse[2][2] = { 0 };
-		inverse(S, SInverse);
-		matMult(stateCovariance[axis], SInverse, K);
+		float SInverse[2 * 2] = { 0 };
+		inverse(S, SInverse, MATRIX_SIZE);
+		matMult(stateCovariance[axis], SInverse, K, MATRIX_SIZE,
+			MATRIX_SIZE, MATRIX_SIZE);
 
 		// x_k = x_{k-1} + K*y
-		matVecMult(K, y, temp1);
-		addVec(xPrev, temp1, xPred);
+		matMult(K, y, temp1, MATRIX_SIZE, MATRIX_SIZE, 1);
+		addMat(xPrev, temp1, xPred, MATRIX_SIZE, 1);
 
 		// P_k = (I - K*H)*P_{k-1}
-		subtractMat(I, K, temp2);
-		matMult(temp2, stateCovariance[axis], PPred);
+		subtractMat(I, K, temp2, MATRIX_SIZE, MATRIX_SIZE);
+		matMult(temp2, stateCovariance[axis], PPred, MATRIX_SIZE,
+			MATRIX_SIZE, MATRIX_SIZE);
 
 		// Write back predictions to original variables
 		position[axis] = xPred[0];
 		velocity[axis] = xPred[1];
-		for (int i = 0; i < 2; ++i) {
-			for (int j = 0; j < 2; ++j) {
-				stateCovariance[axis][i][j] = PPred[i][j];
-			}
+		for (int i = 0; i < 4; ++i) {
+			stateCovariance[axis][i] = PPred[i];
 		}
 	}
 }

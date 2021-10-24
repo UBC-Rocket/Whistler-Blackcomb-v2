@@ -27,6 +27,7 @@ target_include_directories(whistler-blackcomb PUBLIC
     common/include
     common/xbee/include/
     common/xbee/ports/
+    common/CControl/src/CControl/Headers/
     board
     device
     CMSIS
