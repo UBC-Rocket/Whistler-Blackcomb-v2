@@ -50,6 +50,8 @@ After doing these your development environment should be all set for firmware wo
 
 We use Altium for all our PCB design work. To get a free student version of Altium visit [this link](https://www.altium.com/solutions/academic-programs/student-licenses) and fill out the form with your @student.ubc.ca email address. They sometimes take a while to get back about the licenses, so be prepared to potentially have to wait a few days before getting access. 
 
+While waiting or if you need to access Altium Files from a non-Windows computer or one that does not have Altium installed, you can use [Altium's Online Viewer](https://www.altium.com/viewer/). You still need to clone the hardware repository (or at least the specific PCBDoc file) in order to upload it to the viewer. This does not require a license and can get you looking at boards quickly although you cannot make edits.
+
 Even if you don't have your license yet, you can still get the projects set up. First download Altium from its [download page](https://www.altium.com/products/downloads), although you won't be able to edit PCB documents without the license. Next download the following PCB projects by cloning them through git, and open them in Altium to ensure everything is working properly: 
 
 * [Main flight computer](https://github.com/UBC-Rocket/WB-AV-4500-FC)
