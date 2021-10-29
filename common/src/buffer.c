@@ -196,10 +196,8 @@ static void retreat_pointer(cbufHandle_t cbuf)
 int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 {
 
-    printf("\nTaking semaphore");
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
-    printf("\nasserting");
     assert(cbuf && cbuf->buffer);
     uint8_t * message = pvPortMalloc((length+1)*sizeof(uint8_t));
     message[0]=length;

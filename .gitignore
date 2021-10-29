@@ -45,3 +45,6 @@ CTestTestfile.cmake
 _deps
 /Release/
 
+
+# MCUXpresso:
+.mcuxpressoide_packages_support/

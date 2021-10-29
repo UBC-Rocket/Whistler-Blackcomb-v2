@@ -5,7 +5,7 @@
 /*******************************************************************************
  * Includes
  ******************************************************************************/
-
+#include <Functions.h>
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -16,10 +16,10 @@
 
 // Quaternion struct definition
 typedef struct quaternions {
-	double re;
-	double i;
-	double j;
-	double k;
+	float re;
+	float i;
+	float j;
+	float k;
 } quaternion;
 
 /*******************************************************************************
@@ -36,8 +36,8 @@ quaternion qNorm(quaternion q);
 
 quaternion qConjugate(quaternion q);
 
-quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
-		double gy, double gz);
+quaternion getOrientationOrder1(float deltaT, quaternion qPrev, float gx,
+		float gy, float gz);
 
 /**
  * produces a quaternion representing orientation based on a previous orientation
@@ -52,43 +52,31 @@ quaternion getOrientationOrder1(double deltaT, quaternion qPrev, double gx,
  * @param gz z component of angular velocity (rads/sec)
  * @return new quaternion representing orientation 
  */
-quaternion getOrientation(double deltaT, quaternion qPrev, double gx, double gy,
-		double gz);
+quaternion getOrientation(float deltaT, quaternion qPrev, float gx, float gy,
+		float gz);
 
-void matMult(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
-		double result[][MATRIX_SIZE]);
+void matMult(float mat1[], float mat2[], float mat3[], int row_a, 
+	int column_a, int column_b);
 
-void transpose(double mat[][MATRIX_SIZE]);
+void transpose(float mat[], int row, int column);
 
-void matVecMult(double mat[][MATRIX_SIZE], double vec[], double result[]);
+void scalMult(float vec[], float scal, float result[], int size);
 
-void scalMult(double vec[], double scal, double result[]);
+void addMat(float mat1[], float mat2[], float result[], int mat1_row, int mat1_col);
 
-void addMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
-		double result[][MATRIX_SIZE]);
+void subtractMat(float mat1[], float mat2[], float result[],
+	int mat1_row, int mat1_col);
 
-void addVec(double vec1[], double vec2[], double result[]);
+float determinant(float A[], int row);
 
-void subtractMat(double mat1[][MATRIX_SIZE], double mat2[][MATRIX_SIZE],
-		double result[][MATRIX_SIZE]);
+int inverse(float A[], float inverse[], int row);
 
-void subtractVec(double vec1[], double vec2[], double result[]);
+void predictFilter(float deltaT, float position[], float velocity[],
+		float acceleration[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float processCovariance[MATRIX_SIZE * MATRIX_SIZE]);
 
-void getCofactor(double A[][MATRIX_SIZE], double temp[][MATRIX_SIZE], int p,
-		int q, int n);
-
-double determinant(double A[][MATRIX_SIZE], int n);
-
-void adjoint(double A[][MATRIX_SIZE], double adj[][MATRIX_SIZE]);
-
-int inverse(double A[][MATRIX_SIZE], double inverse[][MATRIX_SIZE]);
-
-void predictFilter(double deltaT, double position[], double velocity[],
-		double acceleration[], double stateCovariance[][2][2],
-		double processCovariance[2][2]);
-
-void updateFilter(double position[], double velocity[], double gpsPos[],
-		double gpsVel[], double stateCovariance[][2][2],
-		double observationCovariance[2][2]);
+void updateFilter(float position[], float velocity[], float gpsPos[],
+		float gpsVel[], float stateCovariance[][MATRIX_SIZE * MATRIX_SIZE],
+		float observationCovariance[MATRIX_SIZE * MATRIX_SIZE]);
 
 #endif

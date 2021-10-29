@@ -67,3 +67,15 @@ try running
 sudo apt-get update && sudo apt-get install build-essential
 ```
 and then try building again. 
+
+
+#### Delete CMake Cache and Reconfigure:
+CMake stores a set of persistent variables in `CMakeCahce.txt` which when we rebuild it ignores what it's already saved (not exactly but it acts as a cache). If you notice that you are not seeing warnings/errors/build issues when you rebuild the project press:
+
+Control+Shift+P (Command MacOS)
+
+and select:
+
+CMake: Delete Cache and Reconfigure
+
+This rebuilds __from scratch__ and you should see everything as if it was the first time building. We are currently working out to automatically do this step.

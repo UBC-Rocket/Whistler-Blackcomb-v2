@@ -18,8 +18,9 @@
 #define SINGLE_FLOAT_PACKET_LENGTH 9
 #define SINGLE_INT_PACKET_LENGTH 6
 #define DATA_DUMP_PACKET_LENGTH 86
+#define WB_DEVICE_ID 5
 
-#define MAX_RADIO_WAIT_MS 120000
+#define MAX_RADIO_WAIT_MS 10000
 
 #define MAX_PACKET_SIZE 243
 
@@ -96,7 +97,6 @@ static void outputLoop(void *pv)
     uint8_t individLength;
     for (;;)
     {
-        //radioPrepMessage('m',1);
         if (!cbufCheckEmpty(radioBufTX))
         {
             individLength = cbufGet(radioBufTX, individMessage);
@@ -154,9 +154,12 @@ void GSRadioInit(void)
     radioBufRXCrit=cbufInit(512);
     radioBufRXLow=cbufInit(512);
 
+    initVariables();
+
     uartConfig(&(serial.uart_handle), RADIO_UART, 9600);
 
     xbee_dev_init(&radio, &serial, NULL, NULL);
+
 
     /* Add this for x86 testing */
     //memcpy(&radio.serport.uart_handle.buffer, radioPacket, sizeof(radioPacket));
@@ -226,16 +229,12 @@ void GSRadioInit(void)
             ;
     }
     
-    //printf("\nsending config packet:");
     //immediately force send that config packet
     uint8_t *message = pvPortMalloc(MAX_PACKET_SIZE * sizeof(uint8_t));
     uint8_t length;
     radioPrepConfig();
-    //printf("\ngetting radio message\n");
     length = cbufGet(radioBufTX, message);
     radioTxRequest(&radio, message, length);
-
-    //printf("\nGS radio init FINISHED");
 }
 
 uint32_t getTimestamp()
@@ -269,7 +268,6 @@ void radioPrepPing(void)
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * PING_PACKET_LENGTH); //TODO: adjust length
     uint8_t ID = 0x00;
     uint32_t timestamp = getTimestamp();
-    //timestamp
 
     uint8_t generalFailMode = 0;
 
@@ -346,12 +344,12 @@ void radioPrepEvent(uint16_t eventCode)
 
 void radioPrepConfig(void)
 {
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * CONFIG_PACKET_LENGTH); //TODO: adjust length
+    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * CONFIG_PACKET_LENGTH);
     uint8_t ID = 0x03;
     uint32_t timestamp = getTimestamp();
     uint8_t SIMstatus = SIM_ACTIVE;
-    uint8_t deviceID = 5;        //magic number bad
-    uint8_t verString[40] = {0}; //in future will be better to remove this step?
+    uint8_t deviceID = WB_DEVICE_ID;        
+    uint8_t verString[40] = {0}; //actually setting the version thing would be cool.
 
     message[0] = ID;
     memcpy(&message[1], &timestamp, 4);

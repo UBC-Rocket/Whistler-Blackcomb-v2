@@ -27,6 +27,7 @@ target_include_directories(whistler-blackcomb PUBLIC
     common/include
     common/xbee/include/
     common/xbee/ports/
+    common/CControl/src/CControl/Headers/
     board
     device
     CMSIS
@@ -60,6 +61,7 @@ target_include_directories(hal PUBLIC
 
 target_link_libraries(whistler-blackcomb m)
 target_link_libraries(whistler-blackcomb radio_protocol)
+target_link_libraries(whistler-blackcomb prediction)
 
 find_package(Threads REQUIRED)
 if(THREADS_HAVE_PTHREAD_ARG)

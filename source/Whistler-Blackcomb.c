@@ -135,7 +135,7 @@ int main(void) {
 	tskIDLE_PRIORITY + 2, /* initial priority */
 	(TaskHandle_t*) NULL /* optional task handle_debug to create */
 	)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			; /* error! probably out of memory */
 	}
@@ -145,7 +145,7 @@ int main(void) {
 	NULL,
 	debug_uart_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -155,7 +155,7 @@ int main(void) {
 	NULL,
 	radio_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -165,7 +165,7 @@ int main(void) {
 	NULL,
 	log_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -174,7 +174,7 @@ int main(void) {
 	NULL,
 	state_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -183,7 +183,7 @@ int main(void) {
 	NULL,
 	can_task_PRIORITY,
 	NULL)) != pdPASS) {
-		printf("Task init failed: %d\n", error);
+		printf("Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -379,7 +379,7 @@ static void RadioTask(void *pv) {
 }
 
 static void LogTask(void *pv) {
-	HALFILE file;
+	//HALFILE file;
 	sdInit();
 	for (EVER) {
 //		sdMkDir("/testdir");
@@ -408,19 +408,19 @@ static void CanTask(void *pv) {
 	for (EVER) {
 		canReceive(&can_handle, &rxFrame);
 		printf("CAN received, b0: %d, b1: %d\n", rxFrame.dataByte0, rxFrame.dataByte1);
-		canSend(&can_handle, 0x123, (hal_can_packet_t){'a', 'b', 'c', 'd'}, 4);
+		canSend(&can_handle, 0x123, (hal_can_packet_t){{'a', 'b', 'c', 'd'}}, 4);
 
 		hal_can_packet_id_t id = canGetId(&rxFrame);
 		switch (id) {
 		case can_packet_id_pt:{
 			hal_can_pt_id_t sensor_id = canGetSensorId(&rxFrame);
-			float pressure = canGetSensorValue(&rxFrame);
+			float pressure = canGetFloatValue(&rxFrame);
 			pt_data[sensor_id] = pressure;
 			break;
 		}
 		case can_packet_id_tc:{
 			hal_can_tc_id_t sensor_id = canGetSensorId(&rxFrame);
-			float temp = canGetSensorValue(&rxFrame);
+			float temp = canGetFloatValue(&rxFrame);
 			tc_data[sensor_id] = temp;
 			break;
 		}
@@ -445,7 +445,7 @@ static void CanTask(void *pv) {
 
 
 static void startGSRadioTask(void *pv){
-	vTaskDelay(pdMS_TO_TICKS(3000));
+	//vTaskDelay(pdMS_TO_TICKS(3000));
 	GSRadioInit();
 	printf("%s", GIT_REV);
 	vTaskSuspend(NULL);

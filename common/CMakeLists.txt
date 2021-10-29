@@ -18,9 +18,10 @@ target_sources(
 file(GLOB_RECURSE SRCS ${CMAKE_CURRENT_LIST_DIR}/xbee/src/*.c)
 file(GLOB_RECURSE PORT ${CMAKE_CURRENT_LIST_DIR}/xbee/ports/whistler/*.c)
 
+file(GLOB_RECURSE PRDCT ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Sources/*.c)
+
 target_sources(whistler-blackcomb PUBLIC ${SRCS})
 target_sources(whistler-blackcomb PUBLIC ${PORT})
-
 
 
 add_library(IMU_interpret STATIC
@@ -32,6 +33,11 @@ target_link_libraries(variables freertos)
 
 add_library(state_machine STATIC src/state_machine.c)
 add_library(prediction STATIC src/prediction.c)
+target_Sources(prediction PUBLIC ${PRDCT})
+#target_include_directories(prediction PUBLIC
+#    ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Headers
+#    ${CMAKE_CURRENT_LIST_DIR}/CControl/src/CControl/Sources/LinearAlgebra
+#)
 
 add_library(buffer STATIC src/buffer.c)
 
@@ -51,7 +57,10 @@ target_link_libraries(radio hal)
 
 add_library(radio_protocol STATIC src/radio_protocol.c)
 
-
+add_subdirectory(include)
+add_subdirectory(src)
+add_subdirectory(xbee)
+add_subdirectory(CControl)
 
 target_link_libraries(radio_protocol buffer)
 target_link_libraries(radio_protocol radio)
@@ -60,9 +69,7 @@ target_link_libraries(radio_protocol state_machine)
 target_sources(radio_protocol PUBLIC ${SRCS})
 target_sources(radio_protocol PUBLIC ${PORT})
 
-add_subdirectory(include)
-add_subdirectory(src)
-add_subdirectory(xbee)
+
 
 
 

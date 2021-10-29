@@ -167,18 +167,46 @@ int canGetSensorId(flexcan_frame_t *rxFrame);
 void canSetSensorId(hal_can_packet_t *packet, int id);
 
 /**
+ * Gets command id from a frame
+ * @param rxFrame the frame to extract from, must have id of command read type
+ * @return the id of the command
+ */
+int canGetCommandId(flexcan_frame_t *rxFrame);
+
+/**
+ * Sets command id for a frame
+ * @param rxFrame the frame to set id for
+ * @param id the id of the command
+ */
+void canSetCommandId(hal_can_packet_t *packet, int id);
+
+/**
  * Gets value of sensor from a frame
  * @param rxFrame the frame to extract from, must have id of a sensor read type
  * @return the value of the sensor in the units of the sensor, either pressure
  * or temperature
  */
-float canGetSensorValue(flexcan_frame_t *rxFrame);
+float canGetFloatValue(flexcan_frame_t *rxFrame);
 
 /**
  * Sets sensor value for a packet
  * @param packet the packet to set, must have id of a sensor read type
  * @param value the value to set for the packet
  */
-void canSetSensorValue(hal_can_packet_t *packet, float value);
+void canSetFloatValue(hal_can_packet_t *packet, float value);
+
+/**
+ * Gets value of command from a frame
+ * @param rxFrame the frame to extract from, must have id of a command read type
+ * @return the value of the command
+ */
+int canGetIntValue(flexcan_frame_t *rxFrame);
+
+/**
+ * Sets command value for a packet
+ * @param packet the packet to set, must have id of a command read type
+ * @param value the value to set for the packet
+ */
+void canSetIntValue(hal_can_packet_t *packet, int value);
 
 #endif

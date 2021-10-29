@@ -21,7 +21,7 @@ int* arr = (int*) malloc(20 * sizeof(int));
 
 * Tasks cannot end!
   * FreeRTOS has separation anxiety and is not comfortable with tasks ending unannounced. It may block and act strangely.
-  * If a task is going to end, I think you can avert this issue with `vTaskSuspend(NULL);` at the end of the task. 
+  * If a task is going to end, I think you can avert this issue with `vTaskSuspend(NULL)` at the end of the task. 
 
 ## General
 
