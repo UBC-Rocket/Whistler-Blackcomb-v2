@@ -70,6 +70,11 @@ if(CMAKE_THREAD_LIBS_INIT)
   target_link_libraries(whistler-blackcomb "${CMAKE_THREAD_LIBS_INIT}")
 endif()
 
+# Get git version for radio packet string
+execute_process(COMMAND git rev-parse HEAD
+                OUTPUT_VARIABLE GIT_REV
+                ERROR_QUIET)
+
 # Wno-int-to-pointer-cast is to disable a warning from core_cm4.h on compilation
 # Might be bad to disable it this way, not entirely sure
 # Wno-unused-parameter is to enable hal taking parameters and not using them
@@ -83,7 +88,7 @@ target_compile_options(whistler-blackcomb PRIVATE
     -DZCL_ENABLE_TIME_SERVER
     -DXBEE_CELLULAR_ENABLED
     -DXBEE_DEVICE_ENABLE_ATMODE
-    -DXBEE_XMODEM_TESTING)
+    -DXBEE_XMODEM_T=${GIT_REV})
 
 add_definitions( -DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\" )
 add_definitions( -DCOMPILE_x86 )
