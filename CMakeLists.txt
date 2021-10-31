@@ -75,7 +75,10 @@ endif()
 # Get git version for radio packet string
 execute_process(COMMAND git rev-parse HEAD
                 OUTPUT_VARIABLE GIT_REV
-                ERROR_QUIET)
+                WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+
+string(REPLACE "\n" "" GIT_REV ${GIT_REV})
+string(REPLACE "\"" "" GIT_REV ${GIT_REV})
 
 # Wno-int-to-pointer-cast is to disable a warning from core_cm4.h on compilation
 # Might be bad to disable it this way, not entirely sure
@@ -90,10 +93,14 @@ target_compile_options(whistler-blackcomb PRIVATE
     -DZCL_ENABLE_TIME_SERVER
     -DXBEE_CELLULAR_ENABLED
     -DXBEE_DEVICE_ENABLE_ATMODE
-    -DXBEE_XMODEM_T=${GIT_REV})
+    -DXBEE_XMODEM_T)
 
-add_definitions( -DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\" )
-add_definitions( -DCOMPILE_x86 )
+message(STATUS "Git version: ${GIT_REV}")
+
+
+add_definitions(-DXBEE_PLATFORM_HEADER=\"whistler/platform_config.h\")
+add_definitions(-DGIT_REV="${GIT_REV}")
+add_definitions(-DCOMPILE_x86)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

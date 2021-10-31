@@ -115,7 +115,6 @@ float pt_data[sizeof(pt_names)];
 int main(void) {
 	initHal();
 	initTimers();
-	
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
@@ -447,6 +446,5 @@ static void CanTask(void *pv) {
 static void startGSRadioTask(void *pv){
 	//vTaskDelay(pdMS_TO_TICKS(3000));
 	GSRadioInit();
-	printf("%s", GIT_REV);
 	vTaskSuspend(NULL);
 }
