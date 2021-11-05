@@ -1,7 +1,15 @@
 #include "buffer.h"
 
+//stolen from https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and-c/, for the most part
 
+#define APPROPRIATE_DELAY_TICS 100
 
+/**
+ * Checks if buffer is empty - only for use within something already taking the semaphore!
+ * @param cbuf handle of buffer to check
+ * @return true if empty
+ */
+static bool cbufCheckEmptyInternal(cbufHandle_t cbuf);
 
 
 
@@ -26,11 +34,12 @@ cbufHandle_t cbufInit(size_t size)
     assert(cbuf);
     
     cbuf->semaphore = xSemaphoreCreateBinary();
+    xSemaphoreGive(cbuf->semaphore);
     cbuf->buffer = buffer;
     cbuf->max = size;
     cbufReset(cbuf);
 
-    assert(cbufCheckEmpty(cbuf));
+    assert(cbufCheckEmptyInternal(cbuf));
     
 
     return cbuf;
@@ -72,17 +81,42 @@ bool cbufCheckFull(cbufHandle_t cbuf)
     return returnVal;
 }
 
-bool cbufCheckEmpty(cbufHandle_t cbuf)
+static bool cbufCheckEmptyInternal(cbufHandle_t cbuf)
 {
+    //printf("\n CE asserting");
     assert(cbuf);
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
+    //printf("\n CE taking sem");
+    //xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+
+    //printf("\n CE evaluating");
     bool returnVal=(!cbuf->full && (cbuf->head == cbuf->tail));
 
+
+    //printf("\nCE giving sem");
+    //xSemaphoreGive(cbuf->semaphore);
+
+    return returnVal;
+}
+
+bool cbufCheckEmpty(cbufHandle_t cbuf)
+{
+    //printf("\n CE asserting");
+    assert(cbuf);
+
+    //printf("\n CE taking sem");
+    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+
+    //printf("\n CE evaluating");
+    bool returnVal=(!cbuf->full && (cbuf->head == cbuf->tail));
+
+
+    //printf("\nCE giving sem");
     xSemaphoreGive(cbuf->semaphore);
 
     return returnVal;
 }
+
 
 size_t cbufGetCapacity(cbufHandle_t cbuf)
 {
@@ -122,7 +156,7 @@ size_t cbufGetSize(cbufHandle_t cbuf)
 
 static void advance_pointer(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    //xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
     assert(cbuf);
 
@@ -140,12 +174,12 @@ static void advance_pointer(cbufHandle_t cbuf)
     }
     cbuf->full = (cbuf->head == cbuf->tail);
 
-    xSemaphoreGive(cbuf->semaphore);
+    //xSemaphoreGive(cbuf->semaphore);
 }
 
 static void retreat_pointer(cbufHandle_t cbuf)
 {
-    xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
+    //xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
     assert(cbuf);
 
@@ -155,12 +189,13 @@ static void retreat_pointer(cbufHandle_t cbuf)
         cbuf->tail = 0;
     }
 
-    xSemaphoreGive(cbuf->semaphore);
+    //xSemaphoreGive(cbuf->semaphore);
 
 }
 
 int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 {
+
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
 
     assert(cbuf && cbuf->buffer);
@@ -172,6 +207,7 @@ int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 
     cbuf->buffer[cbuf->head] = message;
     
+
     advance_pointer(cbuf);
     
     xSemaphoreGive(cbuf->semaphore);
@@ -183,13 +219,14 @@ int cbufPut(cbufHandle_t cbuf, uint8_t length, uint8_t *data)
 
 int cbufGet(cbufHandle_t cbuf, uint8_t *data)
 {
+    //printf("\ntaking semaphore");
     xSemaphoreTake(cbuf->semaphore,portMAX_DELAY);
-
+    //printf("\nasserting");
     assert(cbuf && data && cbuf->buffer);
 
     uint8_t length = 0;
-
-    if (!cbufCheckEmpty(cbuf))
+    //printf("\nchecking if empty");
+    if (!cbufCheckEmptyInternal(cbuf))
     {
         uint8_t * message = cbuf->buffer[cbuf->tail];
         length = message[0];
@@ -202,6 +239,7 @@ int cbufGet(cbufHandle_t cbuf, uint8_t *data)
         vPortFree(message);
     }
 
+    //printf("\ngiving semaphore");
     xSemaphoreGive(cbuf->semaphore);
 
     return length;

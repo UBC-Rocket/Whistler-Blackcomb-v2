@@ -50,7 +50,7 @@ int packetBuffersReadLowerLimit[2][SIM_MAX_PACKET_IDS] = {0}; //needs to be init
 //the upper packet limit is the lower limit + the packet buffer size. It's the
 //range of allowable readable values
 SemaphoreHandle_t packetBuffersNewFlag[2][SIM_MAX_PACKET_IDS];
-int handshakeRecieved = 0; //blocks sending until 1
+int  handshakeRecieved =0; //blocks sending until 1
 
 SemaphoreHandle_t simInSemaphore;
 SemaphoreHandle_t simOutSemaphore;
@@ -90,7 +90,10 @@ static void inputLoop(void *pv)
         readChar = getCinForce();
         assert(ack[i] == readChar);
     }
+    //printf("ack rec");
     putConfigPacket();
+
+    //xSemaphoreGive(handshakeRecieved);
     handshakeRecieved = 1;
 
     for (;;)
@@ -108,14 +111,14 @@ static void outputLoop(void *pv)
 {
     printf("SYN"); /*this has to be the first thing to go out, I think*/
     fflush(stdout);
-    while (!handshakeRecieved)
-    {
-    }
+    while(!handshakeRecieved){};
+    //xSemaphoreTake(handshakeRecieved, portMAX_DELAY);
     for (;;)
     {
         //check buffer
         //send what's in buffer
         sendPackets();
+		vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -137,7 +140,7 @@ void stdioInit()
 
     for(int i = 0; i < 2; ++i){
         for(int j = 0; j < SIM_MAX_PACKET_IDS; ++j){
-            packetBuffersNewFlag[i][j] = xSemaphoreCreateBinary();
+            packetBuffersNewFlag[i][j] = xSemaphoreCreateCounting(8,0);
         }
     }
 
@@ -148,12 +151,15 @@ void stdioInit()
     simOutSemaphore = xSemaphoreCreateMutex();
     assert(simOutSemaphore != NULL);
 
+    //handshakeRecieved = xSemaphoreCreateBinary();
+    //xSemaphoreTake(handshakeRecieved, portMAX_DELAY);
+
     if (xTaskCreate(
             outputLoop,
             "stdio out controller",
             50000 / sizeof(StackType_t),
             (void *)NULL,
-            tskIDLE_PRIORITY + 2,
+            tskIDLE_PRIORITY+2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
         for (;;)
@@ -164,7 +170,7 @@ void stdioInit()
             "stdio in controller",
             1000 / sizeof(StackType_t),
             (void *)NULL,
-            tskIDLE_PRIORITY + 2,
+            tskIDLE_PRIORITY+2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
         for (;;)
@@ -249,6 +255,8 @@ void writeToBuf(int mode, const uint8_t data[], uint8_t id, uint16_t length)
         packetBuffersReadLowerLimit[mode][id] = 0;
     }
     xSemaphoreGive(packetBuffersNewFlag[mode][id]);
+
+    //printf("semaphore buffer count: %d\n", uxSemaphoreGetCount(packetBuffersNewFlag[mode][id]));
 }
 
 //sets up the sim rx buffer
@@ -321,6 +329,7 @@ static void sendPackets()
 
     for (int id = 0; id < SIM_MAX_PACKET_IDS; id++)
     {
+        //printf("semaphoreCount for id %d = %d\n",id, uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]));
         if (uxSemaphoreGetCount(packetBuffersNewFlag[TX][id]))
         {
             uint8_t buf[512];
@@ -401,12 +410,14 @@ static void synOut(char c)
  */
 static void putPacket(const uint8_t id, const uint8_t *c, char const length)
 {
+    xSemaphoreTake(simOutSemaphore, portMAX_DELAY);
+
     synOut(id);
 
     synOut((char)(length >> 8));
     synOut((char)(length & 0xFF));
 
-    xSemaphoreTake(simOutSemaphore, portMAX_DELAY);
+    
 
     for (uint8_t const *end = c + length; c != end; c++)
     {

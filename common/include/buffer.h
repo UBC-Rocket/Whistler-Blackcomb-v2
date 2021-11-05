@@ -67,7 +67,7 @@ int cbufGet(cbufHandle_t cbuf, uint8_t * data);
 
 
 /**
- * Checks if buffer is empty
+ * Checks if buffer is empty - only for use within something already taking the semaphore!
  * @param cbuf handle of buffer to check
  * @return true if empty
  */

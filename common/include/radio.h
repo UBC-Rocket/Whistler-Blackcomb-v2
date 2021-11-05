@@ -7,6 +7,7 @@
 #include "xbee/wpan.h"
 #include "xbee/atcmd.h"
 #include "xbee/device.h"
+#include <string.h>
 
 /*******************************************************************************
  * Declarations

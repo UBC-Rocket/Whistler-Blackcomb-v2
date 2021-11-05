@@ -179,8 +179,8 @@ static stateRet_t stateTransitionStartup(stateInput_t *input){
 }
 
 static stateRet_t stateTransitionFueling(stateInput_t *input){
-    if(input->HMI_triggerGroundAbort){
-        input->HMI_triggerGroundAbort = CLEAR;
+    if(input->HMI_triggerAbort){
+        input->HMI_triggerAbort = CLEAR;
         return stateRetAbort;
     } 
     else if(input->HMI_triggerStandby){
@@ -193,8 +193,8 @@ static stateRet_t stateTransitionFueling(stateInput_t *input){
 }
 
 static stateRet_t stateTransitionStandby(stateInput_t *input){
-    if(input->HMI_triggerGroundAbort){
-        input->HMI_triggerGroundAbort = CLEAR;
+    if(input->HMI_triggerAbort){
+        input->HMI_triggerAbort = CLEAR;
         return stateRetAbort;
     }
     else if(input->HMI_triggerFueling){
@@ -211,8 +211,8 @@ static stateRet_t stateTransitionStandby(stateInput_t *input){
 }
 
 static stateRet_t stateTransitionIgnition(stateInput_t *input){
-    if(input->HMI_triggerGroundAbort){
-        input->HMI_triggerGroundAbort=CLEAR;
+    if(input->HMI_triggerAbort){
+        input->HMI_triggerAbort=CLEAR;
         return stateRetAbort;
     }
     //else if(1/*this will eventuall be "all good"*/){
