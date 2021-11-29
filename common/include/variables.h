@@ -8,7 +8,7 @@
 #include "state_machine.h"
 
 
-stateInput_t stateTransitionInput;
+extern stateInput_t stateTransitionInput;
 
 //Sensor Status, in sensor order - see docs
 void setSensorStatus(int sensorID, int status);

@@ -34,6 +34,11 @@
 #define SIM_ACTIVE 1
 #endif
 
+
+xbee_dev_t radio; //These might have more descriptive names in the future.
+
+xbee_serial_t serial;
+
 //declarations
 static void inputLoop(void *pv);
 static void outputLoop(void *pv);
