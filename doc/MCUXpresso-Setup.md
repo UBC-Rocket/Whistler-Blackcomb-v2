@@ -2,7 +2,10 @@
 ### Download Tools
 1. MCUXpresso
 
-Download from [here](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE?tab=Design_Tools_Tab). You will need an account, sign up for one for free. All the default options should be fine. 
+Download from [here](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE?tab=Design_Tools_Tab). You will need an account, sign up for one for free. All the default options should be fine.
+**Important:**
+Unless otherwise noted, select version 11.2.1. This ensures we all have the same versions and don't run into any versioning issues. 
+ 
 
 2. Chip SDK
 
