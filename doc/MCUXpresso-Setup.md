@@ -57,3 +57,22 @@ Here it will ask you what you want configure and this was the setup I was guided
 
 You should now have access to this view and be able to modify anything if you need to.
 
+
+# Adding SDK Examples:
+When we want to add implement features to the board that exist on the chip, the best way to do it is to do as close as possible to what the developer has intended.
+As an example I'm adding the ADC SDK:
+
+1. Select Import SDK Examples:
+ <img width="400" alt="image" src="https://user-images.githubusercontent.com/24193569/145516229-652e9028-5daf-4759-a3b4-78d00206598d.png">
+ 
+2. Select the only board that shows up. This was set when we initially set up the IDE.
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/24193569/145516294-bfcf73c6-9b6d-43ce-930a-dc44c95ede0c.png">
+
+3. Under Driver Examples select the available SDKs you wish to use:
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/24193569/145516372-e13a27ac-cd5c-4343-ba62-56f7d93e4d7f.png">
+
+4. For the Advanced Settings, press finish to continue with the Defaults.
+
+
+When porting over the Example, try to keep it as concise as you can minimizing copying over anything unnecessary. One method is to comment out parts of the example and continually build it to see how much you can strip away. If do need it we can come back and get it, but most is setting up one of many different implementations.
+
