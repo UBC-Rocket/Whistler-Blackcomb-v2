@@ -57,6 +57,11 @@ Here it will ask you what you want configure and this was the setup I was guided
 
 You should now have access to this view and be able to modify anything if you need to.
 
+When done, press the funny-looking and green 'Update Code' button to set all these changes to our project.
+
+<img width="899" alt="image" src="https://user-images.githubusercontent.com/24193569/145519990-1ad7970d-dbf6-486b-876f-75777b9b7bd7.png">
+
+
 
 # Adding SDK Examples:
 When we want to add implement features to the board that exist on the chip, the best way to do it is to do as close as possible to what the developer has intended.
