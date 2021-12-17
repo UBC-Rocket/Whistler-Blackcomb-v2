@@ -7,11 +7,11 @@
 /*
  * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 !!GlobalInfo
-product: Pins v8.0
+product: Pins v10.0
 processor: MK66FX1M0xxx18
 package_id: MK66FX1M0VLQ18
 mcu_data: ksdk2_0
-processor_version: 8.0.1
+processor_version: 10.0.0
 pin_labels:
 - {pin_num: '110', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2, label: LED_RGBBUILTIN, identifier: LED_BUILTIN}
 - {pin_num: '95', pin_signal: TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0, label: DEBUG_UART_RX, identifier: DEBUG_UART_RX;DEBUG_UART_TX}
@@ -21,6 +21,8 @@ pin_labels:
 - {pin_num: '129', pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, label: RADIO_UART_RX, identifier: RADIO_UART_RX}
 - {pin_num: '130', pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA, label: RADIO_UART_TX, identifier: RADIO_UART_TX}
 - {pin_num: '47', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, label: CAN1_STBN, identifier: CAN1_STBN}
+- {pin_num: '91', pin_signal: ADC1_SE14/PTB10/SPI1_PCS0/UART3_RX/FB_AD19/SDRAM_D19/FTM0_FLT1, label: GPS_UART_RX, identifier: GPS_UART_RX}
+- {pin_num: '92', pin_signal: ADC1_SE15/PTB11/SPI1_SCK/UART3_TX/FB_AD18/SDRAM_D18/FTM0_FLT2, label: GPS_UART_TX, identifier: GPS_UART_TX}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -65,6 +67,8 @@ BOARD_InitPins:
   - {pin_num: '45', peripheral: CAN1, signal: TX, pin_signal: ADC0_SE17/PTE24/CAN1_TX/UART4_TX/I2C0_SCL/EWM_OUT_b}
   - {pin_num: '46', peripheral: CAN1, signal: RX, pin_signal: ADC0_SE18/PTE25/LLWU_P21/CAN1_RX/UART4_RX/I2C0_SDA/EWM_IN}
   - {pin_num: '47', peripheral: GPIOE, signal: 'GPIO, 26', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, direction: OUTPUT, gpio_init_state: 'true'}
+  - {pin_num: '91', peripheral: UART3, signal: RX, pin_signal: ADC1_SE14/PTB10/SPI1_PCS0/UART3_RX/FB_AD19/SDRAM_D19/FTM0_FLT1}
+  - {pin_num: '92', peripheral: UART3, signal: TX, pin_signal: ADC1_SE15/PTB11/SPI1_SCK/UART3_TX/FB_AD18/SDRAM_D18/FTM0_FLT2}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -99,6 +103,12 @@ void BOARD_InitPins(void)
     };
     /* Initialize GPIO functionality on pin PTE26 (pin 47)  */
     GPIO_PinInit(BOARD_INITPINS_CAN1_STBN_GPIO, BOARD_INITPINS_CAN1_STBN_PIN, &CAN1_STBN_config);
+
+    /* PORTB10 (pin 91) is configured as UART3_RX */
+    PORT_SetPinMux(BOARD_INITPINS_GPS_UART_RX_PORT, BOARD_INITPINS_GPS_UART_RX_PIN, kPORT_MuxAlt3);
+
+    /* PORTB11 (pin 92) is configured as UART3_TX */
+    PORT_SetPinMux(BOARD_INITPINS_GPS_UART_TX_PORT, BOARD_INITPINS_GPS_UART_TX_PIN, kPORT_MuxAlt3);
 
     /* PORTB16 (pin 95) is configured as UART0_RX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_TX_PORT, BOARD_INITPINS_DEBUG_UART_TX_PIN, kPORT_MuxAlt3);

@@ -15,7 +15,7 @@ typedef unsigned char byte;
 typedef unsigned int uint;
 
 /**
- * This struct holds all the data for the IMU, including configuartion, inputs,
+ * This struct holds all the data for the IMU, including configuration, inputs,
  * and outputs.
  */
 typedef struct IMU {
@@ -25,7 +25,7 @@ typedef struct IMU {
 	unsigned char datagramID;
 
 	/** 
-	 *0 = Setting this to zero will definitly break something. 
+	 *0 = Setting this to zero will definitely break something.
 	 *Rate is always included in datagram.
 	 *1 = [° / s] - Angular Rate or Avg. Angular rate. [DEFAULT]
 	 *2 = [°/sample] - Incremental Angle or Integrated angle

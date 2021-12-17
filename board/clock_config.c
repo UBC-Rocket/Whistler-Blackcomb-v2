@@ -33,11 +33,11 @@
 /* clang-format off */
 /* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 !!GlobalInfo
-product: Clocks v7.0
+product: Clocks v8.0
 processor: MK66FX1M0xxx18
 package_id: MK66FX1M0VLQ18
 mcu_data: ksdk2_0
-processor_version: 8.0.1
+processor_version: 10.0.0
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
 
@@ -174,7 +174,7 @@ void BOARD_BootClockRUN(void)
                                   mcgConfig_BOARD_BootClockRUN.ircs, 
                                   mcgConfig_BOARD_BootClockRUN.fcrdiv);
     /* Set MCG to FEI mode. */
-#if FSL_CLOCK_DRIVER_VERSION >= MAKE_VERSION(2, 2, 0)
+#if FSL_CLOCK_DRIVER_VERSION >= MAKE_VERSION(2, 0, 0)
     CLOCK_BootToFeiMode(mcgConfig_BOARD_BootClockRUN.dmx32,
                         mcgConfig_BOARD_BootClockRUN.drs,
                         CLOCK_CONFIG_FllStableDelay);

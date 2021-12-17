@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding= "UTF-8" ?>
-<configuration name="" xsi:schemaLocation="http://mcuxpresso.nxp.com/XSD/mex_configuration_1.8 http://mcuxpresso.nxp.com/XSD/mex_configuration_1.8.xsd" uuid="3accf2b5-a370-4be2-8470-68d82435c5e8" version="1.8" xmlns="http://mcuxpresso.nxp.com/XSD/mex_configuration_1.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<configuration name="" xsi:schemaLocation="http://mcuxpresso.nxp.com/XSD/mex_configuration_10 http://mcuxpresso.nxp.com/XSD/mex_configuration_10.xsd" uuid="3accf2b5-a370-4be2-8470-68d82435c5e8" version="10" xmlns="http://mcuxpresso.nxp.com/XSD/mex_configuration_10" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <common>
       <processor>MK66FX1M0xxx18</processor>
       <package>MK66FX1M0VLQ18</package>
@@ -13,15 +13,16 @@
       <validate_boot_init_only>true</validate_boot_init_only>
       <generate_extended_information>false</generate_extended_information>
       <generate_code_modified_registers_only>false</generate_code_modified_registers_only>
+      <update_include_paths>true</update_include_paths>
    </preferences>
    <tools>
-      <pins name="Pins" version="8.0" enabled="true" update_project_code="true">
+      <pins name="Pins" version="10.0" enabled="true" update_project_code="true">
          <generated_project_files>
             <file path="board/pin_mux.c" update_enabled="true"/>
             <file path="board/pin_mux.h" update_enabled="true"/>
          </generated_project_files>
          <pins_profile>
-            <processor_version>8.0.1</processor_version>
+            <processor_version>10.0.0</processor_version>
             <pin_labels>
                <pin_label pin_num="110" pin_signal="PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2" label="LED_RGBBUILTIN" identifier="LED_BUILTIN"/>
                <pin_label pin_num="95" pin_signal="TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0" label="DEBUG_UART_RX" identifier="DEBUG_UART_RX;DEBUG_UART_TX"/>
@@ -31,6 +32,8 @@
                <pin_label pin_num="129" pin_signal="PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL" label="RADIO_UART_RX" identifier="RADIO_UART_RX"/>
                <pin_label pin_num="130" pin_signal="PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA" label="RADIO_UART_TX" identifier="RADIO_UART_TX"/>
                <pin_label pin_num="47" pin_signal="PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN" label="CAN1_STBN" identifier="CAN1_STBN"/>
+               <pin_label pin_num="91" pin_signal="ADC1_SE14/PTB10/SPI1_PCS0/UART3_RX/FB_AD19/SDRAM_D19/FTM0_FLT1" label="GPS_UART_RX" identifier="GPS_UART_RX"/>
+               <pin_label pin_num="92" pin_signal="ADC1_SE15/PTB11/SPI1_SCK/UART3_TX/FB_AD18/SDRAM_D18/FTM0_FLT2" label="GPS_UART_TX" identifier="GPS_UART_TX"/>
             </pin_labels>
          </pins_profile>
          <functions_list>
@@ -63,6 +66,11 @@
                      </feature>
                   </dependency>
                   <dependency resourceType="Peripheral" resourceId="CAN1" description="Peripheral CAN1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="UART3" description="Peripheral UART3 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
                      <feature name="initialized" evaluation="equal">
                         <data>true</data>
                      </feature>
@@ -159,17 +167,19 @@
                         <pin_feature name="gpio_init_state" value="true"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="UART3" signal="RX" pin_num="91" pin_signal="ADC1_SE14/PTB10/SPI1_PCS0/UART3_RX/FB_AD19/SDRAM_D19/FTM0_FLT1"/>
+                  <pin peripheral="UART3" signal="TX" pin_num="92" pin_signal="ADC1_SE15/PTB11/SPI1_SCK/UART3_TX/FB_AD18/SDRAM_D18/FTM0_FLT2"/>
                </pins>
             </function>
          </functions_list>
       </pins>
-      <clocks name="Clocks" version="7.0" enabled="true" update_project_code="true">
+      <clocks name="Clocks" version="8.0" enabled="true" update_project_code="true">
          <generated_project_files>
             <file path="board/clock_config.c" update_enabled="true"/>
             <file path="board/clock_config.h" update_enabled="true"/>
          </generated_project_files>
          <clocks_profile>
-            <processor_version>8.0.1</processor_version>
+            <processor_version>10.0.0</processor_version>
          </clocks_profile>
          <clock_configurations>
             <clock_configuration name="BOARD_BootClockRUN">
@@ -239,7 +249,7 @@
          </dcdx_profile>
          <dcdx_configurations/>
       </dcdx>
-      <periphs name="Peripherals" version="8.0" enabled="true" update_project_code="true">
+      <periphs name="Peripherals" version="10.0" enabled="true" update_project_code="true">
          <dependencies>
             <dependency resourceType="SWComponent" resourceId="platform.drivers.uart" description="UART Driver not found in the toolchain/IDE project. Project will not compile!" problem_level="2" source="Peripherals">
                <feature name="enabled" evaluation="equal">
@@ -257,7 +267,7 @@
             <file path="board/peripherals.h" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
-            <processor_version>8.0.1</processor_version>
+            <processor_version>10.0.0</processor_version>
          </peripherals_profile>
          <functional_groups>
             <functional_group name="BOARD_InitPeripherals" uuid="bd3f9b59-c16d-46ae-a368-f32ad44231a1" called_from_default_init="true" id_prefix="" core="core0">
@@ -311,7 +321,7 @@
                   </dependency>
                </dependencies>
                <instances>
-                  <instance name="UART0" uuid="c7baad50-e524-45f8-b52a-6ae56163adae" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART0" enabled="true" comment="" custom_name_enabled="false">
+                  <instance name="UART0" uuid="c7baad50-e524-45f8-b52a-6ae56163adae" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART0" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="uartConfig_t" quick_selection="QuickSelection1">
                         <struct name="uartConfig">
                            <setting name="clockSource" value="BusInterfaceClock"/>
@@ -327,7 +337,7 @@
                         </struct>
                      </config_set>
                   </instance>
-                  <instance name="UART1" uuid="5faad42e-1794-4a0b-8408-94286e504cb5" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART1" enabled="true" comment="" custom_name_enabled="false">
+                  <instance name="UART1" uuid="5faad42e-1794-4a0b-8408-94286e504cb5" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART1" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="uartConfig_t" quick_selection="QuickSelection1">
                         <struct name="uartConfig">
                            <setting name="clockSource" value="BusInterfaceClock"/>
@@ -343,7 +353,7 @@
                         </struct>
                      </config_set>
                   </instance>
-                  <instance name="UART2" uuid="f66b2d9b-0610-4429-9ecd-c3cee94bf6db" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART2" enabled="true" comment="" custom_name_enabled="false">
+                  <instance name="UART2" uuid="f66b2d9b-0610-4429-9ecd-c3cee94bf6db" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART2" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="uartConfig_t" quick_selection="QuickSelection1">
                         <struct name="uartConfig">
                            <setting name="clockSource" value="BusInterfaceClock"/>
@@ -357,6 +367,12 @@
                            <setting name="enableTx" value="true"/>
                            <setting name="enableRx" value="true"/>
                         </struct>
+                     </config_set>
+                  </instance>
+                  <instance name="NVIC" uuid="9a13fb60-9f87-4e33-ae61-0e2b005227b5" type="nvic" type_id="nvic_57b5eef3774cc60acaede6f5b8bddc67" mode="general" peripheral="NVIC" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
+                     <config_set name="nvic">
+                        <array name="interrupt_table"/>
+                        <array name="interrupts"/>
                      </config_set>
                   </instance>
                </instances>
@@ -378,6 +394,12 @@
             <component name="generic_can" uuid="b308716e-a303-4f55-9c64-550f8549b251" type_id="generic_can_1bfdd78b1af214566c1f23cf6a582d80">
                <config_set_global name="global_can"/>
             </component>
+            <component name="generic_enet" uuid="4883c0d5-b934-4f68-b9a3-89b6ed7f06fa" type_id="generic_enet_74db5c914f0ddbe47d86af40cb77a619">
+               <config_set_global name="global_enet"/>
+            </component>
+            <component name="uart_cmsis_common" uuid="2cb8680c-1b86-432b-9d37-804e66cbba57" type_id="uart_cmsis_common_9cb8e302497aa696fdbb5a4fd622c2a8">
+               <config_set_global name="global_USART_CMSIS_common" quick_selection="default"/>
+            </component>
          </components>
       </periphs>
       <tee name="TEE" version="2.0" enabled="false" update_project_code="true">
@@ -385,8 +407,6 @@
          <tee_profile>
             <processor_version>N/A</processor_version>
          </tee_profile>
-         <global_options/>
-         <user_memory_regions/>
       </tee>
    </tools>
 </configuration>

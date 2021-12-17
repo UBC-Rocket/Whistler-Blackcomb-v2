@@ -109,6 +109,24 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_CAN1_STBN_PIN_MASK (1U << 26U)      /*!<@brief PORT pin mask */
                                                            /* @} */
 
+/*! @name PORTB10 (number 91), GPS_UART_RX
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_GPS_UART_RX_PORT PORTB                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_GPS_UART_RX_PIN 10U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_GPS_UART_RX_PIN_MASK (1U << 10U)      /*!<@brief PORT pin mask */
+                                                             /* @} */
+
+/*! @name PORTB11 (number 92), GPS_UART_TX
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_GPS_UART_TX_PORT PORTB                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_GPS_UART_TX_PIN 11U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_GPS_UART_TX_PIN_MASK (1U << 11U)      /*!<@brief PORT pin mask */
+                                                             /* @} */
+
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
  *

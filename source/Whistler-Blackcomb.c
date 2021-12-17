@@ -27,6 +27,7 @@
 /* Includes common between MCU and x86 */
 #include "state_machine.h"
 #include "IMU_interpret.h"
+#include "GPS_interpret.h"
 #include "prediction.h"
 
 /* Includes specific to MCU or x86 */
@@ -48,6 +49,7 @@
 /* TODO: figure out where this is defined properly */
 #define PI acos(-1)
 #define EVER ;;
+GPS_1 GPS;
 
 /* Task priorities. Will update once more finalized */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
@@ -56,6 +58,7 @@
 #define log_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define state_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define can_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define gps_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
@@ -66,11 +69,13 @@ static void RadioTask(void *pv);
 static void LogTask(void *pv);
 static void StateTask(void *pv);
 static void CanTask(void *pv);
+static void GpsTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
  ******************************************************************************/
 const char *debug_intro_message = "";
+const char *gps_intro_message = "log com1 loglist\r\n";
 const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
@@ -79,6 +84,7 @@ uint8_t background_buffer_imu[200];
 
 hal_uart_handle_t hal_uart_debug;
 hal_uart_handle_t hal_uart_imu;
+hal_uart_handle_t hal_uart_gps;
 
 /*******************************************************************************
  * Positioning Variables
@@ -116,7 +122,7 @@ int main(void) {
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
-	halNvicSetPriority(RADIO_UART_RX_TX_IRQn, 5);
+	halNvicSetPriority(GPS_UART_RX_TX_IRQn, 5);
 	/* Have to set these or else semaphore functions in interrupts won't work */
 	halNvicSetPriority(CAN0_ORed_Message_buffer_IRQn, 5);
 	halNvicSetPriority(CAN1_ORed_Message_buffer_IRQn, 5);
@@ -184,6 +190,15 @@ int main(void) {
 		for (;;)
 			;
 	}
+	if ((error = xTaskCreate(GpsTask, "GPS Task",
+		configMINIMAL_STACK_SIZE + 500,
+		NULL,
+		gps_task_PRIORITY,
+		NULL)) != pdPASS) {
+			printf("Task init failed: %ld\n", error);
+			for (;;)
+				;
+		}
 
 	vTaskStartScheduler();
 
@@ -434,4 +449,28 @@ static void CanTask(void *pv) {
 //		canSend(&can_handle, 0x123, txPacket, 6);
 //		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
+}
+
+static void GpsTask(void *pv) {
+	vTaskDelay(pdMS_TO_TICKS(1000));
+	size_t size = 0;
+	int uart_error;
+
+	uartConfig(&hal_uart_gps, GPS_UART, 9600);
+	if (kStatus_Success != uartInit(&hal_uart_gps)) {
+		vTaskSuspend(NULL);
+	}
+	if (kStatus_Success
+			!= uartSend(&hal_uart_gps, (uint8_t*) gps_intro_message,
+						strlen(gps_intro_message))) {
+			vTaskSuspend(NULL);
+		}
+	do {
+		uint8_t buffer;
+		uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
+		printf("%c", buffer);
+
+	} while (kStatus_Success == uart_error);
+	uartDeinit(&hal_uart_gps);
+	vTaskSuspend(NULL);
 }

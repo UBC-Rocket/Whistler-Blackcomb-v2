@@ -86,6 +86,10 @@ void BOARD_InitDebugConsole(void);
 #define CAN_CLK_SOURCE (kFLEXCAN_ClkSrc1)
 #define CAN_CLK_FREQ   CLOCK_GetFreq(kCLOCK_BusClk)
 
+/* FreeRTOS UART GPS */
+#define GPS_UART			UART3
+#define GPS_UART_RX_TX_IRQn UART3_RX_TX_IRQn
+
 #endif /* _BOARD_H_ */
 
 
