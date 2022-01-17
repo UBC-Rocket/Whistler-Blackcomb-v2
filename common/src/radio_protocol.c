@@ -1,11 +1,6 @@
 #include "radio_protocol.h"
 #include <stdio.h>
 
-//unbeleviably dumb mistake - now just tracking down some errors in my code.
-
-
-
-
 //these lengths inlcude the 1 byte ID and the 4 byte timestamp
 #define PING_PACKET_LENGTH 10
 #define MESSAGE_MIN_PACKET_LENGTH 6
@@ -34,7 +29,7 @@
 #define SIM_ACTIVE 1
 #endif
 
-//declarations
+//Declarations
 static void inputLoop(void *pv);
 static void outputLoop(void *pv);
 uint32_t getTimestamp();
@@ -44,12 +39,10 @@ void dealWithLowMessages(void *pv);
 void dealWithCritMessages(void *pv);
 
 cbufHandle_t radioBufTX;
-
 cbufHandle_t radioBufRXCrit;
-
 cbufHandle_t radioBufRXLow;
 
-//loops
+/***** I/O management Loops *****/
 
 static void inputLoop(void *pv)
 {
@@ -169,7 +162,7 @@ void GSRadioInit(void)
     if (xTaskCreate(
             outputLoop,
             "radio out controller",
-            50000 / sizeof(StackType_t),
+            5000 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
@@ -183,7 +176,7 @@ void GSRadioInit(void)
     if (xTaskCreate(
             mandatoryOutput,
             "radio mandatory out controller",
-            50000 / sizeof(StackType_t),
+            5000 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
@@ -277,6 +270,8 @@ void radioPrepPing(void)
     //this is very explicit and not very elegant but I don't like assuming that
     //you can always enumerate through the sensors.
 
+    //This might be something to look at in the future for improvement
+
     modBitFieldSensorStatus(0x04, 31, &generalFailMode, &senStatusBitFieldA);
     modBitFieldSensorStatus(0x05, 30, &generalFailMode, &senStatusBitFieldA);
     modBitFieldSensorStatus(0x06, 29, &generalFailMode, &senStatusBitFieldA);
@@ -359,9 +354,8 @@ void radioPrepConfig(void)
     {
         message[index + 7] = verString[index];
     }
-    //printf("\nputting config packet into TX buffer");
     cbufPut(radioBufTX, CONFIG_PACKET_LENGTH, message);
-    //printf("\ndone with buffer put");
+
     vPortFree(message);
 }
 
@@ -427,13 +421,12 @@ void radioPrepAccel(void)
     vPortFree(message);
 }
 
-//HP Tank PT
-void radioPrepPT_HP_T_001(void)
-{
+
+/***** Generic Functions for single float and int sensors *****/
+
+void radioPrepSingleFloat(uint8_t ID, float value){
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x1E;
     uint32_t timestamp = getTimestamp();
-    float value = getPT_HP_T_001Value();
 
     message[0] = ID;
     memcpy(&message[1], &timestamp, 4);
@@ -442,258 +435,14 @@ void radioPrepPT_HP_T_001(void)
     vPortFree(message);
 }
 
-//HP Tank Out Valve TC
-void radioPrepTC_HP_OUT_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x1F;
-    uint32_t timestamp = getTimestamp();
-    float value = getTC_HP_OUT_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//HP Press Valve
-void radioPrepV_HP_P_001(void)
-{
+void radioPrepSingleInt(uint8_t ID, int value){
     uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x20;
     uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_HP_P_001Value();
 
     message[0] = ID;
     memcpy(&message[1], &timestamp, 4);
     message[5] = value;
     cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Fuel Press Valve
-void radioPrepV_F_PR_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x21;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_PR_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Fuel Vent Valve
-void radioPrepV_F_V_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x22;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_V_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Fuel Tank PT
-void radioPrepPT_F_T_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x23;
-    uint32_t timestamp = getTimestamp();
-    float value = getPT_F_T_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Fuel Fill Valve
-void radioPrepV_F_F_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x24;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_F_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Fuel Injector PT
-void radioPrepPT_F_INJ_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x25;
-    uint32_t timestamp = getTimestamp();
-    float value = getPT_F_INJ_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Main Fuel Valve
-void radioPrepV_F_MFV_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x26;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_F_MFV_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Press Valve
-void radioPrepV_L_PR_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x27;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_PR_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Tank PT
-void radioPrepPT_L_T_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x28;
-    uint32_t timestamp = getTimestamp();
-    float value = getPT_L_T_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Vent Valve
-void radioPrepV_L_V_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x29;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_V_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Fill TC
-void radioPrepTC_L_F_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x2A; // this is the gun rights packet.
-    uint32_t timestamp = getTimestamp();
-    float value = getTC_L_F_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Fill Valve
-void radioPrepV_L_F_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x2B;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_F_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Injector PT
-void radioPrepPT_L_INJ_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x2C;
-    uint32_t timestamp = getTimestamp();
-    float value = getPT_L_INJ_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//Main Oxidizer Valve
-void radioPrepV_L_MOV_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x2D;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_MOV_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Bleed Valve
-void radioPrepV_L_BLD_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_INT_PACKET_LENGTH);
-    uint8_t ID = 0x2E;
-    uint32_t timestamp = getTimestamp();
-    uint8_t value = getV_L_BLD_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    message[5] = value;
-    cbufPut(radioBufTX, SINGLE_INT_PACKET_LENGTH, message);
-    vPortFree(message);
-}
-
-//LOX Bleed TC
-void radioPrepTC_L_BLD_001(void)
-{
-    uint8_t *message = pvPortMalloc(sizeof(uint8_t) * SINGLE_FLOAT_PACKET_LENGTH);
-    uint8_t ID = 0x2F;
-    uint32_t timestamp = getTimestamp();
-    float value = getTC_L_BLD_001Value();
-
-    message[0] = ID;
-    memcpy(&message[1], &timestamp, 4);
-    memcpy(&message[5], &value, 4);
-    cbufPut(radioBufTX, SINGLE_FLOAT_PACKET_LENGTH, message);
     vPortFree(message);
 }
 
@@ -713,41 +462,24 @@ void radioPrepDataDump(void)
     float accelValue[3];
     getAccelValue(accelValue);
 
-    float PT_HP_T_001Value = getPT_HP_T_001Value();
-
-    float TC_HP_OUT_001Value = getTC_HP_OUT_001Value();
-
-    uint8_t V_HP_P_001Value = getV_HP_P_001Value();
-
-    uint8_t V_F_PR_001Value = getV_F_PR_001Value();
-
-    uint8_t V_F_V_001Value = getV_F_V_001Value();
-
-    float PT_F_T_001Value = getPT_F_T_001Value();
-
-    uint8_t V_F_F_001Value = getV_F_F_001Value();
-
-    float PT_F_INJ_001Value = getPT_F_INJ_001Value();
-
-    uint8_t V_F_MFV_001Value = getV_F_MFV_001Value();
-
-    uint8_t V_L_PR_001Value = getV_L_PR_001Value();
-
-    float PT_L_T_001Value = getPT_L_T_001Value();
-
-    uint8_t V_L_V_001Value = getV_L_V_001Value();
-
-    float TC_L_F_001Value = getTC_L_F_001Value();
-
-    uint8_t V_L_F_001Value = getV_L_F_001Value();
-
-    float PT_L_INJ_001Value = getPT_L_INJ_001Value();
-
-    uint8_t V_L_MOV_001Value = getV_L_MOV_001Value();
-
-    uint8_t V_L_BLD_001Value = getV_L_BLD_001Value();
-
-    float TC_L_BLD_001Value = getTC_L_BLD_001Value();
+    float PT_HP_T_001Value =    getSensorDataFloat(sensorPT_HP_T_001);
+    float TC_HP_OUT_001Value =  getSensorDataFloat(sensorTC_HP_OUT_001);
+    uint8_t V_HP_P_001Value =   getSensorDataInt(sensorV_HP_P_001);
+    uint8_t V_F_PR_001Value =   getSensorDataInt(sensorV_F_PR_001);
+    uint8_t V_F_V_001Value =    getSensorDataInt(sensorV_F_V_001);
+    float PT_F_T_001Value =     getSensorDataFloat(sensorPT_F_T_001);
+    uint8_t V_F_F_001Value =    getSensorDataInt(sensorV_F_F_001);
+    float PT_F_INJ_001Value =   getSensorDataFloat(sensorPT_F_INJ_001);
+    uint8_t V_F_MFV_001Value =  getSensorDataInt(sensorV_F_MFV_001);
+    uint8_t V_L_PR_001Value =   getSensorDataInt(sensorV_L_PR_001);
+    float PT_L_T_001Value =     getSensorDataFloat(sensorPT_L_T_001);
+    uint8_t V_L_V_001Value =    getSensorDataInt(sensorV_L_V_001);
+    float TC_L_F_001Value =     getSensorDataFloat(sensorTC_L_F_001);
+    uint8_t V_L_F_001Value =    getSensorDataInt(sensorV_L_F_001);
+    float PT_L_INJ_001Value =   getSensorDataFloat(sensorPT_L_INJ_001);
+    uint8_t V_L_MOV_001Value =  getSensorDataInt(sensorV_L_MOV_001);
+    uint8_t V_L_BLD_001Value =  getSensorDataInt(sensorV_L_BLD_001);
+    float TC_L_BLD_001Value =   getSensorDataFloat(sensorTC_L_BLD_001);
 
     message[0] = ID;
     memcpy(&message[1], &timestamp, 4);
@@ -834,58 +566,58 @@ void dealWithLowMessages(void *pv)
                 radioPrepAccel();
                 break;
             case 0x1E:
-                radioPrepPT_HP_T_001();
+                radioPrepSingleFloat(0x1E, getSensorDataFloat(sensorPT_HP_T_001));
                 break;
             case 0x1F:
-                radioPrepTC_HP_OUT_001();
+                radioPrepSingleFloat(0x1F,getSensorDataFloat(sensorTC_HP_OUT_001));
                 break;
             case 0x20:
-                radioPrepV_HP_P_001();
+                radioPrepSingleInt(0x20,getSensorDataInt(sensorV_HP_P_001));
                 break;
             case 0x21:
-                radioPrepV_F_PR_001();
+                radioPrepSingleInt(0x21,getSensorDataInt(sensorV_F_PR_001));
                 break;
             case 0x22:
-                radioPrepPT_F_T_001();
+                radioPrepSingleFloat(0x22,getSensorDataFloat(sensorPT_F_T_001));
                 break;
             case 0x23:
-                radioPrepPT_F_INJ_001();
+                radioPrepSingleFloat(0x23,getSensorDataFloat(sensorPT_F_INJ_001));
                 break;
             case 0x24:
-                radioPrepV_F_F_001();
+                radioPrepSingleInt(0x24,getSensorDataInt(sensorV_F_F_001));
                 break;
             case 0x25:
-                radioPrepPT_F_INJ_001();
+                radioPrepSingleFloat(0x25,getSensorDataFloat(sensorPT_F_INJ_001));
                 break;
             case 0x26:
-                radioPrepV_F_MFV_001();
+                radioPrepSingleInt(0x26,getSensorDataInt(sensorV_F_MFV_001));
                 break;
             case 0x27:
-                radioPrepV_L_PR_001();
+                radioPrepSingleInt(0x27,getSensorDataInt(sensorV_L_PR_001));
                 break;
             case 0x28:
-                radioPrepPT_L_T_001();
+                radioPrepSingleFloat(0x28,getSensorDataFloat(sensorPT_L_T_001));
                 break;
             case 0x29:
-                radioPrepV_L_V_001();
+                radioPrepSingleInt(0x29,getSensorDataInt(sensorV_L_V_001));
                 break;
             case 0x2A:
-                radioPrepTC_L_F_001();
+                radioPrepSingleFloat(0x2A,getSensorDataFloat(sensorTC_L_F_001));
                 break;
             case 0x2B:
-                radioPrepV_L_F_001();
+                radioPrepSingleInt(0x2B,getSensorDataInt(sensorV_L_F_001));
                 break;
             case 0x2C:
-                radioPrepPT_L_INJ_001();
+                radioPrepSingleFloat(0x2C,getSensorDataFloat(sensorPT_L_INJ_001));
                 break;
             case 0x2D:
-                radioPrepV_L_MOV_001();
+                radioPrepSingleInt(0x2D,getSensorDataInt(sensorV_L_MOV_001));
                 break;
             case 0x2E:
-                radioPrepV_L_BLD_001();
+                radioPrepSingleInt(0x2E,getSensorDataInt(sensorV_L_BLD_001));
                 break;
             case 0x2F:
-                radioPrepTC_L_BLD_001();
+                radioPrepSingleFloat(0x2F,getSensorDataFloat(sensorTC_L_BLD_001));
                 break;
             case 0x30:
                 radioPrepDataDump();

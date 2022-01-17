@@ -152,6 +152,6 @@ int main (void){
     RUN_TEST(baseTest_RTOS);
     RUN_TEST(initBufTest_RTOS);
     RUN_TEST(placeAndRecieveTest_RTOS);
-    RUN_TEST(bufferWraparoundTest_RTOS);
+    //RUN_TEST(bufferWraparoundTest_RTOS);
     return UNITY_END();
 }
