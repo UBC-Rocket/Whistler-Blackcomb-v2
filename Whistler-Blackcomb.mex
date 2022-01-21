@@ -52,17 +52,17 @@
                         <data>true</data>
                      </feature>
                   </dependency>
-                  <dependency resourceType="Peripheral" resourceId="UART2" description="Peripheral UART2 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
-                     <feature name="initialized" evaluation="equal">
-                        <data>true</data>
-                     </feature>
-                  </dependency>
                   <dependency resourceType="Peripheral" resourceId="SDHC" description="Peripheral SDHC is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
                      <feature name="initialized" evaluation="equal">
                         <data>true</data>
                      </feature>
                   </dependency>
                   <dependency resourceType="Peripheral" resourceId="CAN1" description="Peripheral CAN1 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
+                     <feature name="initialized" evaluation="equal">
+                        <data>true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="Peripheral" resourceId="UART3" description="Peripheral UART3 is not initialized" problem_level="1" source="Pins:BOARD_InitPins">
                      <feature name="initialized" evaluation="equal">
                         <data>true</data>
                      </feature>
@@ -109,12 +109,6 @@
                         <pin_feature name="identifier" value="IMU_UART_TX"/>
                      </pin_features>
                   </pin>
-                  <pin peripheral="UART2" signal="RX" pin_num="129" pin_signal="PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL">
-                     <pin_features>
-                        <pin_feature name="digital_filter" value="disable"/>
-                     </pin_features>
-                  </pin>
-                  <pin peripheral="UART2" signal="TX" pin_num="130" pin_signal="PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA"/>
                   <pin peripheral="SDHC" signal="CMD" pin_num="4" pin_signal="ADC1_SE7a/PTE3/SPI1_SIN/UART1_RTS_b/SDHC0_CMD/TRACE_D1/SPI1_SOUT">
                      <pin_features>
                         <pin_feature name="pull_select" value="up"/>
@@ -159,6 +153,8 @@
                         <pin_feature name="gpio_init_state" value="true"/>
                      </pin_features>
                   </pin>
+                  <pin peripheral="UART3" signal="RX" pin_num="123" pin_signal="PTC16/CAN1_RX/UART3_RX/ENET0_1588_TMR0/FB_CS5_b/FB_TSIZ1/FB_BE23_16_BLS15_8_b/SDRAM_DQM2"/>
+                  <pin peripheral="UART3" signal="TX" pin_num="124" pin_signal="PTC17/CAN1_TX/UART3_TX/ENET0_1588_TMR1/FB_CS4_b/FB_TSIZ0/FB_BE31_24_BLS7_0_b/SDRAM_DQM3"/>
                </pins>
             </function>
          </functions_list>
@@ -299,12 +295,12 @@
                         <data type="Frequency" unit="Hz">0</data>
                      </feature>
                   </dependency>
-                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="UART2.uart_tx" description="Signal TX of the peripheral UART2 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="UART3.uart_tx" description="Signal TX of the peripheral UART3 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
                      <feature name="routed" evaluation="equal">
                         <data type="Boolean">true</data>
                      </feature>
                   </dependency>
-                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="UART2.uart_rx" description="Signal RX of the peripheral UART2 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="UART3.uart_rx" description="Signal RX of the peripheral UART3 is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
                      <feature name="routed" evaluation="equal">
                         <data type="Boolean">true</data>
                      </feature>
@@ -343,7 +339,7 @@
                         </struct>
                      </config_set>
                   </instance>
-                  <instance name="UART2" uuid="f66b2d9b-0610-4429-9ecd-c3cee94bf6db" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART2" enabled="true" comment="" custom_name_enabled="false">
+                  <instance name="UART3" uuid="61463e9a-e196-450f-a106-bb0a9e3c71a3" type="uart" type_id="uart_88ab1eca0cddb7ee407685775de016d5" mode="polling" peripheral="UART3" enabled="true" comment="" custom_name_enabled="false">
                      <config_set name="uartConfig_t" quick_selection="QuickSelection1">
                         <struct name="uartConfig">
                            <setting name="clockSource" value="BusInterfaceClock"/>

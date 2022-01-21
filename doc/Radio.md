@@ -1,5 +1,16 @@
 # Radio
 
+## XCTU 
+
+To debug you can use [XCTU](https://hub.digi.com/support/products/xctu/), although it's not great. For linux to get it to run properly it will throw some errors, so run these commands and it should work: 
+
+```
+sudo apt-get install libxtst6:i386
+sudo apt install libgtk2.0-0:i386
+```
+
+It's pretty hacky though so it might take some fiddling
+
 ## Project setup
 
 All the radio code is taken from [this](https://github.com/digidotcom/xbee_ansic_library) library, which is a portable ANSIC C library for xbee radios. Our usage of this library essentially consistutes a port for our specific hardware/hal. The code for the library is in the [xbee](../common/xbee) folder. To successfully port this library to our application, several changes had to be made. 

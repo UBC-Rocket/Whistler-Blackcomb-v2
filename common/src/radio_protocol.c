@@ -174,12 +174,12 @@ void GSRadioInit(void)
     if (xTaskCreate(
             outputLoop,
             "radio out controller",
-            50000 / sizeof(StackType_t),
+            2500 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
-        printf("something's fucked!");
+        printf("Radio out failed initialization");
         for (;;)
             ;
     }
@@ -188,36 +188,36 @@ void GSRadioInit(void)
     if (xTaskCreate(
             mandatoryOutput,
             "radio mandatory out controller",
-            50000 / sizeof(StackType_t),
+            2500 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
-        printf("something's fucked!");
+        printf("Radio mandatory out failed initialization");
         for (;;)
             ;
     }
     if (xTaskCreate(
             inputLoop,
             "radio in controller",
-            5000 / sizeof(StackType_t),
+            2500 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
-        printf("something's fucked!");
+        printf("Radio in failed initialization");
         for (;;)
             ;
     }
     if (xTaskCreate(
             dealWithLowMessages,
             "deal with low messages",
-            5000 / sizeof(StackType_t),
+            2500 / sizeof(StackType_t),
             (void *)NULL,
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
-        printf("something's fucked!");
+        printf("Low message failed initialization");
         for (;;)
             ;
     }
@@ -229,7 +229,7 @@ void GSRadioInit(void)
             tskIDLE_PRIORITY + 2,
             (TaskHandle_t *)NULL) != pdPASS)
     {
-        printf("something's fucked!");
+        printf("Crit messages failed initialization");
         for (;;)
             ;
     }
