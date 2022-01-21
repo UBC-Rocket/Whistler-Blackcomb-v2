@@ -465,14 +465,19 @@ static void GpsTask(void *pv) {
 						strlen(gps_intro_message))) {
 			vTaskSuspend(NULL);
 		}
-	char *str = (char *) malloc(10);
-	size_t charNum = 0;
+
+	//char *str = (char *) malloc(10);
+	//size_t charNum = 0;
+
 	FILE * fp;
 	fp = fopen ("file.txt", "w+");
+	double posx, posy, posz, velx, vely, velz;
+	float stdposx, stdposy, stdposz, stdvelx, stdvely, stdvelz, vlatency;
+	char baseID[4];
 	do {
 		uint8_t buffer;
 		uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-		int fputc(buffer, FILE *fp );
+		int fputc(buffer, fp);
 
 		/*
 		if (charNum >= strlen(str)) {
@@ -485,7 +490,10 @@ static void GpsTask(void *pv) {
 
 	} while (kStatus_Success == uart_error);
 	rewind(fp);
-	fscanf(fp, "",);
+
+	//BESTXYZ
+	fscanf(fp, "%s %d %d %lf %lf %lf %f %f %f $d $d %lf %lf %lf %f %f %f %s %f", );
+
 	uartDeinit(&hal_uart_gps);
 	vTaskSuspend(NULL);
 }
