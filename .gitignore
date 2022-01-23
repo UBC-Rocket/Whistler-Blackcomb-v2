@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 data/logs/*.txt
 data/logs/*.csv
-=======
-data/logs/
->>>>>>> parent of 70ca9bf... Revert "Merge branch 'master' into SIM-Handshake"
 
 *.opendb
 *.DS_Store
@@ -25,6 +21,7 @@ local.properties
 .loadpath
 .recommenders
 *.launch
+*.su
 
 
 # Build folders
