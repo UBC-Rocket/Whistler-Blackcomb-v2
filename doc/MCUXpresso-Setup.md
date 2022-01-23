@@ -95,8 +95,12 @@ Click File->Import, select Git->Projects from Git (with smart import) and select
 <img width="611" alt="image" src="https://user-images.githubusercontent.com/24193569/136500769-1f268bf3-a5f0-4eb2-acee-45bc02e775d4.png">
 
 
-3. After closing the welcome screen, "Import a Project from file system." You can copy the project into the workspace but that's optional.
-4. You will know it's correctly working if you can see all of our Whistler Blackcomb source files in the Project Explorer.
+3. Close the welcome screen by clicking "IDE".
+
+![image](https://user-images.githubusercontent.com/69891140/150701579-c6098a3d-fdb6-42ea-a821-bd6773f69051.png)
+
+4. Then, select "Import a Project from file system." You can copy the project into the workspace but that's optional.
+5. You will know it's correctly working if you can see all of our Whistler Blackcomb source files in the Project Explorer.
 
 <img width="611" alt="image" src="https://user-images.githubusercontent.com/24193569/136500504-34572f9d-e98c-4dd1-9303-1a3c53e5976d.png">
 
@@ -107,8 +111,13 @@ If you get an error saying "Some projects cannot be imported because they alread
 
 Ensure that any changes you make to files shared by x86 and our Board compile without errors by doing a Build in MCUXpresso. This compiles for the Board enviroment instead of the x86 environment we build for in VSCode.
 
-<img width="722" alt="image" src="https://user-images.githubusercontent.com/24193569/137638808-2ae35c65-1d96-437e-aa6a-dd7e8e4c698b.png">
+You should select "Whistler-Blackcomb" (or a file within it) on the Project Explorer (if not visible, select Window -> Show View -> Project Explorer):
 
+![Screenshot 2022-01-23 145202](https://user-images.githubusercontent.com/69891140/150701377-fb3e03b4-80b1-4e9b-a4e3-5603686c0813.png)
+
+And then click build in the Quickstart Panel.
+
+![image](https://user-images.githubusercontent.com/69891140/150701314-b1eb8c10-8001-421c-ab47-ec9ce063dec1.png)
 
 # Pin Configuration View:
 To be able to configure the pins on the MK66F you press the button that has the little green plus mark on it to add a new view to the workspace:
