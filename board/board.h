@@ -78,10 +78,10 @@ void BOARD_InitDebugConsole(void);
 #define IMU_UART_RX_TX_IRQn UART0_RX_TX_IRQn
 
 /* FreeRTOS UART Radio */
-#define RADIO_UART            UART2
+#define RADIO_UART            UART3
 #define RADIO_UART_CLKSRC     SYS_CLK
 #define RADIO_UART_CLK_FREQ   CLOCK_GetFreq(SYS_CLK)
-#define RADIO_UART_RX_TX_IRQn UART2_RX_TX_IRQn
+#define RADIO_UART_RX_TX_IRQn UART3_RX_TX_IRQn
 
 #define CAN_CLK_SOURCE (kFLEXCAN_ClkSrc1)
 #define CAN_CLK_FREQ   CLOCK_GetFreq(kCLOCK_BusClk)
