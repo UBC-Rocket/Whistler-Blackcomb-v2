@@ -29,30 +29,30 @@ void baseTest_RTOS(void){
 void packetPlaceTest(void *pv){
 	radioPrepPing();
 	radioPrepMessage("Hello World!",12);
-    radioPrepEvent(15); //this is literally a random number. It could be anything you want
+    radioPrepEvent(15); //this is literally a random number. It could be anything you want!
 	radioPrepConfig();
 	radioPrepGPS();
 	radioPrepState();
 	radioPrepOrientation();
 	radioPrepAccel();
-	radioPrepPT_HP_T_001();
-	radioPrepTC_HP_OUT_001();
-	radioPrepV_HP_P_001();
-	radioPrepV_F_PR_001();
-	radioPrepV_F_V_001();
-	radioPrepPT_F_T_001();
-	radioPrepV_F_F_001();
-	radioPrepPT_F_INJ_001();
-	radioPrepV_F_MFV_001();
-	radioPrepV_L_PR_001();
-	radioPrepPT_L_T_001();
-	radioPrepV_L_V_001();
-	radioPrepTC_L_F_001();
-	radioPrepV_L_F_001();
-	radioPrepPT_L_INJ_001();
-	radioPrepV_L_MOV_001();
-	radioPrepV_L_BLD_001();
-	radioPrepTC_L_BLD_001();
+	radioPrepSingleFloat(0x1E, getSensorDataFloat(sensorPT_HP_T_001));
+    radioPrepSingleFloat(0x1F,getSensorDataFloat(sensorTC_HP_OUT_001));
+    radioPrepSingleInt(0x20,getSensorDataInt(sensorV_HP_P_001));
+    radioPrepSingleInt(0x21,getSensorDataInt(sensorV_F_PR_001));
+    radioPrepSingleFloat(0x22,getSensorDataFloat(sensorPT_F_T_001));
+    radioPrepSingleFloat(0x23,getSensorDataFloat(sensorPT_F_INJ_001));
+    radioPrepSingleInt(0x24,getSensorDataInt(sensorV_F_F_001));
+    radioPrepSingleFloat(0x25,getSensorDataFloat(sensorPT_F_INJ_001));
+    radioPrepSingleInt(0x26,getSensorDataInt(sensorV_F_MFV_001));
+    radioPrepSingleInt(0x27,getSensorDataInt(sensorV_L_PR_001));
+    radioPrepSingleFloat(0x28,getSensorDataFloat(sensorPT_L_T_001));
+    radioPrepSingleInt(0x29,getSensorDataInt(sensorV_L_V_001));
+    radioPrepSingleFloat(0x2A,getSensorDataFloat(sensorTC_L_F_001));
+    radioPrepSingleInt(0x2B,getSensorDataInt(sensorV_L_F_001));
+    radioPrepSingleFloat(0x2C,getSensorDataFloat(sensorPT_L_INJ_001));
+    radioPrepSingleInt(0x2D,getSensorDataInt(sensorV_L_MOV_001));
+    radioPrepSingleInt(0x2E,getSensorDataInt(sensorV_L_BLD_001));
+    radioPrepSingleFloat(0x2F,getSensorDataFloat(sensorTC_L_BLD_001));
 	radioPrepDataDump();
     vTaskEndScheduler();
     
