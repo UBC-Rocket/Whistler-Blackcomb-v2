@@ -25,7 +25,6 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
-#define PORT_DFER_DFE_2_MASK 0x04u     /*!<@brief Digital Filter Enable Mask for item 2. */
 #define SOPT5_UART0TXSRC_UART_TX 0x00u /*!<@brief UART 0 transmit data source select: UART0_TX pin */
 #define SOPT5_UART1TXSRC_UART_TX 0x00u /*!<@brief UART 1 transmit data source select: UART1_TX pin */
 
@@ -77,24 +76,6 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_IMU_UART_TX_PIN 4U                   /*!<@brief PORT pin number */
 #define BOARD_INITPINS_IMU_UART_TX_PIN_MASK (1U << 4U)      /*!<@brief PORT pin mask */
                                                             /* @} */
-
-/*! @name PORTD2 (number 129), RADIO_UART_RX
-  @{ */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_RADIO_UART_RX_PORT PORTD               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_RADIO_UART_RX_PIN 2U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_RADIO_UART_RX_PIN_MASK (1U << 2U)      /*!<@brief PORT pin mask */
-                                                              /* @} */
-
-/*! @name PORTD3 (number 130), RADIO_UART_TX
-  @{ */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_RADIO_UART_TX_PORT PORTD               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_RADIO_UART_TX_PIN 3U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_RADIO_UART_TX_PIN_MASK (1U << 3U)      /*!<@brief PORT pin mask */
-                                                              /* @} */
 
 /*! @name PORTE26 (number 47), CAN1_STBN
   @{ */

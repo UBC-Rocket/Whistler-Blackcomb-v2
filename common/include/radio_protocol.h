@@ -12,9 +12,9 @@
 #include "variables.h"
 #include "state_machine.h"
 
-xbee_dev_t radio; //These might have more descriptive names in the future.
+extern xbee_dev_t radio; //These might have more descriptive names in the future.
 
-xbee_serial_t serial;
+extern xbee_serial_t serial;
 
 
 

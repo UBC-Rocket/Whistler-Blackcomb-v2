@@ -52,8 +52,6 @@ BOARD_InitPins:
   - {pin_num: '96', peripheral: UART0, signal: TX, pin_signal: TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1, identifier: DEBUG_UART_RX}
   - {pin_num: '106', peripheral: UART1, signal: RX, pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, identifier: IMU_UART_RX}
   - {pin_num: '109', peripheral: UART1, signal: TX, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, identifier: IMU_UART_TX}
-  - {pin_num: '129', peripheral: UART2, signal: RX, pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, digital_filter: disable}
-  - {pin_num: '130', peripheral: UART2, signal: TX, pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA}
   - {pin_num: '4', peripheral: SDHC, signal: CMD, pin_signal: ADC1_SE7a/PTE3/SPI1_SIN/UART1_RTS_b/SDHC0_CMD/TRACE_D1/SPI1_SOUT, pull_select: up, pull_enable: enable}
   - {pin_num: '2', peripheral: SDHC, signal: 'DATA, 0', pin_signal: ADC1_SE5a/PTE1/LLWU_P0/SPI1_SOUT/UART1_RX/SDHC0_D0/TRACE_D3/I2C1_SCL/SPI1_SIN, pull_select: up,
     pull_enable: enable}
@@ -65,6 +63,8 @@ BOARD_InitPins:
   - {pin_num: '45', peripheral: CAN1, signal: TX, pin_signal: ADC0_SE17/PTE24/CAN1_TX/UART4_TX/I2C0_SCL/EWM_OUT_b}
   - {pin_num: '46', peripheral: CAN1, signal: RX, pin_signal: ADC0_SE18/PTE25/LLWU_P21/CAN1_RX/UART4_RX/I2C0_SDA/EWM_IN}
   - {pin_num: '47', peripheral: GPIOE, signal: 'GPIO, 26', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, direction: OUTPUT, gpio_init_state: 'true'}
+  - {pin_num: '123', peripheral: UART3, signal: RX, pin_signal: PTC16/CAN1_RX/UART3_RX/ENET0_1588_TMR0/FB_CS5_b/FB_TSIZ1/FB_BE23_16_BLS15_8_b/SDRAM_DQM2}
+  - {pin_num: '124', peripheral: UART3, signal: TX, pin_signal: PTC17/CAN1_TX/UART3_TX/ENET0_1588_TMR1/FB_CS4_b/FB_TSIZ0/FB_BE31_24_BLS7_0_b/SDRAM_DQM3}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -81,8 +81,6 @@ void BOARD_InitPins(void)
     CLOCK_EnableClock(kCLOCK_PortB);
     /* Port C Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortC);
-    /* Port D Clock Gate Control: Clock enabled */
-    CLOCK_EnableClock(kCLOCK_PortD);
     /* Port E Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortE);
 
@@ -106,6 +104,12 @@ void BOARD_InitPins(void)
     /* PORTB17 (pin 96) is configured as UART0_TX */
     PORT_SetPinMux(BOARD_INITPINS_DEBUG_UART_RX_PORT, BOARD_INITPINS_DEBUG_UART_RX_PIN, kPORT_MuxAlt3);
 
+    /* PORTC16 (pin 123) is configured as UART3_RX */
+    PORT_SetPinMux(PORTC, 16U, kPORT_MuxAlt3);
+
+    /* PORTC17 (pin 124) is configured as UART3_TX */
+    PORT_SetPinMux(PORTC, 17U, kPORT_MuxAlt3);
+
     /* PORTC3 (pin 106) is configured as UART1_RX */
     PORT_SetPinMux(BOARD_INITPINS_IMU_UART_RX_PORT, BOARD_INITPINS_IMU_UART_RX_PIN, kPORT_MuxAlt3);
 
@@ -114,20 +118,6 @@ void BOARD_InitPins(void)
 
     /* PORTC5 (pin 110) is configured as PTC5 */
     PORT_SetPinMux(BOARD_INITPINS_LED_BUILTIN_PORT, BOARD_INITPINS_LED_BUILTIN_PIN, kPORT_MuxAsGpio);
-    /* Configure digital filter */
-    PORT_EnablePinsDigitalFilter(
-        /* Digital filter is configured on port D */
-        PORTD,
-        /* Digital filter is configured for PORTD0 */
-        PORT_DFER_DFE_2_MASK,
-        /* Disable digital filter */
-        false);
-
-    /* PORTD2 (pin 129) is configured as UART2_RX */
-    PORT_SetPinMux(BOARD_INITPINS_RADIO_UART_RX_PORT, BOARD_INITPINS_RADIO_UART_RX_PIN, kPORT_MuxAlt3);
-
-    /* PORTD3 (pin 130) is configured as UART2_TX */
-    PORT_SetPinMux(BOARD_INITPINS_RADIO_UART_TX_PORT, BOARD_INITPINS_RADIO_UART_TX_PIN, kPORT_MuxAlt3);
 
     /* PORTE0 (pin 1) is configured as SDHC0_D1 */
     PORT_SetPinMux(PORTE, 0U, kPORT_MuxAlt4);

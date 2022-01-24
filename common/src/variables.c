@@ -1,6 +1,7 @@
 #include "variables.h"
 
-/* I feel bad about this code. It is bad and sad and makes me mad. Sorry.*/
+
+stateInput_t stateTransitionInput = {0};
 
 struct sensorStatus_s{
     uint8_t status[0x2F]; 

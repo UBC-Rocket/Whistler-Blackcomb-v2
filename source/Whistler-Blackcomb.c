@@ -105,11 +105,6 @@ float tc_data[sizeof(tc_names)];
 float pt_data[sizeof(pt_names)];
 
 /*******************************************************************************
- * State Transition Variables
- ******************************************************************************/
-
-
-/*******************************************************************************
  * Main
  ******************************************************************************/
 int main(void) {
@@ -370,9 +365,14 @@ static void RadioTask(void *pv) {
 	while (1) {
 		int len = radioReceive(&radio, packet);
 
-		if (len > 0) {
-			radioTxRequest(&radio, packet, len);
-		}
+		printf("%d, %s\n", len, packet);
+
+//		if (len > 0) {
+		packet[0] = 42;
+		packet[1] = '\n';
+		len = 2;
+		radioTxRequest(&radio, packet, len);
+//		}
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
@@ -445,6 +445,6 @@ static void CanTask(void *pv) {
 
 static void startGSRadioTask(void *pv){
 	//vTaskDelay(pdMS_TO_TICKS(3000));
-	GSRadioInit();
+//	GSRadioInit();
 	vTaskSuspend(NULL);
 }
