@@ -58,6 +58,7 @@
 #define log_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define state_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define can_task_PRIORITY (configMAX_PRIORITIES - 1)
+#define spi_task_PRIORITY (configMAX_PRIORITIES - 1)
 
 /*******************************************************************************
  * Prototypes
@@ -69,6 +70,7 @@ static void LogTask(void *pv);
 static void StateTask(void *pv);
 static void CanTask(void *pv);
 static void startGSRadioTask(void *pv);
+static void SpiTask(void *pv);
 
 /*******************************************************************************
  * UART Variables
@@ -190,6 +192,16 @@ int main(void) {
 	can_task_PRIORITY,
 	NULL)) != pdPASS) {
 		printf("Task init failed: %d\n", error);
+		for (;;)
+			;
+	}
+
+	if ((error = xTaskCreate(SpiTask, "SPI Task",
+	configMINIMAL_STACK_SIZE + 500,
+	NULL,
+	spi_task_PRIORITY,
+	NULL)) != pdPASS) {
+		printf("SPI Task init failed: %ld\n", error);
 		for (;;)
 			;
 	}
@@ -446,5 +458,10 @@ static void CanTask(void *pv) {
 static void startGSRadioTask(void *pv){
 	//vTaskDelay(pdMS_TO_TICKS(3000));
 //	GSRadioInit();
+	vTaskSuspend(NULL);
+}
+
+static void SpiTask(void *pv) {
+	printf("hi");
 	vTaskSuspend(NULL);
 }
