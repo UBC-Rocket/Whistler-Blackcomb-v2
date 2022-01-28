@@ -74,7 +74,7 @@ package() {
 
 2. Chip SDK
 
-Go to [here](https://mcuxpresso.nxp.com/download/78d26642c8a4ca1efecebe0f36145702) and download it. If that doesn't work for some reason you can also get the SDK package yourself [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
+Go to [here](https://mcuxpresso.nxp.com/download/9ba397a99467670531f186cddcf1b1a4) and download it. If that doesn't work for some reason you can also get the SDK package yourself [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
 
 ![](images/SDKSelect.png)
 ![](images/SDKDownload.png)
