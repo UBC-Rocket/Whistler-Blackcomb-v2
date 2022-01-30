@@ -75,7 +75,7 @@ static void GpsTask(void *pv);
  * UART Variables
  ******************************************************************************/
 const char *debug_intro_message = "";
-const char *gps_intro_message = "log com1 loglist\r\n";
+const char *gps_message = "log bestxyza ontime 1\r\n";
 const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
@@ -456,13 +456,13 @@ static void GpsTask(void *pv) {
 	size_t size = 0;
 	int uart_error;
 
-	uartConfig(&hal_uart_gps, GPS_UART, 9600);
+	uartConfig(&hal_uart_gps, GPS_UART, 19200);
 	if (kStatus_Success != uartInit(&hal_uart_gps)) {
 		vTaskSuspend(NULL);
 	}
 	if (kStatus_Success
-			!= uartSend(&hal_uart_gps, (uint8_t*) gps_intro_message,
-						strlen(gps_intro_message))) {
+			!= uartSend(&hal_uart_gps, (uint8_t*) gps_message,
+						strlen(gps_message))) {
 			vTaskSuspend(NULL);
 		}
 
@@ -470,14 +470,17 @@ static void GpsTask(void *pv) {
 	//size_t charNum = 0;
 
 	FILE * fp;
-	fp = fopen ("file.txt", "w+");
+	//fp = fopen ("file.txt", "w+");
 	double posx, posy, posz, velx, vely, velz;
 	float stdposx, stdposy, stdposz, stdvelx, stdvely, stdvelz, vlatency;
 	char baseID[4];
+	char heading[10];
+	int enum1, enum2, enum3, enum4;
+
 	do {
 		uint8_t buffer;
 		uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-		int fputc(buffer, fp);
+		//int fputc(int buffer, FILE *fp);
 
 		/*
 		if (charNum >= strlen(str)) {
@@ -489,11 +492,14 @@ static void GpsTask(void *pv) {
 		//charNum++;
 
 	} while (kStatus_Success == uart_error);
-	rewind(fp);
+	//rewind(fp);
 
 	//BESTXYZ
-	fscanf(fp, "%s %d %d %lf %lf %lf %f %f %f $d $d %lf %lf %lf %f %f %f %s %f", );
+	fscanf(fp, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
+			heading, &enum1, &enum2, &posx, &posy, &posz, &stdposx, &stdposy, &stdposz,
+			&enum3, &enum4, &velx, &vely, &velz, &stdvelx, &stdvely, &stdvelz, baseID, &vlatency);
 
+	fclose(fp);
 	uartDeinit(&hal_uart_gps);
 	vTaskSuspend(NULL);
 }
