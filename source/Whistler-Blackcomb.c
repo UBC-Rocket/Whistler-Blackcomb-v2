@@ -25,6 +25,13 @@
 #include "timers.h"
 #include "variables.h"
 
+/* FreeRTOS DSPI includes */
+#include "fsl_device_registers.h"
+#include "fsl_debug_console.h"
+#include "fsl_dspi.h"
+#include "fsl_dspi_freertos.h"
+#include "fsl_gpio.h"
+
 /* Includes common between MCU and x86 */
 #include "state_machine.h"
 #include "IMU_interpret.h"
@@ -42,6 +49,7 @@
 /* Radio Stuff */
 #include "xbee/wpan.h"
 #include "radio.h"
+
 
 /*******************************************************************************
  * Definitions
@@ -462,9 +470,38 @@ static void startGSRadioTask(void *pv){
 }
 
 static void SpiTask(void *pv) {
-	while(true) {
-		vTaskDelay(pdMS_TO_TICKS(3000));
-		printf("hi");
-	}
-	vTaskSuspend(NULL);
+    dspi_transfer_t masterXfer;
+    dspi_rtos_handle_t master_rtos_handle;
+    dspi_master_config_t masterConfig;
+    uint32_t sourceClock;
+    status_t status;
+
+    DSPI_MasterGetDefaultConfig(&masterConfig);
+
+    sourceClock = DSPI_MASTER_CLK_FREQ;
+    status      = DSPI_RTOS_Init(&master_rtos_handle, EXAMPLE_DSPI_MASTER_BASEADDR, &masterConfig, sourceClock);
+
+    if (status != kStatus_Success)
+    {
+        PRINTF("DSPI master: error during initialization. \r\n");
+        vTaskSuspend(NULL);
+    }
+    /*Start master transfer*/
+    masterXfer.txData      = masterSendBuffer;
+    masterXfer.rxData      = masterReceiveBuffer;
+    masterXfer.dataSize    = TRANSFER_SIZE;
+    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0 | kDSPI_MasterPcsContinuous;
+
+    status = DSPI_RTOS_Transfer(&master_rtos_handle, &masterXfer);
+
+    if (status == kStatus_Success)
+    {
+        PRINTF("DSPI master transfer completed successfully. \r\n\r\n");
+    }
+    else
+    {
+        PRINTF("DSPI master transfer completed with error. \r\n\r\n");
+    }
+
+    vTaskSuspend(NULL);
 }
