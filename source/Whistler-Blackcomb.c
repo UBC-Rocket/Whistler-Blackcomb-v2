@@ -59,6 +59,17 @@
 #define PI acos(-1)
 #define EVER ;;
 
+/* SPI Constants */
+#define EXAMPLE_DSPI_MASTER_BASE (SPI1_BASE)
+#define EXAMPLE_DSPI_MASTER_IRQN (SPI1_IRQn)
+#define DSPI_MASTER_CLK_SRC      (DSPI1_CLK_SRC)
+#define DSPI_MASTER_CLK_FREQ     CLOCK_GetFreq((DSPI1_CLK_SRC))
+#define EXAMPLE_DSPI_MASTER_BASEADDR ((SPI_Type *)EXAMPLE_DSPI_MASTER_BASE)
+#define TRANSFER_SIZE     (2)     /*! Transfer size */
+#define TRANSFER_BAUDRATE (500000U) /*! Transfer baudrate - 500k */
+uint8_t masterReceiveBuffer[TRANSFER_SIZE] = {0};
+uint8_t masterSendBuffer[TRANSFER_SIZE]    = {0};
+
 /* Task priorities. Will update once more finalized */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
