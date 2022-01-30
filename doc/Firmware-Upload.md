@@ -20,7 +20,7 @@ So you've written code and now you want to put it on the board. How do you do th
 
 5. To power on the Board, there should be wires soldered on as seen in the diagram below. Connect +3.3V to the red wire soldered at GPIO, and GND to the wire soldered in CAN. IGNORE the red wire in CAN.
 
-![image](https://user-images.githubusercontent.com/69891140/151716661-fed5ea0e-5f88-402a-bd0f-5ab0f4b613d9.png)
+![image](https://user-images.githubusercontent.com/69891140/151717244-1f1ae573-186e-41f7-983d-1e57107b741c.png)
 
 6. In MCUXpresso, in the Quickstart panel, click "Debug".
 
