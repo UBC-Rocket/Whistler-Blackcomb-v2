@@ -197,7 +197,7 @@ int main(void) {
 	}
 
 	if ((error = xTaskCreate(SpiTask, "SPI Task",
-	configMINIMAL_STACK_SIZE + 500,
+	configMINIMAL_STACK_SIZE + 100,
 	NULL,
 	spi_task_PRIORITY,
 	NULL)) != pdPASS) {
@@ -462,6 +462,9 @@ static void startGSRadioTask(void *pv){
 }
 
 static void SpiTask(void *pv) {
-	printf("hi");
+	while(true) {
+		vTaskDelay(pdMS_TO_TICKS(3000));
+		printf("hi");
+	}
 	vTaskSuspend(NULL);
 }
