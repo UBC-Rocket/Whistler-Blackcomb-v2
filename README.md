@@ -45,11 +45,12 @@ All documentation is currently kept in the [doc/](doc/) directory. Note that alt
 
 ### Firmware Concept Guides
 
-1. Miscellaneous bugs and unexpected interactions that you want to warn people about should go in this [list](doc/Misc-Bugs.md). 
-2. How continuous integration works and how to access ours in this [guide](doc/Continuous-Integration.md). 
-3. FreeRTOS installation and usage [guide](doc/RTOS-Basics.md).
-4. Radio system [guide](doc/Radio.md). 
-5. CAN communication [guide](doc/CAN.md)
+1. Uploading code from MCUXpresso to our board [guide](doc/Firmware-Upload.md)
+2. Miscellaneous bugs and unexpected interactions that you want to warn people about should go in this [list](doc/Misc-Bugs.md). 
+3. How continuous integration works and how to access ours in this [guide](doc/Continuous-Integration.md). 
+4. FreeRTOS installation and usage [guide](doc/RTOS-Basics.md).
+5. Radio system [guide](doc/Radio.md). 
+6. CAN communication [guide](doc/CAN.md)
 
 ### Legacy Functionality
 
