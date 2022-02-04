@@ -31,6 +31,7 @@
                <pin_label pin_num="129" pin_signal="PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL" label="RADIO_UART_RX" identifier="RADIO_UART_RX"/>
                <pin_label pin_num="130" pin_signal="PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA" label="RADIO_UART_TX" identifier="RADIO_UART_TX"/>
                <pin_label pin_num="47" pin_signal="PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN" label="CAN1_STBN" identifier="CAN1_STBN"/>
+               <pin_label pin_num="113" pin_signal="ADC1_SE4b/CMP0_IN2/PTC8/FTM3_CH4/I2S0_MCLK/FB_AD7/SDRAM_A15" label="LED_RGBBUILTIN" identifier="LED_BUILTIN"/>
             </pin_labels>
          </pins_profile>
          <functions_list>
@@ -84,11 +85,6 @@
                   </dependency>
                </dependencies>
                <pins>
-                  <pin peripheral="GPIOC" signal="GPIO, 5" pin_num="110" pin_signal="PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2">
-                     <pin_features>
-                        <pin_feature name="direction" value="OUTPUT"/>
-                     </pin_features>
-                  </pin>
                   <pin peripheral="UART0" signal="RX" pin_num="95" pin_signal="TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0">
                      <pin_features>
                         <pin_feature name="identifier" value="DEBUG_UART_TX"/>
@@ -155,6 +151,7 @@
                   </pin>
                   <pin peripheral="UART3" signal="RX" pin_num="123" pin_signal="PTC16/CAN1_RX/UART3_RX/ENET0_1588_TMR0/FB_CS5_b/FB_TSIZ1/FB_BE23_16_BLS15_8_b/SDRAM_DQM2"/>
                   <pin peripheral="UART3" signal="TX" pin_num="124" pin_signal="PTC17/CAN1_TX/UART3_TX/ENET0_1588_TMR1/FB_CS4_b/FB_TSIZ0/FB_BE31_24_BLS7_0_b/SDRAM_DQM3"/>
+                  <pin peripheral="GPIOC" signal="GPIO, 8" pin_num="113" pin_signal="ADC1_SE4b/CMP0_IN2/PTC8/FTM3_CH4/I2S0_MCLK/FB_AD7/SDRAM_A15"/>
                </pins>
             </function>
          </functions_list>
