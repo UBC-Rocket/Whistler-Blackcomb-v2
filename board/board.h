@@ -86,6 +86,9 @@ void BOARD_InitDebugConsole(void);
 #define CAN_CLK_SOURCE (kFLEXCAN_ClkSrc1)
 #define CAN_CLK_FREQ   CLOCK_GetFreq(kCLOCK_BusClk)
 
+/* DSPI Constants */
+//TODO
+
 #endif /* _BOARD_H_ */
 
 

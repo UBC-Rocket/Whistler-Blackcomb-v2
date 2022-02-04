@@ -26,20 +26,6 @@ extern "C" {
 void BOARD_InitBootPins(void);
 
 #define SOPT5_UART0TXSRC_UART_TX 0x00u /*!<@brief UART 0 transmit data source select: UART0_TX pin */
-#define SOPT5_UART1TXSRC_UART_TX 0x00u /*!<@brief UART 1 transmit data source select: UART1_TX pin */
-
-/*! @name PORTC5 (number 110), LED_RGBBUILTIN
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LED_BUILTIN_GPIO GPIOC               /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LED_BUILTIN_GPIO_PIN_MASK (1U << 5U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LED_BUILTIN_PORT PORTC               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LED_BUILTIN_PIN 5U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LED_BUILTIN_PIN_MASK (1U << 5U)      /*!<@brief PORT pin mask */
-                                                            /* @} */
 
 /*! @name PORTB16 (number 95), DEBUG_UART_RX
   @{ */
@@ -59,24 +45,6 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_DEBUG_UART_RX_PIN_MASK (1U << 17U)      /*!<@brief PORT pin mask */
                                                                /* @} */
 
-/*! @name PORTC3 (number 106), IMU_UART_TX
-  @{ */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_IMU_UART_RX_PORT PORTC               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_IMU_UART_RX_PIN 3U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_IMU_UART_RX_PIN_MASK (1U << 3U)      /*!<@brief PORT pin mask */
-                                                            /* @} */
-
-/*! @name PORTC4 (number 109), IMU_UART_RX
-  @{ */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_IMU_UART_TX_PORT PORTC               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_IMU_UART_TX_PIN 4U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_IMU_UART_TX_PIN_MASK (1U << 4U)      /*!<@brief PORT pin mask */
-                                                            /* @} */
-
 /*! @name PORTE26 (number 47), CAN1_STBN
   @{ */
 
@@ -88,6 +56,37 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_CAN1_STBN_PORT PORTE                /*!<@brief PORT peripheral base pointer */
 #define BOARD_INITPINS_CAN1_STBN_PIN 26U                   /*!<@brief PORT pin number */
 #define BOARD_INITPINS_CAN1_STBN_PIN_MASK (1U << 26U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
+
+/*! @name PORTC8 (number 113), LED_RGBBUILTIN
+  @{ */
+
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_LED_BUILTIN_PIN_GPIO GPIOC               /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITPINS_LED_BUILTIN_PIN_GPIO_PIN_MASK (1U << 8U) /*!<@brief GPIO pin mask */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_LED_BUILTIN_PIN_PORT PORTC               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_LED_BUILTIN_PIN_PIN 8U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_LED_BUILTIN_PIN_PIN_MASK (1U << 8U)      /*!<@brief PORT pin mask */
+                                                                /* @} */
+
+/*! @name PORTC6 (number 111), SPI0_MOSI0
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_SPI0_MOSI0_PORT PORTC               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_SPI0_MOSI0_PIN 6U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_SPI0_MOSI0_PIN_MASK (1U << 6U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
+
+/*! @name PORTC7 (number 112), SPI0_MISO0
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_SPI0_MISO0_PORT PORTC               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_SPI0_MISO0_PIN 7U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_SPI0_MISO0_PIN_MASK (1U << 7U)      /*!<@brief PORT pin mask */
                                                            /* @} */
 
 /*!

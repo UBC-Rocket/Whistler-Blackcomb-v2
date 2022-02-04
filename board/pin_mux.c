@@ -13,14 +13,17 @@ package_id: MK66FX1M0VLQ18
 mcu_data: ksdk2_0
 processor_version: 8.0.1
 pin_labels:
-- {pin_num: '110', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2, label: LED_RGBBUILTIN, identifier: LED_BUILTIN}
+- {pin_num: '110', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2, label: SPI0_SCK0, identifier: SPI0_SCK0}
 - {pin_num: '95', pin_signal: TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0, label: DEBUG_UART_RX, identifier: DEBUG_UART_RX;DEBUG_UART_TX}
 - {pin_num: '96', pin_signal: TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1, label: DEBUG_UART_TX, identifier: DEBUG_UART_TX;DEBUG_UART_RX}
-- {pin_num: '106', pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, label: IMU_UART_TX, identifier: IMU_UART_TX;IMU_UART_RX}
+- {pin_num: '106', pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, label: SPI_CS0b, identifier: SPI_CS0b}
 - {pin_num: '109', pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, label: IMU_UART_RX, identifier: IMU_UART_RX;IMU_UART_TX}
 - {pin_num: '129', pin_signal: PTD2/LLWU_P13/SPI0_SOUT/UART2_RX/FTM3_CH2/FB_AD4/SDRAM_A12/I2C0_SCL, label: RADIO_UART_RX, identifier: RADIO_UART_RX}
 - {pin_num: '130', pin_signal: PTD3/SPI0_SIN/UART2_TX/FTM3_CH3/FB_AD3/SDRAM_A11/I2C0_SDA, label: RADIO_UART_TX, identifier: RADIO_UART_TX}
 - {pin_num: '47', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, label: CAN1_STBN, identifier: CAN1_STBN}
+- {pin_num: '113', pin_signal: ADC1_SE4b/CMP0_IN2/PTC8/FTM3_CH4/I2S0_MCLK/FB_AD7/SDRAM_A15, label: LED_RGBBUILTIN, identifier: LED_BUILTIN_PIN}
+- {pin_num: '111', pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_SOUT/PDB0_EXTRG/I2S0_RX_BCLK/FB_AD9/SDRAM_A17/I2S0_MCLK, label: SPI0_MOSI0, identifier: SPI0_MOSI0}
+- {pin_num: '112', pin_signal: CMP0_IN1/PTC7/SPI0_SIN/USB0_SOF_OUT/I2S0_RX_FS/FB_AD8/SDRAM_A16, label: SPI0_MISO0, identifier: SPI0_MISO0}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -47,11 +50,8 @@ void BOARD_InitBootPins(void)
 BOARD_InitPins:
 - options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
 - pin_list:
-  - {pin_num: '110', peripheral: GPIOC, signal: 'GPIO, 5', pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2, direction: OUTPUT}
   - {pin_num: '95', peripheral: UART0, signal: RX, pin_signal: TSI0_CH9/PTB16/SPI1_SOUT/UART0_RX/FTM_CLKIN0/FB_AD17/SDRAM_D17/EWM_IN/TPM_CLKIN0, identifier: DEBUG_UART_TX}
   - {pin_num: '96', peripheral: UART0, signal: TX, pin_signal: TSI0_CH10/PTB17/SPI1_SIN/UART0_TX/FTM_CLKIN1/FB_AD16/SDRAM_D16/EWM_OUT_b/TPM_CLKIN1, identifier: DEBUG_UART_RX}
-  - {pin_num: '106', peripheral: UART1, signal: RX, pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, identifier: IMU_UART_RX}
-  - {pin_num: '109', peripheral: UART1, signal: TX, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT, identifier: IMU_UART_TX}
   - {pin_num: '4', peripheral: SDHC, signal: CMD, pin_signal: ADC1_SE7a/PTE3/SPI1_SIN/UART1_RTS_b/SDHC0_CMD/TRACE_D1/SPI1_SOUT, pull_select: up, pull_enable: enable}
   - {pin_num: '2', peripheral: SDHC, signal: 'DATA, 0', pin_signal: ADC1_SE5a/PTE1/LLWU_P0/SPI1_SOUT/UART1_RX/SDHC0_D0/TRACE_D3/I2C1_SCL/SPI1_SIN, pull_select: up,
     pull_enable: enable}
@@ -65,6 +65,12 @@ BOARD_InitPins:
   - {pin_num: '47', peripheral: GPIOE, signal: 'GPIO, 26', pin_signal: PTE26/ENET_1588_CLKIN/UART4_CTS_b/RTC_CLKOUT/USB0_CLKIN, direction: OUTPUT, gpio_init_state: 'true'}
   - {pin_num: '123', peripheral: UART3, signal: RX, pin_signal: PTC16/CAN1_RX/UART3_RX/ENET0_1588_TMR0/FB_CS5_b/FB_TSIZ1/FB_BE23_16_BLS15_8_b/SDRAM_DQM2}
   - {pin_num: '124', peripheral: UART3, signal: TX, pin_signal: PTC17/CAN1_TX/UART3_TX/ENET0_1588_TMR1/FB_CS4_b/FB_TSIZ0/FB_BE31_24_BLS7_0_b/SDRAM_DQM3}
+  - {pin_num: '113', peripheral: GPIOC, signal: 'GPIO, 8', pin_signal: ADC1_SE4b/CMP0_IN2/PTC8/FTM3_CH4/I2S0_MCLK/FB_AD7/SDRAM_A15}
+  - {pin_num: '106', peripheral: SPI0, signal: PCS1, pin_signal: CMP1_IN1/PTC3/LLWU_P7/SPI0_PCS1/UART1_RX/FTM0_CH2/CLKOUT/I2S0_TX_BCLK, identifier: ''}
+  - {pin_num: '109', peripheral: SIM, signal: UART1_MOD_OUT, pin_signal: PTC4/LLWU_P8/SPI0_PCS0/UART1_TX/FTM0_CH3/FB_AD11/SDRAM_A19/CMP1_OUT}
+  - {pin_num: '110', peripheral: SPI0, signal: SCK, pin_signal: PTC5/LLWU_P9/SPI0_SCK/LPTMR0_ALT2/I2S0_RXD0/FB_AD10/SDRAM_A18/CMP0_OUT/FTM0_CH2, identifier: ''}
+  - {pin_num: '111', peripheral: SPI0, signal: SOUT, pin_signal: CMP0_IN0/PTC6/LLWU_P10/SPI0_SOUT/PDB0_EXTRG/I2S0_RX_BCLK/FB_AD9/SDRAM_A17/I2S0_MCLK}
+  - {pin_num: '112', peripheral: SPI0, signal: SIN, pin_signal: CMP0_IN1/PTC7/SPI0_SIN/USB0_SOF_OUT/I2S0_RX_FS/FB_AD8/SDRAM_A16}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -83,13 +89,6 @@ void BOARD_InitPins(void)
     CLOCK_EnableClock(kCLOCK_PortC);
     /* Port E Clock Gate Control: Clock enabled */
     CLOCK_EnableClock(kCLOCK_PortE);
-
-    gpio_pin_config_t LED_BUILTIN_config = {
-        .pinDirection = kGPIO_DigitalOutput,
-        .outputLogic = 0U
-    };
-    /* Initialize GPIO functionality on pin PTC5 (pin 110)  */
-    GPIO_PinInit(BOARD_INITPINS_LED_BUILTIN_GPIO, BOARD_INITPINS_LED_BUILTIN_PIN, &LED_BUILTIN_config);
 
     gpio_pin_config_t CAN1_STBN_config = {
         .pinDirection = kGPIO_DigitalOutput,
@@ -110,14 +109,23 @@ void BOARD_InitPins(void)
     /* PORTC17 (pin 124) is configured as UART3_TX */
     PORT_SetPinMux(PORTC, 17U, kPORT_MuxAlt3);
 
-    /* PORTC3 (pin 106) is configured as UART1_RX */
-    PORT_SetPinMux(BOARD_INITPINS_IMU_UART_RX_PORT, BOARD_INITPINS_IMU_UART_RX_PIN, kPORT_MuxAlt3);
+    /* PORTC3 (pin 106) is configured as SPI0_PCS1 */
+    PORT_SetPinMux(PORTC, 3U, kPORT_MuxAlt2);
 
     /* PORTC4 (pin 109) is configured as UART1_TX */
-    PORT_SetPinMux(BOARD_INITPINS_IMU_UART_TX_PORT, BOARD_INITPINS_IMU_UART_TX_PIN, kPORT_MuxAlt3);
+    PORT_SetPinMux(PORTC, 4U, kPORT_MuxAlt3);
 
-    /* PORTC5 (pin 110) is configured as PTC5 */
-    PORT_SetPinMux(BOARD_INITPINS_LED_BUILTIN_PORT, BOARD_INITPINS_LED_BUILTIN_PIN, kPORT_MuxAsGpio);
+    /* PORTC5 (pin 110) is configured as SPI0_SCK */
+    PORT_SetPinMux(PORTC, 5U, kPORT_MuxAlt2);
+
+    /* PORTC6 (pin 111) is configured as SPI0_SOUT */
+    PORT_SetPinMux(BOARD_INITPINS_SPI0_MOSI0_PORT, BOARD_INITPINS_SPI0_MOSI0_PIN, kPORT_MuxAlt2);
+
+    /* PORTC7 (pin 112) is configured as SPI0_SIN */
+    PORT_SetPinMux(BOARD_INITPINS_SPI0_MISO0_PORT, BOARD_INITPINS_SPI0_MISO0_PIN, kPORT_MuxAlt2);
+
+    /* PORTC8 (pin 113) is configured as PTC8 */
+    PORT_SetPinMux(BOARD_INITPINS_LED_BUILTIN_PIN_PORT, BOARD_INITPINS_LED_BUILTIN_PIN_PIN, kPORT_MuxAsGpio);
 
     /* PORTE0 (pin 1) is configured as SDHC0_D1 */
     PORT_SetPinMux(PORTE, 0U, kPORT_MuxAlt4);
@@ -196,13 +204,10 @@ void BOARD_InitPins(void)
 
     SIM->SOPT5 = ((SIM->SOPT5 &
                    /* Mask bits to zero which are setting */
-                   (~(SIM_SOPT5_UART0TXSRC_MASK | SIM_SOPT5_UART1TXSRC_MASK)))
+                   (~(SIM_SOPT5_UART0TXSRC_MASK)))
 
                   /* UART 0 transmit data source select: UART0_TX pin. */
-                  | SIM_SOPT5_UART0TXSRC(SOPT5_UART0TXSRC_UART_TX)
-
-                  /* UART 1 transmit data source select: UART1_TX pin. */
-                  | SIM_SOPT5_UART1TXSRC(SOPT5_UART1TXSRC_UART_TX));
+                  | SIM_SOPT5_UART0TXSRC(SOPT5_UART0TXSRC_UART_TX));
 }
 /***********************************************************************************************************************
  * EOF

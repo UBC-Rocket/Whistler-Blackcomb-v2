@@ -60,10 +60,10 @@
 #define EVER ;;
 
 /* SPI Constants */
-#define EXAMPLE_DSPI_MASTER_BASE (SPI1_BASE)
+#define EXAMPLE_DSPI_MASTER_BASE (SPI1_BASE) //confused, what's BASE and IRQn? Where do I assign MISO, MOSI, and CS0B?
 #define EXAMPLE_DSPI_MASTER_IRQN (SPI1_IRQn)
-#define DSPI_MASTER_CLK_SRC      (DSPI1_CLK_SRC)
-#define DSPI_MASTER_CLK_FREQ     CLOCK_GetFreq((DSPI1_CLK_SRC))
+#define DSPI_MASTER_CLK_SRC      (SPI0_SCK0)
+#define DSPI_MASTER_CLK_FREQ     CLOCK_GetFreq((SPI0_SCK0))
 #define EXAMPLE_DSPI_MASTER_BASEADDR ((SPI_Type *)EXAMPLE_DSPI_MASTER_BASE)
 #define TRANSFER_SIZE     (2)     /*! Transfer size */
 #define TRANSFER_BAUDRATE (500000U) /*! Transfer baudrate - 500k */
