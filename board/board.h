@@ -87,7 +87,7 @@ void BOARD_InitDebugConsole(void);
 #define CAN_CLK_FREQ   CLOCK_GetFreq(kCLOCK_BusClk)
 
 /* DSPI Constants */
-#define EXAMPLE_DSPI_MASTER_BASE (SPI0_BASE) //confused, what's BASE and IRQn? Where do I assign MISO, MOSI, and CS0B?
+#define EXAMPLE_DSPI_MASTER_BASE (SPI0_BASE) //changed example code from SPI1 to SPI0
 #define EXAMPLE_DSPI_MASTER_IRQN (SPI0_IRQn)
 #define DSPI_MASTER_CLK_SRC      (DSPI0_CLK_SRC)
 #define DSPI_MASTER_CLK_FREQ     CLOCK_GetFreq((DSPI0_CLK_SRC))
