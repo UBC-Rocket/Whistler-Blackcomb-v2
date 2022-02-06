@@ -62,14 +62,14 @@ void BOARD_InitBootPins(void);
   @{ */
 
 /* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LED_BUILTIN_PIN_GPIO GPIOC               /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LED_BUILTIN_PIN_GPIO_PIN_MASK (1U << 8U) /*!<@brief GPIO pin mask */
+#define BOARD_INITPINS_LED_BUILTIN_GPIO GPIOC               /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITPINS_LED_BUILTIN_GPIO_PIN_MASK (1U << 8U) /*!<@brief GPIO pin mask */
 
 /* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LED_BUILTIN_PIN_PORT PORTC               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LED_BUILTIN_PIN_PIN 8U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LED_BUILTIN_PIN_PIN_MASK (1U << 8U)      /*!<@brief PORT pin mask */
-                                                                /* @} */
+#define BOARD_INITPINS_LED_BUILTIN_PORT PORTC               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_LED_BUILTIN_PIN 8U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_LED_BUILTIN_PIN_MASK (1U << 8U)      /*!<@brief PORT pin mask */
+                                                            /* @} */
 
 /*! @name PORTC6 (number 111), SPI0_MOSI0
   @{ */

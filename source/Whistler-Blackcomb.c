@@ -59,17 +59,6 @@
 #define PI acos(-1)
 #define EVER ;;
 
-/* SPI Constants */
-#define EXAMPLE_DSPI_MASTER_BASE (SPI1_BASE) //confused, what's BASE and IRQn? Where do I assign MISO, MOSI, and CS0B?
-#define EXAMPLE_DSPI_MASTER_IRQN (SPI1_IRQn)
-#define DSPI_MASTER_CLK_SRC      (SPI0_SCK0)
-#define DSPI_MASTER_CLK_FREQ     CLOCK_GetFreq((SPI0_SCK0))
-#define EXAMPLE_DSPI_MASTER_BASEADDR ((SPI_Type *)EXAMPLE_DSPI_MASTER_BASE)
-#define TRANSFER_SIZE     (2)     /*! Transfer size */
-#define TRANSFER_BAUDRATE (500000U) /*! Transfer baudrate - 500k */
-uint8_t masterReceiveBuffer[TRANSFER_SIZE] = {0};
-uint8_t masterSendBuffer[TRANSFER_SIZE]    = {0};
-
 /* Task priorities. Will update once more finalized */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define imu_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
@@ -126,6 +115,11 @@ float tc_data[sizeof(tc_names)];
 float pt_data[sizeof(pt_names)];
 
 /*******************************************************************************
+ * SPI Variables
+ ******************************************************************************/
+uint8_t masterReceiveBuffer[TRANSFER_SIZE] = {0};
+uint8_t masterSendBuffer[TRANSFER_SIZE]    = {0};
+/*******************************************************************************
  * Main
  ******************************************************************************/
 int main(void) {
@@ -166,7 +160,7 @@ int main(void) {
 	}
 
 	if ((error = xTaskCreate(RadioTask, "Radio Task",
-	configMINIMAL_STACK_SIZE + 1000,
+	configMINIMAL_STACK_SIZE + 500,
 	NULL,
 	radio_task_PRIORITY,
 	NULL)) != pdPASS) {
@@ -497,7 +491,17 @@ static void SpiTask(void *pv) {
         PRINTF("DSPI master: error during initialization. \r\n");
         vTaskSuspend(NULL);
     }
+
+//    while(status != kStatus_Success)
+//    {
+//    	PRINTF("DSPI master: error, status was: %d \r\n", status);
+//    	status = DSPI_RTOS_Init(&master_rtos_handle, EXAMPLE_DSPI_MASTER_BASEADDR, &masterConfig, sourceClock);
+//    	vTaskDelay(pdMS_TO_TICKS(1000));
+//    }
     /*Start master transfer*/
+    masterSendBuffer[0] = 'a';
+    masterSendBuffer[1] = 'b';
+
     masterXfer.txData      = masterSendBuffer;
     masterXfer.rxData      = masterReceiveBuffer;
     masterXfer.dataSize    = TRANSFER_SIZE;
@@ -513,6 +517,5 @@ static void SpiTask(void *pv) {
     {
         PRINTF("DSPI master transfer completed with error. \r\n\r\n");
     }
-
     vTaskSuspend(NULL);
 }
