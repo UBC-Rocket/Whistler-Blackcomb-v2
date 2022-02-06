@@ -7,7 +7,7 @@ So you've written code and now you want to put it on the board. How do you do th
 
 ![image](https://user-images.githubusercontent.com/69891140/151716280-574579f7-8aa1-4ac5-a8fe-745fafc95289.png)
 
-2. Ensure that cable on the J-Link Mini is plugged in with the wire pointing away from the board, as shown:
+2. Ensure that cable on the J-Link Mini is plugged in with the wire pointing away from the board **and with the pink line on the LEFT** as shown:
 
 ![image](https://user-images.githubusercontent.com/69891140/151716306-62e0cfc8-4e3a-4dc6-beaa-f05352ea7155.png)
 
