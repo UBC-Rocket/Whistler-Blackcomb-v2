@@ -132,6 +132,7 @@ int main(void) {
 	/* Have to set these or else semaphore functions in interrupts won't work */
 	halNvicSetPriority(CAN0_ORed_Message_buffer_IRQn, 5);
 	halNvicSetPriority(CAN1_ORed_Message_buffer_IRQn, 5);
+	halNvicSetPriority(EXAMPLE_DSPI_MASTER_IRQN, 5);
 
 	BaseType_t error;
 
@@ -474,6 +475,11 @@ static void startGSRadioTask(void *pv){
 	vTaskSuspend(NULL);
 }
 
+/**
+ * Testing SPI communication with BMS. Adapted from freertos_dspi example code and WB-Can-Firmware.
+ * Uses SPI0 pins, can change it in board.h to SPI1 or SPI2.
+ * Key functions called: DSPI_RTOS_Init and " "_Transfer.
+ */
 static void SpiTask(void *pv) {
     dspi_transfer_t masterXfer;
     dspi_rtos_handle_t master_rtos_handle;
@@ -492,12 +498,6 @@ static void SpiTask(void *pv) {
         vTaskSuspend(NULL);
     }
 
-//    while(status != kStatus_Success)
-//    {
-//    	PRINTF("DSPI master: error, status was: %d \r\n", status);
-//    	status = DSPI_RTOS_Init(&master_rtos_handle, EXAMPLE_DSPI_MASTER_BASEADDR, &masterConfig, sourceClock);
-//    	vTaskDelay(pdMS_TO_TICKS(1000));
-//    }
     /*Start master transfer*/
     masterSendBuffer[0] = 'a';
     masterSendBuffer[1] = 'b';
@@ -517,5 +517,18 @@ static void SpiTask(void *pv) {
     {
         PRINTF("DSPI master transfer completed with error. \r\n\r\n");
     }
+    for (int i = 0; i < TRANSFER_SIZE; i++) {
+	    PRINTF("RX: %d ", masterReceiveBuffer[i]);
+    }
+    printf("\n");
+
+   while (true) {
+	   status = DSPI_RTOS_Transfer(&master_rtos_handle, &masterXfer);
+	   for (int i = 0; i < TRANSFER_SIZE; i++) {
+		   PRINTF("RX: %d ", masterReceiveBuffer[i]);
+	   }
+	   printf("\n");
+	   vTaskDelay(pdMS_TO_TICKS(1000));
+   }
     vTaskSuspend(NULL);
 }
