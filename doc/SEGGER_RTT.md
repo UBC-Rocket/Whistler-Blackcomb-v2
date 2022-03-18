@@ -16,6 +16,12 @@ Within the Utilities Folder there are the relevant files needed to be included i
 ```
 /Applications/SEGGER/JLink_V754b
 ```
+
+On Linux it was found to be the following: 
+
+```
+/opt/SEGGER/JLink
+```
 In this folder, there is the RTT-Viewer Application:
 <img width="583" alt="image" src="https://user-images.githubusercontent.com/24193569/158081685-f96fc07c-da76-4df1-b647-d31775615361.png">
 
