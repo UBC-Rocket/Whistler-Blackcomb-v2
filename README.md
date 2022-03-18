@@ -42,6 +42,7 @@ All documentation is currently kept in the [doc/](doc/) directory. Note that alt
 1. MCUXpresso project setup [guide](doc/MCUXpresso-Setup.md). 
 2. x86 Compilation explanation and setup [guide](doc/x86-Compilation.md). 
 3. Setting up Windows compilation with Cygwin [guide](doc/Windows-Compilation-with-Cygwin.md). This is only strictly  necessary if you want to be able to do software-in-the-loop testing with [groundstation](https://github.com/UBC-Rocket/UBCRocketGroundStation).
+4. Setup for RTT debugging [guide](doc/SEGGER_RTT.md). 
 
 ### Firmware Concept Guides
 
