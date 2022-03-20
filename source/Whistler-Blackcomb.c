@@ -484,11 +484,8 @@ static void GpsTask(void *pv) {
 	}
 
 
-	//char *str = (char *) malloc(10);
-	//size_t charNum = 0;
-
-	FILE * fp;
-	//fp = fopen ("file.txt", "w+");
+	char gpsdata[400];
+	int charNum = 0;
 	double posx, posy, posz, velx, vely, velz;
 	float stdposx, stdposy, stdposz, stdvelx, stdvely, stdvelz, vlatency;
 	char baseID[4];
@@ -498,26 +495,18 @@ static void GpsTask(void *pv) {
 	do {
 		uint8_t buffer;
 		uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-		//int fputc(int buffer, FILE *fp);
-
-		/*
-		if (charNum >= strlen(str)) {
-			str = (char *) realloc(&str, strlen(str)+10);
-		}
-		str[charNum] = buffer;
-		*/
+		gpsdata[charNum] = buffer;
+		charNum++;
 		printf("%c", buffer);
-		//charNum++;
 
 	} while (kStatus_Success == uart_error);
-	//rewind(fp);
+
 
 	//BESTXYZ
-	fscanf(fp, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
+	sscanf(gpsdata, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
 			heading, &enum1, &enum2, &posx, &posy, &posz, &stdposx, &stdposy, &stdposz,
 			&enum3, &enum4, &velx, &vely, &velz, &stdvelx, &stdvely, &stdvelz, baseID, &vlatency);
 
-	fclose(fp);
 	uartDeinit(&hal_uart_gps);
 	vTaskSuspend(NULL);
 }
