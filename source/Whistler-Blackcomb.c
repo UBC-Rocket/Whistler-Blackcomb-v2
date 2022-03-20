@@ -75,7 +75,7 @@ static void GpsTask(void *pv);
  * UART Variables
  ******************************************************************************/
 const char *debug_intro_message = "";
-const char *gps_message = "log bestxyza ontime 1\r\n";
+const char *gps_message = "log bestxyza ontime 1\n";
 const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
@@ -456,15 +456,33 @@ static void GpsTask(void *pv) {
 	size_t size = 0;
 	int uart_error;
 
-	uartConfig(&hal_uart_gps, GPS_UART, 19200);
+	uartConfig(&hal_uart_gps, GPS_UART, 9600);
 	if (kStatus_Success != uartInit(&hal_uart_gps)) {
 		vTaskSuspend(NULL);
 	}
-	if (kStatus_Success
+	for (EVER) {
+		if (kStatus_Success
 			!= uartSend(&hal_uart_gps, (uint8_t*) gps_message,
 						strlen(gps_message))) {
 			vTaskSuspend(NULL);
 		}
+		/* do {
+				uint8_t buffer;
+				uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
+				//int fputc(int buffer, FILE *fp);
+
+
+				if (charNum >= strlen(str)) {
+					str = (char *) realloc(&str, strlen(str)+10);
+				}
+				str[charNum] = buffer;
+
+				printf("%c", buffer);
+				//charNum++;
+
+			} while (kStatus_Success == uart_error); */
+	}
+
 
 	//char *str = (char *) malloc(10);
 	//size_t charNum = 0;
