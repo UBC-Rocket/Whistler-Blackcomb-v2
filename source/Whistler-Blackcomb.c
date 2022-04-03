@@ -233,6 +233,7 @@ int main(void) {
  * @brief Simple blink Task as sanity check for program working
  */
 static void BlinkTask(void *pv) {
+	vTaskSuspend(NULL);
 	while (1) {
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
 		// Very important: Don't use normal delays in RTOS tasks, things will break
@@ -246,6 +247,7 @@ static void BlinkTask(void *pv) {
  * implementing library code. 
  */
 static void ReadImuTask(void *pv) {
+	vTaskSuspend(NULL);
 	configImu(&IMU);
 	crc32_initTable();
 
@@ -375,7 +377,7 @@ static void ReadImuTask(void *pv) {
 //		0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21, 0xC7 };
 /* Right now just echoes anything sent to the radio */
 static void RadioTask(void *pv) {
-
+	vTaskSuspend(NULL);
 	xbee_dev_t radio;
 	xbee_serial_t serial;
 
@@ -404,6 +406,7 @@ static void RadioTask(void *pv) {
 }
 
 static void LogTask(void *pv) {
+	vTaskSuspend(NULL);
 	//HALFILE file;
 	sdInit();
 	for (EVER) {
@@ -416,6 +419,7 @@ static void LogTask(void *pv) {
 }
 
 static void StateTask(void *pv) {
+	vTaskSuspend(NULL);
 	for (EVER) {
 		/*TODO: set all the state inputs...*/
 		setNextState(&stateTransitionInput);
@@ -428,6 +432,7 @@ hal_can_packet_t rxPacket;
 hal_can_packet_t txPacket;
 flexcan_frame_t rxFrame;
 static void CanTask(void *pv) {
+	vTaskSuspend(NULL);
 	hal_can_handle_t can_handle;
 	canInit(&can_handle, CAN1);
 	for (EVER) {
@@ -499,8 +504,8 @@ static void SpiTask(void *pv) {
     }
 
     /*Start master transfer*/
-    masterSendBuffer[0] = 'a';
-    masterSendBuffer[1] = 'b';
+    masterSendBuffer[0] = '1';
+    masterSendBuffer[1] = '2';
 
     masterXfer.txData      = masterSendBuffer;
     masterXfer.rxData      = masterReceiveBuffer;
@@ -522,10 +527,20 @@ static void SpiTask(void *pv) {
     }
     printf("\n");
 
+   int counter = 0;
    while (true) {
 	   status = DSPI_RTOS_Transfer(&master_rtos_handle, &masterXfer);
+	   if (counter == 0) {
+		   for (int i = 0; i < TRANSFER_SIZE; i++) {
+			   masterXfer.txData[0] = 'a';
+			   masterXfer.txData[1] = 'b';
+			   PRINTF("TX: %d ", masterXfer.txData[i]);
+		   }
+		   counter = 0;
+	   }
+//	   counter++;
 	   for (int i = 0; i < TRANSFER_SIZE; i++) {
-		   PRINTF("RX: %d ", masterReceiveBuffer[i]);
+		   PRINTF("RX: %d ", masterXfer.rxData[i]);
 	   }
 	   printf("\n");
 	   vTaskDelay(pdMS_TO_TICKS(1000));
