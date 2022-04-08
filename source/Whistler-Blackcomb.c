@@ -452,61 +452,48 @@ static void CanTask(void *pv) {
 }
 
 static void GpsTask(void *pv) {
-	vTaskDelay(pdMS_TO_TICKS(1000));
-	size_t size = 0;
-	int uart_error;
-
-	uartConfig(&hal_uart_gps, GPS_UART, 9600);
-	if (kStatus_Success != uartInit(&hal_uart_gps)) {
-		vTaskSuspend(NULL);
-	}
 	for (EVER) {
+		vTaskDelay(pdMS_TO_TICKS(1000));
+		size_t size = 0;
+		int uart_error;
+
+		uartConfig(&hal_uart_gps, GPS_UART, 9600);
+		if (kStatus_Success != uartInit(&hal_uart_gps)) {
+			vTaskSuspend(NULL);
+		}
+
 		if (kStatus_Success
 			!= uartSend(&hal_uart_gps, (uint8_t*) gps_message,
 						strlen(gps_message))) {
 			vTaskSuspend(NULL);
 		}
-		/* do {
-				uint8_t buffer;
-				uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-				//int fputc(int buffer, FILE *fp);
 
+		char gpsdata[400];
+		int charNum = 0;
+		double posx, posy, posz, velx, vely, velz;
+		float stdposx, stdposy, stdposz, stdvelx, stdvely, stdvelz, vlatency;
+		char baseID[4];
+		char heading[10];
+		int enum1, enum2, enum3, enum4;
 
-				if (charNum >= strlen(str)) {
-					str = (char *) realloc(&str, strlen(str)+10);
-				}
-				str[charNum] = buffer;
+		do {
+			uint8_t buffer;
+			printf("Pre receive: %d\n", uart_error);
+			uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
+			printf("Post receive: %d\n", uart_error);
+			gpsdata[charNum] = buffer;
+			printf("Char num: %d\n", charNum);
+			charNum++;
+			printf("Buffer: %c\n", buffer);
 
-				printf("%c", buffer);
-				//charNum++;
+		} while (kStatus_Success == uart_error);
 
-			} while (kStatus_Success == uart_error); */
+		//BESTXYZ
+		sscanf(gpsdata, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
+				heading, &enum1, &enum2, &posx, &posy, &posz, &stdposx, &stdposy, &stdposz,
+				&enum3, &enum4, &velx, &vely, &velz, &stdvelx, &stdvely, &stdvelz, baseID, &vlatency);
+
+		uartDeinit(&hal_uart_gps);
+		vTaskSuspend(NULL);
 	}
-
-
-	char gpsdata[400];
-	int charNum = 0;
-	double posx, posy, posz, velx, vely, velz;
-	float stdposx, stdposy, stdposz, stdvelx, stdvely, stdvelz, vlatency;
-	char baseID[4];
-	char heading[10];
-	int enum1, enum2, enum3, enum4;
-
-	do {
-		uint8_t buffer;
-		uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-		gpsdata[charNum] = buffer;
-		charNum++;
-		printf("%c", buffer);
-
-	} while (kStatus_Success == uart_error);
-
-
-	//BESTXYZ
-	sscanf(gpsdata, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
-			heading, &enum1, &enum2, &posx, &posy, &posz, &stdposx, &stdposy, &stdposz,
-			&enum3, &enum4, &velx, &vely, &velz, &stdvelx, &stdvely, &stdvelz, baseID, &vlatency);
-
-	uartDeinit(&hal_uart_gps);
-	vTaskSuspend(NULL);
 }
