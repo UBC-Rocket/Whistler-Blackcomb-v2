@@ -5,6 +5,7 @@ Printf takes time and that time we've found has been correlated with some jitter
 
 
 Within the Utilities Folder there are the relevant files needed to be included in the project. We are using the **V754b version** to run this protocol. If you download a newer version of the J-Link software, it may come with a newer version which asks you if you would like to upgrade to the newer firmware. From minimal testing, we concluded that it's easier to use the same version as there is no unexpected behaviour which would occur when using different firmware versions. One occurence included being unable to connect to the board. If this happens, reflash the V754b firmware version onto the J-Link Debugger and do not upgrade to the newer version when asked. Alternatively, just keep this version on your computer.
+
 <img width="254" alt="image" src="https://user-images.githubusercontent.com/24193569/158081376-431b5f91-21ee-4337-9924-9519860ed882.png">
 
 # To Use RTT:
@@ -28,11 +29,17 @@ In this folder, there is the RTT-Viewer Application:
 With a started debug session, connect to an Existing Session and press OK.
 
 <img width="401" alt="image" src="https://user-images.githubusercontent.com/24193569/158081714-de028d23-78bb-404d-8329-918c82f23703.png">
-After Connecting you will see your messages.
+
+After Connecting with a running debug session you will see your messages appear.
 
 <img width="651" alt="image" src="https://user-images.githubusercontent.com/24193569/158081726-6f9d5378-8b61-4cdb-94be-fe41ae85d5ec.png">
 
-Contact Davin for any further questions or if something is not covered in this document
 
-## Implementation
-2. Replace your desired `printf` with the SEGGER command, as found in the examples in the above Utilities location. Debug your program
+## What to Expect:
+With the current revision, the DAQ board is sending basic test messages to the RTT Terminal. See what it's sending in the RTT Viewer window. You can also send commands to the DAQ Board via RTT Viewer, where you can verify the board recieves it by printing it to the existing debug session console in MCUXpresso.
+
+## Implementation of your code
+2. Replace your desired `printf` with the SEGGER command, as found in the examples in the above Utilities location. You now have access to RTT to Debug your program without printf delays.
+
+
+Contact Davin for any further questions or if something is not covered in this document
