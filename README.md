@@ -10,7 +10,7 @@ This is a repository with the code for the UBC Rocket Whistler Blackcomb flight 
 
 ## Project Structure
 
-This is a high level overview of the file structure we use for this project. Any folders not mentioned here are libraries/drivers that are not custom developed. 
+This is a high level overview of the file structure we use for this project. Any folders not mentioned here are libraries/drivers that are not custom developed.
 
 * board
   * Generated files by MCUXpresso for pin configuration
