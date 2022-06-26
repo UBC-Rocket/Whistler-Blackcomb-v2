@@ -27,7 +27,6 @@
 /* Includes common between MCU and x86 */
 #include "state_machine.h"
 #include "IMU_interpret.h"
-#include "GPS_interpret.h"
 #include "prediction.h"
 
 /* Includes specific to MCU or x86 */
@@ -49,7 +48,6 @@
 /* TODO: figure out where this is defined properly */
 #define PI acos(-1)
 #define EVER ;;
-GPS_1 GPS;
 
 /* Task priorities. Will update once more finalized */
 #define debug_uart_task_PRIORITY (configMAX_PRIORITIES - 1)
@@ -75,7 +73,7 @@ static void GpsTask(void *pv);
  * UART Variables
  ******************************************************************************/
 const char *debug_intro_message = "";
-const char *gps_message = "log bestxyza ontime 1\n";
+const char *gps_message = "ECHO THISPORT ON\n";
 const char *send_ring_overrun = "\r\nRing buffer overrun!\r\n";
 const char *send_hardware_overrun = "\r\nHardware buffer overrun!\r\n";
 char toPrint[100];
@@ -451,19 +449,32 @@ static void CanTask(void *pv) {
 	}
 }
 
+
 static void GpsTask(void *pv) {
+
+	/*
+	//See hal_uart.h for documentation on UART commands
+
+	//See board.h for GPS_UART
+	//Had some concerns about baudrate, not sure if this is actually an issue or not
+
+	uartConfig(&hal_uart_gps, GPS_UART, 9600);
+
+
+	if (kStatus_Success != uartInit(&hal_uart_gps)) {
+		vTaskSuspend(NULL);
+	}
+
+	//Task must be in an infinite loop, not entirely sure which UART commands should be within the loop
 	for (EVER) {
 		vTaskDelay(pdMS_TO_TICKS(1000));
-		size_t size = 0;
-		int uart_error;
 
-		uartConfig(&hal_uart_gps, GPS_UART, 9600);
-		if (kStatus_Success != uartInit(&hal_uart_gps)) {
-			vTaskSuspend(NULL);
-		}
+		//Sends message to the GPS.
+		//See   https://docs.novatel.com/OEM7/Content/PDFs/PreviousVersions/OEM7_Commands_Logs_Manual_v9.pdf
+		//for list of GPS commands and details on them
 
 		if (kStatus_Success
-			!= uartSend(&hal_uart_gps, (uint8_t*) gps_message,
+			!= uartSend(&hal_uart_gps, (uint8_t*)gps_message,
 						strlen(gps_message))) {
 			vTaskSuspend(NULL);
 		}
@@ -476,24 +487,26 @@ static void GpsTask(void *pv) {
 		char heading[10];
 		int enum1, enum2, enum3, enum4;
 
+
+		//Receives one byte at a time from the GPS response and puts it in a char array
 		do {
 			uint8_t buffer;
-			printf("Pre receive: %d\n", uart_error);
 			uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-			printf("Post receive: %d\n", uart_error);
 			gpsdata[charNum] = buffer;
-			printf("Char num: %d\n", charNum);
 			charNum++;
-			printf("Buffer: %c\n", buffer);
 
 		} while (kStatus_Success == uart_error);
 
-		//BESTXYZ
+		//sscanf parses the information in the char array and stores it in separate variables
+		//This is the parsing for the BESTXYZ command specifically
 		sscanf(gpsdata, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
 				heading, &enum1, &enum2, &posx, &posy, &posz, &stdposx, &stdposy, &stdposz,
 				&enum3, &enum4, &velx, &vely, &velz, &stdvelx, &stdvely, &stdvelz, baseID, &vlatency);
 
-		uartDeinit(&hal_uart_gps);
-		vTaskSuspend(NULL);
 	}
+
+	//Final UART command
+	uartDeinit(&hal_uart_gps);
+	vTaskSuspend(NULL);
+	*/
 }
