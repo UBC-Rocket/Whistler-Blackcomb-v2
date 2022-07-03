@@ -50,6 +50,10 @@
 #include "xbee/wpan.h"
 #include "radio.h"
 
+/* BMS Stuff */
+#include "bms.h"
+
+
 
 /*******************************************************************************
  * Definitions
@@ -475,8 +479,9 @@ static void CanTask(void *pv) {
 
 
 static void startGSRadioTask(void *pv){
+	vTaskSuspend(NULL);
 	//vTaskDelay(pdMS_TO_TICKS(3000));
-//	GSRadioInit();
+	GSRadioInit();
 	vTaskSuspend(NULL);
 }
 
@@ -486,6 +491,7 @@ static void startGSRadioTask(void *pv){
  * Key functions called: DSPI_RTOS_Init and " "_Transfer.
  */
 static void SpiTask(void *pv) {
+	vTaskSuspend(NULL);
     dspi_transfer_t masterXfer;
     dspi_rtos_handle_t master_rtos_handle;
     dspi_master_config_t masterConfig;
@@ -493,6 +499,9 @@ static void SpiTask(void *pv) {
     status_t status;
 
     DSPI_MasterGetDefaultConfig(&masterConfig);
+
+    masterConfig.whichPcs           = kDSPI_Pcs1;
+    masterConfig.pcsActiveHighOrLow = kDSPI_PcsActiveLow;
 
     sourceClock = DSPI_MASTER_CLK_FREQ;
     status      = DSPI_RTOS_Init(&master_rtos_handle, EXAMPLE_DSPI_MASTER_BASEADDR, &masterConfig, sourceClock);
@@ -504,8 +513,10 @@ static void SpiTask(void *pv) {
     }
 
     /*Start master transfer*/
-    masterSendBuffer[0] = '1';
-    masterSendBuffer[1] = '2';
+    masterSendBuffer[0] = 0x03;
+    masterSendBuffer[1] = 0x60;
+    masterSendBuffer[2] = 0xF4;
+    masterSendBuffer[3] =  0x6C;
 
     masterXfer.txData      = masterSendBuffer;
     masterXfer.rxData      = masterReceiveBuffer;
@@ -523,27 +534,29 @@ static void SpiTask(void *pv) {
         PRINTF("DSPI master transfer completed with error. \r\n\r\n");
     }
     for (int i = 0; i < TRANSFER_SIZE; i++) {
-	    PRINTF("RX: %d ", masterReceiveBuffer[i]);
+	    PRINTF("RX: %hx ", masterReceiveBuffer[i]);
     }
     printf("\n");
 
-   int counter = 0;
    while (true) {
-	   status = DSPI_RTOS_Transfer(&master_rtos_handle, &masterXfer);
-	   if (counter == 0) {
-		   for (int i = 0; i < TRANSFER_SIZE; i++) {
-			   masterXfer.txData[0] = 'a';
-			   masterXfer.txData[1] = 'b';
-			   PRINTF("TX: %d ", masterXfer.txData[i]);
-		   }
-		   counter = 0;
-	   }
-//	   counter++;
+	    masterSendBuffer[0] = 0x03;
+	    masterSendBuffer[1] = 0x60;
+	    masterSendBuffer[2] = 0xF4;
+	    masterSendBuffer[3] = 0x6C;
 	   for (int i = 0; i < TRANSFER_SIZE; i++) {
-		   PRINTF("RX: %d ", masterXfer.rxData[i]);
+		   PRINTF("TX: %hx ", masterXfer.txData[i]);
+	   }
+	   status = DSPI_RTOS_Transfer(&master_rtos_handle, &masterXfer);
+	   if (status == kStatus_Success) {
+		   for (int i = 0; i < TRANSFER_SIZE; i++) {
+			   PRINTF("RX: %hx ", masterXfer.rxData[i]);
+		   }
+	   }
+	   else {
+		   printf("Transfer failed, retrying");
 	   }
 	   printf("\n");
-	   vTaskDelay(pdMS_TO_TICKS(1000));
+	   vTaskDelay(pdMS_TO_TICKS(2000));
    }
     vTaskSuspend(NULL);
 }

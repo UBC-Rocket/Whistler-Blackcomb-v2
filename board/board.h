@@ -92,7 +92,7 @@ void BOARD_InitDebugConsole(void);
 #define DSPI_MASTER_CLK_SRC      (DSPI0_CLK_SRC)
 #define DSPI_MASTER_CLK_FREQ     CLOCK_GetFreq((DSPI0_CLK_SRC))
 #define EXAMPLE_DSPI_MASTER_BASEADDR ((SPI_Type *)EXAMPLE_DSPI_MASTER_BASE)
-#define TRANSFER_SIZE     (2)     /*! Transfer size */
-#define TRANSFER_BAUDRATE (500000U) /*! Transfer baudrate - 500k */
+#define TRANSFER_SIZE     (4)     /*! Transfer size */
+#define TRANSFER_BAUDRATE (7000U) /*! Transfer baudrate - 7k */
 
 #endif /* _BOARD_H_ */
