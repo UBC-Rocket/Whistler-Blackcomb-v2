@@ -25,6 +25,8 @@ void SpiInit(){
 
 	    masterConfig.whichPcs           = kDSPI_Pcs1;
 	    masterConfig.pcsActiveHighOrLow = kDSPI_PcsActiveLow;
+	    masterConfig.whichCtar               = kDSPI_Ctar1;
+	    masterConfig.ctarConfig.baudRate     = 7000;
 
 	    sourceClock = DSPI_MASTER_CLK_FREQ;
 	    status      = DSPI_RTOS_Init(&master_rtos_handle, EXAMPLE_DSPI_MASTER_BASEADDR, &masterConfig, sourceClock);
@@ -44,7 +46,8 @@ void SpiInit(){
 	    masterXfer.txData      = masterSendBuffer;
 	    masterXfer.rxData      = masterReceiveBuffer;
 	    masterXfer.dataSize    = TRANSFER_SIZE;
-	    masterXfer.configFlags = kDSPI_MasterCtar0 | kDSPI_MasterPcs0 | kDSPI_MasterPcsContinuous;
+	    // The _MasterCtar# and _MasterPcs# flags should match the masterConfig flags that are set above.
+	    masterXfer.configFlags = kDSPI_MasterCtar1 | kDSPI_MasterPcs1 | kDSPI_MasterPcsContinuous;
 
 	    status = DSPI_RTOS_Transfer(&master_rtos_handle, &masterXfer);
 
