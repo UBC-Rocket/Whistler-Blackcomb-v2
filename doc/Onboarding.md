@@ -32,11 +32,11 @@ For code/pcb contributions, we use github as version control to keep everyone up
 
 ## GitHub Access
 
-No matter what type of work you will be doing, you will need access to the teams GitHub repositories. Given this guide is itself hosted on GitHub you likely already know how to access the team's repos, and to get member status contact Xander. 
+No matter what type of work you will be doing, you will need access to the teams GitHub repositories. Given this guide is itself hosted on GitHub you likely already know how to access the team's repos. 
 
 ## Next Steps
 
-Depending on what you'll primarily be working on, here are some next steps to get started contributing to the project. Even if you're only expecting to do one kind of work, if you're interested I'd definitely encourage you to set up the development environment for the other aspects of the team if only to get a better understanding of what's going on in the project. 
+Depending on what you'll primarily be working on, here are some next steps to get started contributing to the project. Even if you're only expecting to do one kind of work, if you're interested we'd definitely encourage you to set up the development environment for the other aspects of the team if only to get a better understanding of what's going on in the project. 
 
 ### Firmware
 
