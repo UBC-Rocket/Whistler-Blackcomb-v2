@@ -10,6 +10,9 @@ Unless otherwise noted, select version 11.2.1. This ensures we all have the same
 
 If you're an Arch user MCUXpresso really doesn't like installing itself, so you have to install it manually. To do so use the following PKGBUILD file (mostly taken from the AUR PKGBUILD which is for a newer version): 
 
+<details>
+    <summary>PKGBUILD file</summary>
+    
 ```
 # BUILD INSTRUCTIONS:
 #
@@ -71,7 +74,9 @@ package() {
     install -D -m644 ${srcdir}/ProductLicense.txt ${pkgdir}/usr/share/licenses/${pkgname}/ProductLicense.txt;
 }
 ```
-
+ 
+</details>
+    
 2. Chip SDK
 
 Go to [here](https://mcuxpresso.nxp.com/download/9ba397a99467670531f186cddcf1b1a4) and download it. If that doesn't work for some reason you can also get the SDK package yourself [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
