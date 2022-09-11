@@ -8,7 +8,7 @@ For more comprehensive testing, this entire project can be compiled for the x86 
 
 To enable this, two seperate build systems are used. MCUXpresso is used for the board compilation, and this enables the use of many built in functionality such as pin assignment and others that are quite useful. For x86 compilation, CMake is used instead. Both systems share most of their source code, but a hardware abstraction layer is implemented with different implementations for each. For example, if a task was to toggle a pin repeatedly (i.e. blink example), both compilations would share their main task source code. Each time it was time to toggle the pin, that task would call a function from the hardware abstraction layer. If it's the physical board calling it the abstraction layer would physically toggle the pin output, but if it was a desktop running it the abstraction layer would do something different, such as logging the even to a file. This way the "task" is running the exact same, just the output is different. 
 
-### File Structure
+### File Structurex
 
 The way that this is accomplished is by using a different set of includes for each compilation. These two sources are in the [envs](../envs) folder. Each has a seperate set of implementations for extremely similar implementations of the hardware abstraction layer, abbreviated HAL. For example, the toggle example above would have the implementation for the physical board as the [hal_io.h](../envs/board/include/hal_io.h) file in the board folder but for x86 compilation it would be [hal_io.h](../envs/x86/include/hal_io.h) in the x86 folder. To keep functionality of the two systems identical both share a common header despite different implementation of the functionality required. The [CMakeLists.txt](../CMakeLists.txt) specifies x86 HAL files to be included, and a similar functionality is achieved through MCUXpresso. All code that we've written that is common between the two applications is in the [common](../common) folder, with the exception of the main executable file which is in [source](../source). 
 
@@ -48,7 +48,7 @@ sudo apt install cmake
 
 ### Install Submodules
 
-In order to compile the project for x86, we need to install a submodule — [Unity](https://github.com/ThrowTheSwitch/Unity) — which is used for unit testing. If you are cloning the project for the first time, you can pass `--recurse-submodules` when you `git clone`, but if you've already cloned the repository to your computer you need to run (from the project directoy, in your shell) `git submodule init` and then `git submodule update`. This lets git know that the empty folder in [externl](../external) called 'Unity' is a submodule, and then fills it up with what it should hold - the Unity unit testing framework.
+In order to compile the project for x86, we need to install a submodule — [Unity](https://github.com/ThrowTheSwitch/Unity) — which is used for unit testing. If you are cloning the project for the first time, you can pass `--recurse-submodules` when you `git clone`, but if you've already cloned the repository to your computer you need to run (from the project directoy, in your shell) `git submodule init` and then `git submodule update`. This lets git know that the empty folder in [external](../external) called 'Unity' is a submodule, and then fills it up with what it should hold - the Unity unit testing framework.
 
 ### Build Project
 
