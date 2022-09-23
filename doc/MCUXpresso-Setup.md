@@ -81,6 +81,9 @@ package() {
 
 Go to [here](https://mcuxpresso.nxp.com/download/9ba397a99467670531f186cddcf1b1a4) and download it. If that doesn't work for some reason you can also get the SDK package yourself [here](https://mcuxpresso.nxp.com/en/select), search for MK66FX1 and click on "Build MCUXpresso SDK. Select all and download SDK. Note that this might take a few minutes. 
 
+<img width="722" alt="image" src="https://user-images.githubusercontent.com/24193569/191883856-3ac137c4-4b02-4ba6-932d-47407a7869ab.png">
+
+
 ![](images/SDKSelect.png)
 ![](images/SDKDownload.png)
 
@@ -142,7 +145,7 @@ When done, press the funny-looking and green 'Update Code' button to set all the
 
 
 # Adding SDK Examples:
-When we want to add implement features to the board that exist on the chip, the best way to do it is to do as close as possible to what the developer has intended.
+At the very top of this file we installed the SDK Builder. This provides drivers to and examples to  implement features to the board that physically exist on the chip. The best way to do it is to do as close as possible to what the developer has intended and follow the example as best as you can. Very important things to note are to change the masks that are set in the example as you may be using a different iteration of the that feature (i.e. ADC0 vs ADC1)
 As an example I'm adding the ADC SDK:
 
 1. Select Import SDK Examples:
