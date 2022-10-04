@@ -14,6 +14,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "SEGGER_RTT.h"
+
 /* Pin definitions */
 #include "board.h"
 #include "pin_mux.h"
