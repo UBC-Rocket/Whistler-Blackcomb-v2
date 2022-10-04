@@ -45,6 +45,7 @@
 #include "xbee/wpan.h"
 #include "radio.h"
 
+
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
@@ -112,6 +113,10 @@ float pt_data[sizeof(pt_names)];
 int main(void) {
 	initHal();
 	initTimers();
+
+	/* RTT Stuff*/
+	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
+
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
@@ -277,6 +282,10 @@ static void ReadImuTask(void *pv) {
 
 	/* Receive input from imu and parse it. */
 	do {
+
+		//test RTT send:
+		SEGGER_RTT_WriteString(0,"Segger RTT Test\r\n\r\n");
+
 		uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);
 		if (uart_error == kStatus_UART_RxHardwareOverrun) {
 			/* Notify about hardware buffer overrun */
