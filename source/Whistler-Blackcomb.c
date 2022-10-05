@@ -14,10 +14,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifndef COMPILE_x86
-#include "SEGGER_RTT.h"
-#endif
-
 /* Pin definitions */
 #include "board.h"
 #include "pin_mux.h"
@@ -42,6 +38,7 @@
 #include "hal_uart.h"
 #include "hal_sd.h"
 #include "hal_can.h"
+#include "hal_rtt.h"
 
 /* Radio Stuff */
 #include "xbee/wpan.h"
@@ -117,10 +114,8 @@ int main(void) {
 	initTimers();
 
 	/* RTT Stuff*/
-	#ifndef COMPILE_x86
-	SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
-	SEGGER_RTT_WriteString(0,"RTT is on\r\n\r\n"); //this is, you know, replaceable or removable.
-	#endif
+	rttSetup();
+
 
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
@@ -223,9 +218,7 @@ int main(void) {
 static void BlinkTask(void *pv) {
 	while (1) {
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
-		#ifndef COMPILE_x86 //yes this should be put into the HAL. Damn, I'm going to have to do that aren't I.
-		SEGGER_RTT_WriteString(0,"RTT Test\r\n\r\n"); 
-		#endif
+		rttWriteString(0,"RTT Test\r\n\r\n"); 
 		// Very important: Don't use normal delays in RTOS tasks, things will break
 
 		vTaskDelay(pdMS_TO_TICKS(1000));
