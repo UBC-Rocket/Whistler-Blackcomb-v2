@@ -10,11 +10,11 @@ Like all Whistler-Blackcomb teams, we take part in the team-wide meeting on Sund
 
 In addition to the main weekly meeting, we will have a midweek meeting every week. The exact time/day of this meeting isn't set in stone and can be discussed on a per-term basis to suit everyone's availability. This meeting will most likely consist of a quick update on what everyone's progress is, and then an optional work period afterwards. Attendance is expected but isn't as important as for the Sunday meetings, so if something comes up don't worry too much about missing the midweek meeting. 
 
-## Slack
+## 1. Slack
 
 For team communication we have a UBC Rocket wide slack, with a wb-avionics channel for coordination between teams. Generally for specific things like availability or quick questions we use direct messages to either individual people or the team of active members, whereas the general wb-avionics channel isn't used as much. 
 
-## Google Drive
+## 2. Google Drive
 
 UBC Rocket uses google drive as a centralized location for resources and files relating to the team. If you're reading this you should have been added to it already, but if not let Xander know and it can be arranged. We have a folder for our subteam at UBC Rocket -> WHISTLER BLACKCOMB -> Subteams -> Avionics, although finding things in the drive is quite difficult and most of our documentation is kept here on GitHub instead. 
 
@@ -30,7 +30,7 @@ To keep track of tasks and who is responsible for completing them, we use github
 
 For code/pcb contributions, we use github as version control to keep everyone up to date with the current version of the project. We follow the fairly standard github workflow of doing work on a new branch, and then starting a pull request to merge to master/main once the work has been completed. For pull requests you should have someone review your work before finally merging. 
 
-## GitHub Access
+## 3. GitHub Access
 
 No matter what type of work you will be doing, you will need access to the teams GitHub repositories. Given this guide is itself hosted on GitHub you likely already know how to access the team's repos. 
 
@@ -38,7 +38,7 @@ No matter what type of work you will be doing, you will need access to the teams
 
 Depending on what you'll primarily be working on, here are some next steps to get started contributing to the project. Even if you're only expecting to do one kind of work, if you're interested we'd definitely encourage you to set up the development environment for the other aspects of the team if only to get a better understanding of what's going on in the project. 
 
-### Firmware
+### 4. Firmware
 
 The firmware for the flight computer is on GitHub [here](https://github.com/UBC-Rocket/Whistler-Blackcomb-v2). The first steps to get set up with it, regardless of operating system is to follow [this guide](../doc/MCUXpresso-Setup.md), which will get you set up with MCUXpresso for board compilation. 
 
@@ -46,7 +46,7 @@ Next, follow [this guide](../doc/x86-Compilation.md) to set up your ability to c
 
 After doing these your development environment should be all set for firmware work! Explanations of specific implementations are linked in the readme file for the firmware. 
 
-### Hardware
+### 5. Hardware
 
 We use Altium for all our PCB design work. To get a free student version of Altium visit [this link](https://www.altium.com/solutions/academic-programs/student-licenses) and fill out the form with your @student.ubc.ca email address. They sometimes take a while to get back about the licenses, so be prepared to potentially have to wait a few days before getting access. 
 
