@@ -48,7 +48,7 @@ sudo apt install cmake
 
 ### Install Submodules
 
-In order to compile the project for x86, we need to install a submodule — [Unity](https://github.com/ThrowTheSwitch/Unity) — which is used for unit testing. If you are cloning the project for the first time, you can pass `--recurse-submodules` when you `git clone`, but if you've already cloned the repository to your computer you need to run (from the project directoy, in your shell) `git submodule init` and then `git submodule update`. This lets git know that the empty folder in [externl](../external) called 'Unity' is a submodule, and then fills it up with what it should hold - the Unity unit testing framework.
+In order to compile the project for x86, we need to install a submodule — [Unity](https://github.com/ThrowTheSwitch/Unity) — which is used for unit testing. If you are cloning the project for the first time, you can pass `--recurse-submodules` when you `git clone`, but if you've already cloned the repository to your computer you need to run (from the project directoy, in your shell) `git submodule init` and then `git submodule update`. This lets git know that the empty folder in [external](../external) called 'Unity' is a submodule, and then fills it up with what it should hold - the Unity unit testing framework.
 
 ### Build Project
 
