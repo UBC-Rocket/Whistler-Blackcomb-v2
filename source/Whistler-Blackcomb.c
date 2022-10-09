@@ -143,15 +143,15 @@ int main(void) {
 	//This has been temporarily commented out. It appears to be breaking things.
 	//This needs to be resolved VERY soon.
 
-	//if ((error = xTaskCreate(ReadImuTask, "IMU Task",
-	//configMINIMAL_STACK_SIZE + 300,
-	//NULL,
-	//debug_uart_task_PRIORITY,
-	//NULL)) != pdPASS) {
-	//	printf("Task init failed: %ld\n", error);
-	//	for (;;)
-	//		;
-	//}
+	if ((error = xTaskCreate(ReadImuTask, "IMU Task",
+	configMINIMAL_STACK_SIZE + 300,
+	NULL,
+	debug_uart_task_PRIORITY,
+	NULL)) != pdPASS) {
+		printf("Task init failed: %ld\n", error);
+		for (;;)
+			;
+	}
 
 	if ((error = xTaskCreate(RadioTask, "Radio Task",
 	configMINIMAL_STACK_SIZE + 1000,
@@ -288,6 +288,12 @@ static void ReadImuTask(void *pv) {
 	do {
 
 		uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);
+
+		/* Useful for debugging IMU connection*/
+		//char uart_errorDebugString[15] ;
+		//sprintf(uart_errorDebugString, "uart_error: %.1d\n", uart_error);
+		//rttWriteString(0,uart_errorDebugString);
+
 		if (uart_error == kStatus_UART_RxHardwareOverrun) {
 			/* Notify about hardware buffer overrun */
 			if (kStatus_Success
@@ -305,6 +311,11 @@ static void ReadImuTask(void *pv) {
 				vTaskSuspend(NULL);
 			}
 		}
+		/* Useful for debugging IMU connection*/
+		// char byte0DebugString[13] ;
+		// sprintf(byte0DebugString, "byte 0: %.3d\n", IMU.datagram[0]);
+		// rttWriteString(0,byte0DebugString);
+		
 		if (n > 0 && IMU.datagram[0] == 0x93) {
 			// Parse Datagram
 			parse_error = interpretImuData(&IMU);
@@ -321,6 +332,11 @@ static void ReadImuTask(void *pv) {
 				double gx = IMU.rate[0] * PI / 180;
 				double gy = IMU.rate[1] * PI / 180;
 				double gz = IMU.rate[2] * PI / 180;
+
+				/*Useful for debugging IMU connection*/
+				char accelDebugString[24] ;
+				sprintf(accelDebugString, "x: %3d, y: %3d, z: %3d\n", (int) (IMU.incl[0]*100), (int) (IMU.incl[1]*100), (int) (IMU.incl[2]*100));
+				rttWriteString(0,accelDebugString);
 
 				int cur_time = timeSinceStartup();
 
@@ -344,10 +360,11 @@ static void ReadImuTask(void *pv) {
 
 				imu_last_time = cur_time;
 			}
-
+			
+			//rttWriteString(0,toPrint);
 			uartSend(&hal_uart_debug, (uint8_t*) toPrint, len);
 		}
-	} while (kStatus_Success == uart_error);
+	} while (true/*kStatus_Success == uart_error*/);
 
 	uartDeinit(&hal_uart_debug);
 	uartDeinit(&hal_uart_imu);
