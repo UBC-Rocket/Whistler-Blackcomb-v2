@@ -7,6 +7,7 @@ To communicate between the DAQ board and the main flight computer, a can bus is 
   * Can be one of the following: 
     * 0: Pressure transducer (PT) read
     * 1: Thermocouple (TC) read
+    * 2: Command read
     * [To add others later]
   * Depending on the this bytes, the remaining bytes represent different things
 * Pressure transducer read
@@ -19,5 +20,8 @@ To communicate between the DAQ board and the main flight computer, a can bus is 
     * [Will list TCs later once finalized]
   * Data bytes 2-5: reading in degrees C
     * data is transmitted in little endian format
+* Command read
+  * Data byte 1: Command id
+  * Data bytes 2-5: value of command
 
 For SIM communication, the id byte is currently set to be 'c' for can packets to be received. 
