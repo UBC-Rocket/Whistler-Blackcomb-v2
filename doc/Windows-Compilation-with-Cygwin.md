@@ -37,7 +37,7 @@ Select 'next' and confirm your instalations. Other packages required by `gcc-cor
 Use the Windows start menu search to search for 'environment' and select 'edit the system environment variables', or find it from `Control Panel>System and Security>System>Advanced System Settings`. Click on 'Environment Variables...'
 
 Under 'System variables', select `Path` and choose 'Edit'
-![Select 'Path' and 'Edit'](images/5-Cygwin-edit-path.png)
+![Select 'Path' and 'Edit'](images/5-Cygwin-edit-path.png).
 
 Choose 'browse' and find the location of the Cygwin `bin` directory; it should be by default `C:\cygwin64\bin`. 
 
