@@ -41,7 +41,7 @@ Under 'System variables', select `Path` and choose 'Edit'
 
 Choose 'browse' and find the location of the Cygwin `bin` directory; it should be by default `C:\cygwin64\bin`. 
 
-Confirm that Cygwin is in pathfhgdfhgdhd , and restart your computer.
+Confirm that Cygwin is in path , and restart your computer.
 
 # Configure Visual Studio Code
 Navagate in Powershell (or equivalant) to the directory you created above and launch Visual Studio Code with `code .`.
