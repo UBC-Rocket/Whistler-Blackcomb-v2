@@ -16,3 +16,10 @@ Follow the naming convention of existing includes to allow you to use an `#inclu
 https://community.nxp.com/t5/LPCXpresso-IDE-FAQs/Adding-Include-paths-to-a-project/m-p/467852
 
 
+### Utilize "camelCase"
+October 30, 2022
+
+- Variables (including structs) are lower camelCase
+- Functions are lower camelCase
+- Types are "<type>_t" 
+
