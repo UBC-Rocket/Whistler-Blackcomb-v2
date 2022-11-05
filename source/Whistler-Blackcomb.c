@@ -38,10 +38,12 @@
 #include "hal_uart.h"
 #include "hal_sd.h"
 #include "hal_can.h"
+#include "hal_rtt.h"
 
 /* Radio Stuff */
 #include "xbee/wpan.h"
 #include "radio.h"
+
 
 /*******************************************************************************
  * Definitions
@@ -111,6 +113,10 @@ int main(void) {
 	initHal();
 	initTimers();
 
+	/* RTT Stuff*/
+	rttSetup();
+
+
 	halNvicSetPriority(DEBUG_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(IMU_UART_RX_TX_IRQn, 5);
 	halNvicSetPriority(RADIO_UART_RX_TX_IRQn, 5);
@@ -134,15 +140,18 @@ int main(void) {
 			; /* error! probably out of memory */
 	}
 
-	if ((error = xTaskCreate(ReadImuTask, "IMU Task",
-	configMINIMAL_STACK_SIZE + 300,
-	NULL,
-	debug_uart_task_PRIORITY,
-	NULL)) != pdPASS) {
-		printf("Task init failed: %ld\n", error);
-		for (;;)
-			;
-	}
+	//This has been temporarily commented out. It appears to be breaking things.
+	//This needs to be resolved VERY soon.
+
+	//if ((error = xTaskCreate(ReadImuTask, "IMU Task",
+	//configMINIMAL_STACK_SIZE + 300,
+	//NULL,
+	//debug_uart_task_PRIORITY,
+	//NULL)) != pdPASS) {
+	//	printf("Task init failed: %ld\n", error);
+	//	for (;;)
+	//		;
+	//}
 
 	if ((error = xTaskCreate(RadioTask, "Radio Task",
 	configMINIMAL_STACK_SIZE + 1000,
@@ -209,7 +218,9 @@ int main(void) {
 static void BlinkTask(void *pv) {
 	while (1) {
 		digitalToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
+		rttWriteString(0,"RTT Test\r\n\r\n"); 
 		// Very important: Don't use normal delays in RTOS tasks, things will break
+
 		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
@@ -275,6 +286,7 @@ static void ReadImuTask(void *pv) {
 
 	/* Receive input from imu and parse it. */
 	do {
+
 		uart_error = uartReceive(&hal_uart_imu, IMU.datagram, 40, &n);
 		if (uart_error == kStatus_UART_RxHardwareOverrun) {
 			/* Notify about hardware buffer overrun */
