@@ -185,10 +185,10 @@ int interpretImuData(IMU_1 *imu) {
 		//accelerometer parse loop
 		const int ACCEL_DIVISOR = 18;
 		for (int i = 0; i < 3; i++) {
-			signed int bitrep = ((imu->datagram[datagramCount] << 24) 
-					| (imu->datagram[datagramCount + 1] << 16) 
-					| (imu->datagram[datagramCount + 2] << 8)) >> 8;
-			imu->accel[i] = bitrep / 1.0 / (1 << ACCEL_DIVISOR);
+			signed int bitrep = (imu->datagram[datagramCount] << 16)
+				+ (imu->datagram[datagramCount + 1] << 8)
+				+ imu->datagram[datagramCount + 2];
+			imu->accel[i] = to_2C(bitrep) / 1.0 / (1 << ACCEL_DIVISOR);
 			datagramCount += 3;
 		}
 
