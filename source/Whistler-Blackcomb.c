@@ -58,6 +58,8 @@
 #define can_task_PRIORITY (configMAX_PRIORITIES - 1)
 #define gps_task_PRIORITY (configMAX_PRIORITIES - 1)
 
+#define log(msg...) { printf(msg); printf("\n"); }
+
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -449,21 +451,45 @@ static void CanTask(void *pv) {
 	}
 }
 
+#define GPS_BUF_SIZE 512
+
+/// @brief gets a pointer to the next string after the next comma and sets the comma to a null char
+/// @param src the src string
+/// @return pointer to the next string
+static char *get_next_gps_str(char *src) {
+	char *ret = strchr(src, ',');
+	*ret++ = '\0';
+	return ret;
+}
+
+/// @brief gets a pointer to the nth string after the next comma and sets the commas to a null char
+/// @param src the src string
+/// @return pointer to the nth string
+static char *get_next_gps_str_n(char *src, int n) {
+	if (!n) {
+		return;
+	}
+	return get_next_gps_str_n(get_next_gps_str(src), n--);
+}
 
 static void GpsTask(void *pv) {
 
-	/*
+
 	//See hal_uart.h for documentation on UART commands
 
 	//See board.h for GPS_UART
 	//Had some concerns about baudrate, not sure if this is actually an issue or not
 
-	uartConfig(&hal_uart_gps, GPS_UART, 9600);
+	uartConfig(&hal_uart_gps, GPS_UART, 9600 << 1);
 
-
+	int uart_error;
 	if (kStatus_Success != uartInit(&hal_uart_gps)) {
 		vTaskSuspend(NULL);
 	}
+
+	char gpsdata[GPS_BUF_SIZE + 1];
+	// this is to prevent overflow
+	gpsdata[GPS_BUF_SIZE] = '\0';
 
 	//Task must be in an infinite loop, not entirely sure which UART commands should be within the loop
 	for (EVER) {
@@ -472,14 +498,18 @@ static void GpsTask(void *pv) {
 		//Sends message to the GPS.
 		//See   https://docs.novatel.com/OEM7/Content/PDFs/PreviousVersions/OEM7_Commands_Logs_Manual_v9.pdf
 		//for list of GPS commands and details on them
+		// gps_message = "LOG THISPORT BESTPOSA ONCE 0 0 NOHOLD\r\n";
+		// if (kStatus_Success != uartSend(&hal_uart_gps, (uint8_t*)gps_message, strlen(gps_message))) {
+		// 	vTaskSuspend(NULL);
+		// }
 
-		if (kStatus_Success
-			!= uartSend(&hal_uart_gps, (uint8_t*)gps_message,
-						strlen(gps_message))) {
+		gps_message = "LOG THISPORT BESTPOSA ONCE 0 0 HOLD\r\n";
+		if (kStatus_Success != uartSend(&hal_uart_gps, (uint8_t*)gps_message, strlen(gps_message))) {
 			vTaskSuspend(NULL);
 		}
 
-		char gpsdata[400];
+		
+		
 		int charNum = 0;
 		double posx, posy, posz, velx, vely, velz;
 		float stdposx, stdposy, stdposz, stdvelx, stdvely, stdvelz, vlatency;
@@ -487,26 +517,72 @@ static void GpsTask(void *pv) {
 		char heading[10];
 		int enum1, enum2, enum3, enum4;
 
+		// With no antenna, sending:
+		// #BESTPOSA,COM1,0,95.5,UNKNOWN,0,1189.000,02440020,b1f6,14307;INSUFFICIENT_OBS,NONE,0.00000000000,0.00000000000,0.0000,0.0000,WGS84,0.0000,0.0000,0.0000,"",0.000,0.000,0,0,0,0,00,00,00,00*76077f48
+		size_t rcvdSize;
+		printf("receiving\n");
+		int pos = 0;
+		while (1) {
+			uartReceive(&hal_uart_gps, &gpsdata[pos], 1, &rcvdSize);
+			if (1) {
+				printf("received: %s", gpsdata);
+				pos++;
+				if (pos == GPS_BUF_SIZE) {
+					// somehow, the gps sent too many characters
+					log("filled the gpsdata buffer which is strange. Retrying...");
+					goto reset;
+				}
+				if (gpsdata[pos - 1] == '\n' || gpsdata[pos - 1] == '\r') {
+					break;
+				}
+			} else {
+				log("failed to receive from gps uart");
+			}
+		}
+		strcpy(gpsdata, "#BESTPOSA,COM1,0,95.5,UNKNOWN,0,1189.000,02440020,b1f6,14307;INSUFFICIENT_OBS,NONE,0.00000000000,0.00000000000,0.0000,0.0000,WGS84,0.0000,0.0000,0.0000,"",0.000,0.000,0,0,0,0,00,00,00,00*76077f48");
+		
+		printf("received\n");
+		if (strncmp(gpsdata, "#BESTPOSA", 9)) {
+			log("did not get correct message from uart")
+			goto reset;
+		}
 
-		//Receives one byte at a time from the GPS response and puts it in a char array
-		do {
-			uint8_t buffer;
-			uart_error = uartReceive(&hal_uart_gps, &buffer, 1, &size);
-			gpsdata[charNum] = buffer;
-			charNum++;
+		// get a pointer to the data section of the message (after the header which ends with ';')
+		char *sol_stat = strchr(&gpsdata[9], ';') + 1;
+		char *pos_type = get_next_gps_str(sol_stat);
+		char *data = get_next_gps_str(pos_type);
 
-		} while (kStatus_Success == uart_error);
+		printf("data: %s", data);
+		double lat, lon, hgt;
+		float undulation;
+		/*int get_data_res = sscanf(data, "%lf,%lf,%lf,%f", &lat, &lon, &hgt, &undulation);
+		if (get_data_res != 4) {
+			log("unable to get data from gps message");
+			goto reset;
+		}
 
-		//sscanf parses the information in the char array and stores it in separate variables
-		//This is the parsing for the BESTXYZ command specifically
-		sscanf(gpsdata, "%s,%d,%d,%lf,%lf,%lf,%f,%f,%f,%d,%d,%lf,%lf,%lf,%f,%f,%f,%s,%f",
-				heading, &enum1, &enum2, &posx, &posy, &posz, &stdposx, &stdposy, &stdposz,
-				&enum3, &enum4, &velx, &vely, &velz, &stdvelx, &stdvely, &stdvelz, baseID, &vlatency);
+		log("got data: latitude: %lf, longitude: %lf, height: %lf", lat, lon, hgt);
 
+		char *datum_id = get_next_gps_str_n(data, 4);
+		char *stats = get_next_gps_str(datum_id);
+
+		float latSD, lonSD, hgtSD;
+		int get_stats_res = sscanf(stats, "%f,%f,%f", &latSD, &lonSD, &hgtSD);
+		if (get_stats_res != 3) {
+			log("unable to get stats from the gps message");
+			goto reset;
+		}
+
+		char *stationID = get_next_gps_str_n(stats, 3);
+		char *info = get_next_gps_str(stationID);*/
+
+
+		reset:
+		memset(&gpsdata[0], '\0', GPS_BUF_SIZE);
 	}
 
 	//Final UART command
 	uartDeinit(&hal_uart_gps);
 	vTaskSuspend(NULL);
-	*/
+
 }
