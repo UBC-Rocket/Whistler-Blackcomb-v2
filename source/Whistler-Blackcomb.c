@@ -334,9 +334,9 @@ static void ReadImuTask(void *pv) {
 				double gz = IMU.rate[2] * PI / 180;
 
 				/*Useful for debugging IMU connection*/
-				char accelDebugString[24] ;
-				sprintf(accelDebugString, "x: %3d, y: %3d, z: %3d\n", (int) (IMU.incl[0]*100), (int) (IMU.incl[1]*100), (int) (IMU.incl[2]*100));
-				rttWriteString(0,accelDebugString);
+				//char accelDebugString[24] ;
+				//sprintf(accelDebugString, "x: %3d, y: %3d, z: %3d\n", (int) (IMU.incl[0]*100), (int) (IMU.incl[1]*100), (int) (IMU.incl[2]*100));
+				//rttWriteString(0,accelDebugString);
 
 				int cur_time = timeSinceStartup();
 
