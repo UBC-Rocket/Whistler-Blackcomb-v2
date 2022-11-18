@@ -364,7 +364,7 @@ static void ReadImuTask(void *pv) {
 			//rttWriteString(0,toPrint);
 			uartSend(&hal_uart_debug, (uint8_t*) toPrint, len);
 		}
-	} while (kStatus_Success == uart_error);
+	} while (true/*kStatus_Success == uart_error*/);
 
 	uartDeinit(&hal_uart_debug);
 	uartDeinit(&hal_uart_imu);
