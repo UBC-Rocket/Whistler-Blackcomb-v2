@@ -183,12 +183,12 @@ int interpretImuData(IMU_1 *imu) {
 	//evaluate if datagram includes accelerometer data
 	if (imu->interpAccel) {
 		//accelerometer parse loop
-		int accel_divisor[8]={20,19,18,16,23,22,21,19};
+		const int ACCEL_DIVISOR = 18;
 		for (int i = 0; i < 3; i++) {
-			unsigned int bitrep = (imu->datagram[datagramCount] << 16)
-					+ (imu->datagram[datagramCount + 1] << 8)
-					+ imu->datagram[datagramCount + 2];
-			imu->accel[i] = to_2C(bitrep) / 1.0 / (1 << accel_divisor[imu->interpAccel-1]);
+			int bitrep = (imu->datagram[datagramCount] << 16)
+				+ (imu->datagram[datagramCount + 1] << 8)
+				+ imu->datagram[datagramCount + 2];
+			imu->accel[i] = to_2C(bitrep) / 1.0 / (1 << ACCEL_DIVISOR);
 			datagramCount += 3;
 		}
 
