@@ -38,6 +38,10 @@ int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 	return UART_RTOS_Receive(&handle->rtos_handle, buffer, length, received);
 }
 
+int gpsUartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length, size_t *received) {
+	return UART_RTOS_GPS_Receive(&handle->rtos_handle, buffer, length, received);
+}
+
 
 size_t uartRxUsed(hal_uart_handle_t *handle){
 	return UART_TransferGetRxRingBufferLength(&handle->uart_handle);

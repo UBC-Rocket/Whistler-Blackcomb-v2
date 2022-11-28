@@ -24,8 +24,10 @@ static void UART_RTOS_Callback(UART_Type *base, uart_handle_t *state, status_t s
     xHigherPriorityTaskWoken = pdFALSE;
     xResult                  = pdFAIL;
 
+    printf("callback status: %lu\n", status);
     if (status == kStatus_UART_RxIdle)
     {
+        printf("BRUH\n");
         xResult = xEventGroupSetBitsFromISR(handle->rxEvent, RTOS_UART_COMPLETE, &xHigherPriorityTaskWoken);
     }
     else if (status == kStatus_UART_TxIdle)
@@ -252,6 +254,14 @@ int UART_RTOS_Send(uart_rtos_handle_t *handle, const uint8_t *buffer, uint32_t l
     return retval;
 }
 
+int UART_RTOS_GPS_Receive(uart_rtos_handle_t *handle, uint8_t *buffer, uint32_t length, size_t *received) {
+    xSemaphoreTake(handle->rxSemaphore, portMAX_DELAY);
+    int status = GPS_UART_GetLine(handle->base, handle->t_state, buffer, length, received);
+    xSemaphoreGive(handle->rxSemaphore);
+    printf("returned");
+    return status;
+}
+
 /*FUNCTION**********************************************************************
  *
  * Function Name : UART_RTOS_Recv
@@ -310,6 +320,7 @@ int UART_RTOS_Receive(uart_rtos_handle_t *handle, uint8_t *buffer, uint32_t leng
     ev = xEventGroupWaitBits(handle->rxEvent,
                              RTOS_UART_COMPLETE | RTOS_UART_RING_BUFFER_OVERRUN | RTOS_UART_HARDWARE_BUFFER_OVERRUN,
                              pdTRUE, pdFALSE, portMAX_DELAY);
+    printf("EV: %lu\n", ev);
     if (ev & RTOS_UART_HARDWARE_BUFFER_OVERRUN)
     {
         /* Stop data transfer to application buffer, ring buffer is still active */

@@ -1090,6 +1090,45 @@ status_t UART_TransferGetSendCount(UART_Type *base, uart_handle_t *handle, uint3
     return kStatus_Success;
 }
 
+status_t GPS_UART_GetLine(UART_Type *base, uart_handle_t *handle, char *buf, size_t buf_len, size_t *received_amt) {
+    status_t status;
+    printf("TEST\n");
+    if ((uint8_t)kUART_RxBusy == handle->rxState)
+    {
+        printf("BUSY\n");
+        status = kStatus_UART_RxBusy;
+    }
+
+    size_t bytesReceived = 0;
+    /* Disable UART RX IRQ, protect ring buffer. */
+    UART_DisableInterrupts(base, (uint32_t)kUART_RxDataRegFullInterruptEnable);
+    printf("Disable\n");
+    size_t bytesToCopy = UART_TransferGetRxRingBufferLength(handle);
+    if (bytesToCopy != 0U)
+    {
+        bytesToCopy = MIN(buf_len - bytesReceived, bytesToCopy);
+
+        /* Copy data from ring buffer to user memory. */
+        for (int i = 0U; i < bytesToCopy; i++)
+        {
+            buf[bytesReceived++] = handle->rxRingBuffer[handle->rxRingBufferTail];
+
+            /* Wrap to 0. Not use modulo (%) because it might be large and slow. */
+            if ((size_t)handle->rxRingBufferTail + 1U == handle->rxRingBufferSize)
+            {
+                handle->rxRingBufferTail = 0U;
+            }
+            else
+            {
+                handle->rxRingBufferTail++;
+            }
+        }
+    }
+    printf("ENABLING\n");
+    UART_EnableInterrupts(base, (uint32_t)kUART_RxDataRegFullInterruptEnable);
+    printf("ENABLED\n");
+}
+
 /*!
  * brief Receives a buffer of data using an interrupt method.
  *
@@ -1162,6 +1201,7 @@ status_t UART_TransferReceiveNonBlocking(UART_Type *base,
 
             /* How many bytes in RX ring buffer currently. */
             bytesToCopy = UART_TransferGetRxRingBufferLength(handle);
+            printf("bytesToCopy: %lu\n", bytesToCopy);
 
             if (bytesToCopy != 0U)
             {
@@ -1185,7 +1225,8 @@ status_t UART_TransferReceiveNonBlocking(UART_Type *base,
                     }
                 }
             }
-
+            printf("bytes to receive %lu\n", bytesToReceive);
+            printf("got: %s", xfer->data);
             /* If ring buffer does not have enough data, still need to read more data. */
             if (bytesToReceive != 0U)
             {
@@ -1204,6 +1245,7 @@ status_t UART_TransferReceiveNonBlocking(UART_Type *base,
             {
                 if (handle->callback != NULL)
                 {
+                    printf("CALLBACK\n");
                     handle->callback(base, handle, kStatus_UART_RxIdle, handle->userData);
                 }
             }
@@ -1230,12 +1272,14 @@ status_t UART_TransferReceiveNonBlocking(UART_Type *base,
         /* Return the how many bytes have read. */
         if (receivedBytes != NULL)
         {
+            printf("NOTNULL\n");
             *receivedBytes = bytesCurrentReceived;
         }
+        printf("received bytes: %lu\n", *receivedBytes);
 
         status = kStatus_Success;
     }
-
+    printf("status: %u", status);
     return status;
 }
 
