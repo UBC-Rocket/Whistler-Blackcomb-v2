@@ -142,6 +142,12 @@ When done, press the funny-looking and green 'Update Code' button to set all the
 
 <img width="899" alt="image" src="https://user-images.githubusercontent.com/24193569/145519990-1ad7970d-dbf6-486b-876f-75777b9b7bd7.png">
 
+# Configuration Tools:
+The Config Pins, Config Peripherals, and Config Clock are all a part of the Config Tools extension included in MCUXpresso. Here is a document outlining them:
+
+<img width="1062" alt="image" src="https://user-images.githubusercontent.com/24193569/213950417-c46633b1-333c-40e4-801a-bf67ae7d8b14.png">
+
+Link: https://www.nxp.com/docs/en/quick-reference-guide/MCUXDQS.pdf
 
 
 # Adding SDK Examples:
