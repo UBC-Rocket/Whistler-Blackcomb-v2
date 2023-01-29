@@ -475,18 +475,30 @@ static char *get_next_gps_str_n(char *src, int n) {
 	return get_next_gps_str_n(get_next_gps_str(src), n--);
 }
 
-void test_gps(char *msg) {
-    char gpsdata[GPS_BUF_SIZE + 1];
-	// this is to prevent overflow
-	gpsdata[GPS_BUF_SIZE] = '\0';
-    strcpy(gpsdata, msg);
-    if (strncmp(gpsdata, "#BESTPOSA", 9)) {
-        log("did not get correct message from uart")
-        return;
-    }
+void process_gps(char *msg) {
+	// check for both "#BESTPOSA" and "BESTPOSA" cases
+	char *start = strchr(msg, '#');
+	if (!start) {
+		start = strchr(msg, 'B');
+		if (!start) {
+			log("did not get correct message from uart %s", msg);
+			return;
+		} else {
+			if (strncmp(start, "BESTPOSA", 8)) {
+				log("did not get correct message from uart %s", msg);
+				return;
+			}
+		}
+	} else {
+		if (strncmp(start, "#BESTPOSA", 9)) {
+			log("did not get correct message from uart %s", msg);
+			return;
+		}
+	}
+    
 
     // get a pointer to the data section of the message (after the header which ends with ';')
-    char *sol_stat = strchr(&gpsdata[9], ';') + 1;
+    char *sol_stat = strchr(start, ';') + 1;
 
     /*
     0 => sol stat
@@ -510,6 +522,7 @@ void test_gps(char *msg) {
     for (int i = 1; i < 16; i++) {
         values[i] = get_next_gps_str(values[i - 1]);
         if (!values[i]) {
+			log("Failed to get value: %u", i);
         	return;
         }
     }
@@ -517,15 +530,6 @@ void test_gps(char *msg) {
     for (int i = 0; i < 16; i++) {
         printf("%u: %s\n", i, values[i]);
     }
-
-    //double lat = atof(values[2]);
-    //double lon = atof(values[3]);
-    //double hgt = atof(values[4]);
-
-    //printf("lat: %lf, lon: %lf, hgt: %lf\n", lat, lon, hgt);
-
-    reset:
-    memset(&gpsdata[0], '\0', GPS_BUF_SIZE);
 }
 
 static void GpsTask(void *pv) {
@@ -536,7 +540,7 @@ static void GpsTask(void *pv) {
 	//See board.h for GPS_UART
 	//Had some concerns about baudrate, not sure if this is actually an issue or not
 
-	uartConfig(&hal_uart_gps, GPS_UART, 9600 << 1);
+	uartConfig(&hal_uart_gps, GPS_UART, 9600 * 2);
 
 	int uart_error;
 	if (kStatus_Success != uartInit(&hal_uart_gps)) {
@@ -550,7 +554,6 @@ static void GpsTask(void *pv) {
 
 	//Task must be in an infinite loop, not entirely sure which UART commands should be within the loop
 	for (EVER) {
-		printf("delaying\n");
 		vTaskDelay(pdMS_TO_TICKS(1000));
 
 		//Sends message to the GPS.
@@ -561,23 +564,21 @@ static void GpsTask(void *pv) {
 		// 	vTaskSuspend(NULL);
 		// }
 
-		printf("sending\n");
 		gps_message = "LOG THISPORT BESTPOSA ONCE 0 0 HOLD\r\n";
 		if (kStatus_Success != uartSend(&hal_uart_gps, (uint8_t*)gps_message, strlen(gps_message))) {
 			vTaskSuspend(NULL);
 		}
-		printf("sent");
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		//vTaskDelay(pdMS_TO_TICKS(1000));
 
 		// With no antenna, sending:
 		// #BESTPOSA,COM1,0,95.5,UNKNOWN,0,1189.000,02440020,b1f6,14307;INSUFFICIENT_OBS,NONE,0.00000000000,0.00000000000,0.0000,0.0000,WGS84,0.0000,0.0000,0.0000,"",0.000,0.000,0,0,0,0,00,00,00,00*76077f48
 		size_t rcvdSize;
-		printf("receiving\n");
-		printf("size: %lu", uartRxUsed(&hal_uart_gps));
-		int pos = 0;
-		int err = gpsUartReceive(&hal_uart_gps, &gpsdata[pos], GPS_BUF_SIZE, &rcvdSize);
-		printf("asdf\n");
-		test_gps(gpsdata);
+		//int stat = uartReceive(&hal_uart_gps, gpsdata, 197, &rcvdSize);
+		int err = gpsUartReceive(&hal_uart_gps, gpsdata, GPS_BUF_SIZE, &rcvdSize);
+		printf("got string: \"%s\", status: %u\n", gpsdata, err);
+		printf("received: %u\n", rcvdSize);
+		process_gps(gpsdata);
+
 
 		memset(&gpsdata[0], '\0', GPS_BUF_SIZE);
 	}

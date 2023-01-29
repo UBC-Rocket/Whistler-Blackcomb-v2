@@ -27,7 +27,7 @@
 
 /*! @brief Retry times for waiting flag. */
 #ifndef UART_RETRY_TIMES
-#define UART_RETRY_TIMES 0U /* Defining to zero means to keep waiting for the flag until it is assert/deassert. */
+#define UART_RETRY_TIMES 1000U /* Defining to zero means to keep waiting for the flag until it is assert/deassert. */
 #endif
 
 /*! @brief Error codes for the UART driver. */

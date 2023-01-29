@@ -39,6 +39,23 @@ int uartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length,
 }
 
 int gpsUartReceive(hal_uart_handle_t *handle, uint8_t *buffer, uint32_t length, size_t *received) {
+    *received = 0;
+	size_t cur_size = 0;
+    bool success = false;
+    for (int i = 0; i < 100; i++) {
+        size_t tmp = uartRxUsed(handle);
+        if (tmp > 20) {
+            if (tmp == cur_size) {
+                success = true;
+                break;
+            }
+            cur_size = tmp;
+        }
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+    if (!success) {
+        return -1;
+    }
 	return UART_RTOS_GPS_Receive(&handle->rtos_handle, buffer, length, received);
 }
 
